@@ -1,20 +1,17 @@
-#Introduction 
-Sample Mark
+﻿Sample Mark
+===============================
 
-#Getting Started
-TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
-1.	Installation process
-2.	Software dependencies
-3.	Latest releases
-4.	API references
+![logo](./appico.ico)
 
-#Build and Test
-TODO: Describe and show how to build your code and run the tests. 
+## Source description
+    This supports all kinds of annotations needed in a driving database. It supports bounding box,and video tracking.
+### Catalogue
 
-#Contribute
-TODO: Explain how other users and developers can contribute to make your code better. 
+## Depend
+* [MSVC2015_64](https://www.visualstudio.com/zh-hans/downloads/)
+* [Qt5](https://www.qt.io/download-open-source/#section-2)
+* [OpenCV4.0+opencv_contrib](https://github.com/opencv/opencv)
+* [C++11](https://en.wikipedia.org/wiki/C%2B%2B11)
 
-If you want to learn more about creating good readme files then refer the following [guidelines](https://www.visualstudio.com/en-us/docs/git/create-a-readme). You can also seek inspiration from the below readme files:
-- [ASP.NET Core](https://github.com/aspnet/Home)
-- [Visual Studio Code](https://github.com/Microsoft/vscode)
-- [Chakra Core](https://github.com/Microsoft/ChakraCore)
+## Discuss
+QQ：320367853

@@ -1,50 +1,9 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+#C++
+*.user
 
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-#intermediate files
-*.tlog
-*.log
-*.lastbuildstate
-*.ipch
-*.db
-*.opendb
-*.pdb
-*.idb
-.vs/
-*.CopyComplete
-*.filters
-lib/*.*
-*/result/*.*
-*.suo
-
-#python
-*.pyc
-
-
+#other
+*.doc
+*.docx
+*.vsd
+model/*.*
+#document/*.*

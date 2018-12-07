@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>images/play.png</file>
+        <file>images/cross.png</file>
+        <file>images/open.png</file>
+        <file>images/close.png</file>
+        <file>images/start.png</file>
+        <file>images/cut.png</file>
+        <file>images/mark.png</file>
+        <file>images/crop.png</file>
+        <file>images/video.png</file>
+        <file>images/videoCut.png</file>
+        <file>images/record.png</file>
+        <file>images/imageTovideo.png</file>
+    </qresource>
+</RCC>
