@@ -93,10 +93,7 @@ RESOURCES += \
 
 RC_ICONS = appico.ico
 
-INCLUDEPATH+= "C:/Program Files (x86)/Windows Kits/10/Include/10.0.10240.0/ucrt"
 INCLUDEPATH+= D:\opencv\opencv400\MyBuild\install\include
-
-LIBS+=-L"C:/Program Files (x86)/Windows Kits/10/Lib/10.0.10240.0/ucrt/x64"
 
 #LIBS+=D:\opencv\opencv400\MyBuild\install\x64\vc14\lib\opencv_xphoto400d.lib
 #LIBS+=D:\opencv\opencv400\MyBuild\install\x64\vc14\lib\opencv_xobjdetect400d.lib
