@@ -8,9 +8,9 @@
 ### Catalogue
 
 ## Depend
-* [MSVC2015_64](https://www.visualstudio.com/zh-hans/downloads/)
+* gcc_64
 * [Qt5](https://www.qt.io/download-open-source/#section-2)
-* [OpenCV4.0+opencv_contrib](https://github.com/opencv/opencv)
+* [OpenCV3.4.6+opencv_contrib](https://github.com/opencv/opencv)
 * [C++11](https://en.wikipedia.org/wiki/C%2B%2B11)
 
 ## Discuss
