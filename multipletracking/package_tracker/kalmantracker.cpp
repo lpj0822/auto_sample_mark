@@ -84,7 +84,7 @@ void KalmanTracker::init()
     // it user for next point position prediction.
     cv::Rect2f rect((float)predictObject.rect.x, (float)predictObject.rect.y,
                     (float)predictObject.rect.width, (float)predictObject.rect.height);
-    kalmanFilter = std::make_unique<MyKalmanFilter>(rect, speed, dt, Accel_noise_mag);
+    kalmanFilter.reset(new MyKalmanFilter(rect, speed, dt, Accel_noise_mag));
     skipped_frames = 0;
     trace.clear();
 }

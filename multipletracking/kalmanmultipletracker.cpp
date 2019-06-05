@@ -202,7 +202,7 @@ float KalmanMultipleTracker::computeRectDistance(const TrackingObject &object1, 
     float centerY2 = object2.rect.y + object2.rect.height / 2.0f;
     float diffX = centerX1 - centerX2;
     float diffY = centerY1 - centerY2;
-    float dist = std::sqrtf(diffX * diffX + diffY * diffY);
+    float dist = std::sqrt(diffX * diffX + diffY * diffY);
     return dist;
 }
 

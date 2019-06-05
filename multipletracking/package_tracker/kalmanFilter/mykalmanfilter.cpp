@@ -11,7 +11,7 @@ MyKalmanFilter::MyKalmanFilter(cv::Rect2f rect, float speed, float dt, float acc
     // Process noise. (standard deviation of acceleration: )
     // shows, woh much target can accelerate.
     //6 state variables, 4 measurements, 0 control variables
-    kalman = std::make_unique<cv::KalmanFilter>(6, 4, 0, CV_32F);
+    kalman.reset(new cv::KalmanFilter(6, 4, 0, CV_32F));
     initMaxtrix();
 
     std::cout << "MyKalmanFilter()" << std::endl;
