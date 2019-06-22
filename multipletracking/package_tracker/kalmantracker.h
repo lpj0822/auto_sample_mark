@@ -12,7 +12,7 @@ public:
     ~KalmanTracker();
 
     void kalmanPrediction();//kalman预测
-    void kalmanUpdate(TrackingObject object, bool isCorrect);//kalman更新
+    void kalmanUpdate(TrackingObject object);//kalman更新
     void setSkippedFrame(size_t num);
     void addSkippedFrame(size_t num);
     size_t getSkippedFrame();

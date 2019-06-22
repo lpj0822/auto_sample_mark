@@ -1,4 +1,4 @@
-#-------------------------------------------------
+T#-------------------------------------------------
 #
 # Project created by QtCreator 2017-05-08T12:15:54
 #
@@ -52,7 +52,9 @@ SOURCES += main.cpp\
     drawShape/drawpolygonshape.cpp \
     saveMarkData/jsonprocessvideo.cpp \
     videoTools/qcamerawindow.cpp \
-    videomultipletracking.cpp
+    videomultipletracking.cpp \
+    imagecontrolwindow.cpp \
+    videocontrolwindow.cpp
 
 HEADERS  += controlwindow.h \
     editablelabel.h \
@@ -83,7 +85,9 @@ HEADERS  += controlwindow.h \
     drawShape/drawpolygonshape.h \
     saveMarkData/jsonprocessvideo.h \
     videoTools/qcamerawindow.h \
-    videomultipletracking.h
+    videomultipletracking.h \
+    imagecontrolwindow.h \
+    videocontrolwindow.h
 
 RESOURCES += \
     style.qrc \

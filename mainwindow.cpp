@@ -36,7 +36,9 @@ void MainWindow::slotOpenImageDir()
     else
     {
         dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
-        centerWidget->setMarkDataList(this->openDataDir, processDataList, MarkDataType::IMAGE);
+        loadDataType = MarkDataType::IMAGE;
+        imageWidget->setMarkDataList(this->openDataDir, processDataList, loadDataType);
+        centerWidget->setCurrentIndex(loadDataType);
     }
 }
 
@@ -53,7 +55,9 @@ void MainWindow::slotOpenVideoDir()
     else
     {
         dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
-        centerWidget->setMarkDataList(this->openDataDir, processDataList, MarkDataType::VIDEO);
+        loadDataType = MarkDataType::VIDEO;
+        imageWidget->setMarkDataList(this->openDataDir, processDataList, loadDataType);
+        centerWidget->setCurrentIndex(loadDataType);
     }
 }
 
@@ -173,7 +177,18 @@ void MainWindow::slotUserManual()
 void MainWindow::slotSelectMarkShape(const QString &text)
 {
     int index = this->shapeBox->currentData().toInt();
-    centerWidget->setDrawShape(index);
+    switch (loadDataType)
+    {
+    case MarkDataType::IMAGE:
+        imageWidget->setDrawShape(index);
+        break;
+    case MarkDataType::VIDEO:
+        imageWidget->setDrawShape(index);
+        break;
+    case MarkDataType::UNKNOWN:
+        controlWidget->setDrawShape(index);
+        break;
+    }
 }
 
 void MainWindow::slotCloseOtherWindow(QString flag)
@@ -244,6 +259,7 @@ void MainWindow::initData()
     videoCroppingWindow = NULL;
     cameraWindow = NULL;
     openDataDir = ".";
+    loadDataType = MarkDataType::UNKNOWN;
 }
 
 void MainWindow::initAction()
@@ -354,13 +370,21 @@ void MainWindow::initToolBar()
 
 void MainWindow::initUI()
 {
-   centerWidget = new ControlWindow(this);
+   centerWidget = new QStackedWidget(this);
+
+   controlWidget = new ControlWindow(this);
+   controlWidget->setDrawShape(this->shapeBox->currentData().toInt());
+   imageWidget = new ImageControlWindow(this);
+   imageWidget->setDrawShape(this->shapeBox->currentData().toInt());
+
+   centerWidget->addWidget(controlWidget);
+   centerWidget->addWidget(imageWidget);
+   centerWidget->setCurrentIndex(loadDataType);
+
    this->setCentralWidget(centerWidget);
    //this->setMaximumSize(700,520);
    this->setMinimumSize(1100, 700);
    this->setWindowTitle(tr("样本标注系统"));
-
-   centerWidget->setDrawShape(this->shapeBox->currentData().toInt());
 }
 
 void MainWindow::initConnect()
@@ -387,5 +411,6 @@ void MainWindow::initConnect()
 
     connect(shapeBox, &QComboBox::currentTextChanged, this, &MainWindow::slotSelectMarkShape);
 
-    connect(this, &MainWindow::signalManualMarkParamterChanged, centerWidget, &ControlWindow::slotManualMarkParamterChanged);
+    connect(this, &MainWindow::signalManualMarkParamterChanged, controlWidget, &ControlWindow::slotManualMarkParamterChanged);
+    connect(this, &MainWindow::signalManualMarkParamterChanged, imageWidget, &ControlWindow::slotManualMarkParamterChanged);
 }

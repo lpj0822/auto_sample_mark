@@ -1,4 +1,5 @@
 ﻿#include "assignmentproblemsolver.h"
+#include <cfloat>
 #include <iostream>
 
 AssignmentProblemSolver::AssignmentProblemSolver()

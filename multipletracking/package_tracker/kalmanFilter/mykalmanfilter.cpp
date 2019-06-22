@@ -11,7 +11,7 @@ MyKalmanFilter::MyKalmanFilter(cv::Rect2f rect, float speed, float dt, float acc
     // Process noise. (standard deviation of acceleration: )
     // shows, woh much target can accelerate.
     //6 state variables, 4 measurements, 0 control variables
-    kalman = std::make_unique<cv::KalmanFilter>(6, 4, 0, CV_32F);
+    kalman.reset(new cv::KalmanFilter(6, 4, 0, CV_32F));
     initMaxtrix();
 
     std::cout << "MyKalmanFilter()" << std::endl;
@@ -33,26 +33,16 @@ cv::Rect2f MyKalmanFilter::prediction()
     return lastResult;
 }
 
-cv::Rect2f MyKalmanFilter::update(cv::Rect2f rect, bool DataCorrect)
+cv::Rect2f MyKalmanFilter::update(cv::Rect2f rect)
 {
     //观测值
     cv::Mat measure(4, 1, CV_32FC1);
-    if (!DataCorrect)
-    {
-        //update using prediction
-        measure.at<float>(0) = lastResult.x + lastResult.width / 2;
-        measure.at<float>(1) = lastResult.y + lastResult.height / 2;
-        measure.at<float>(2) = lastResult.width;
-        measure.at<float>(3) = lastResult.height;
-    }
-    else
-    {
-        //update using measurements
-        measure.at<float>(0) = rect.x + rect.width / 2;
-        measure.at<float>(1) = rect.y + rect.height / 2;
-        measure.at<float>(2) = rect.width;
-        measure.at<float>(3) = rect.height;
-    }
+    //update using measurements
+    measure.at<float>(0) = rect.x + rect.width / 2;
+    measure.at<float>(1) = rect.y + rect.height / 2;
+    measure.at<float>(2) = rect.width;
+    measure.at<float>(3) = rect.height;
+
     // Correction矫正
     cv::Mat estimated = kalman->correct(measure);
     lastResult.width = estimated.at<float>(2);
@@ -125,7 +115,7 @@ void MyKalmanFilter::initMaxtrix()
     // [ 0    Ey  0  0 ]
     // [ 0    0   Ew 0 ]
     // [ 0    0   0  Eh]
-    cv::setIdentity(kalman->measurementNoiseCov, cv::Scalar::all(0.1));
+    cv::setIdentity(kalman->measurementNoiseCov, cv::Scalar::all(0.5));
     //posteriori error estimate covariance matrix P
     // [ 1   0  0  0  0  0]
     // [ 0   1  0  0  0  0]

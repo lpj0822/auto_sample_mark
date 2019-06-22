@@ -12,6 +12,7 @@ class MyScrollArea : public QScrollArea
 
 public:
     MyScrollArea(QWidget *parent = 0);
+    ~MyScrollArea() = default;
 
 signals:
     void signalsKey(int keyValue);

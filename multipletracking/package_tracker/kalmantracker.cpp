@@ -19,14 +19,16 @@ KalmanTracker::~KalmanTracker()
 //kalman预测
 void KalmanTracker::kalmanPrediction()
 {
-    kalmanFilter->prediction();
+    cv::Rect2f result = kalmanFilter->prediction();
+    this->predictObject.rect = cv::Rect((int)result.x, (int)result.y, (int)result.width, (int)result.height);
+    this->trace.push_back(this->predictObject.rect);
 }
 
 //kalman更新
-void KalmanTracker::kalmanUpdate(TrackingObject object, bool isCorrect)
+void KalmanTracker::kalmanUpdate(TrackingObject object)
 {
     cv::Rect2f rect((float)object.rect.x, (float)object.rect.y, (float)object.rect.width, (float)object.rect.height);
-    cv::Rect2f result = kalmanFilter->update(rect, isCorrect);
+    cv::Rect2f result = kalmanFilter->update(rect);
     this->predictObject.rect = cv::Rect((int)result.x, (int)result.y, (int)result.width, (int)result.height);
     this->trace.push_back(this->predictObject.rect);
 }
@@ -84,7 +86,7 @@ void KalmanTracker::init()
     // it user for next point position prediction.
     cv::Rect2f rect((float)predictObject.rect.x, (float)predictObject.rect.y,
                     (float)predictObject.rect.width, (float)predictObject.rect.height);
-    kalmanFilter = std::make_unique<MyKalmanFilter>(rect, speed, dt, Accel_noise_mag);
+    kalmanFilter.reset(new MyKalmanFilter(rect, speed, dt, Accel_noise_mag));
     skipped_frames = 0;
     trace.clear();
 }
@@ -106,7 +108,7 @@ void KalmanTracker::loadConfig()
     cv::FileStorage fs;
     fs.open("./config/KalmanTrack.xml", cv::FileStorage::READ);
 
-    cv::read(fs["speed"], speed, 0);
+    cv::read(fs["speed"], speed, 0.1);
     cv::read(fs["dt"], dt, 0.01f);
     cv::read(fs["Accel_noise_mag"], Accel_noise_mag, 0.5f);
 

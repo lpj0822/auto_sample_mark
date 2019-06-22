@@ -11,14 +11,17 @@
 #include <QToolBar>
 #include <QAction>
 #include <QComboBox>
+#include <QStackedWidget>
 #include "videoTools/fromvideotopicturewindow.h"
 #include "videoTools/frompicturetovideowindow.h"
 #include "videoTools/videocuttingwindow.h"
 #include "videoTools/videocroppingwindow.h"
 #include "videoTools/qcamerawindow.h"
 #include "autoSampleMark/autosamplemarkwindow.h"
-#include "controlwindow.h"
 #include "drawShape/myshape.h"
+#include "controlwindow.h"
+#include "imagecontrolwindow.h"
+#include "videocontrolwindow.h"
 
 class MainWindow : public QMainWindow
 {
@@ -98,7 +101,9 @@ private:
     QLabel *shapeLabel;
     QComboBox *shapeBox;
 
-    ControlWindow *centerWidget;
+    QStackedWidget *centerWidget;
+    ControlWindow *controlWidget;
+    ImageControlWindow *imageWidget;
 
 private:
     AutoSampleMarkWindow *autoSampleMarkWindow;
@@ -109,6 +114,7 @@ private:
     VideoCroppingWindow *videoCroppingWindow;
     QCameraWindow *cameraWindow;
 
+    MarkDataType loadDataType;
     MyShape myShape;
 
     QString openDataDir;

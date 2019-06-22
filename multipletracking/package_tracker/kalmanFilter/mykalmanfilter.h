@@ -12,7 +12,7 @@ public:
     ~MyKalmanFilter();
 
     cv::Rect2f prediction();//预测
-    cv::Rect2f update(cv::Rect2f rect, bool DataCorrect);//更新
+    cv::Rect2f update(cv::Rect2f rect);//更新
 
 private:
     void initMaxtrix();
