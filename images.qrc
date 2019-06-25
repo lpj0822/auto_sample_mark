@@ -12,5 +12,6 @@
         <file>images/videoCut.png</file>
         <file>images/record.png</file>
         <file>images/imageTovideo.png</file>
+        <file>images/pcl.png</file>
     </qresource>
 </RCC>

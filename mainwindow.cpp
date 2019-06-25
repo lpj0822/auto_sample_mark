@@ -296,6 +296,7 @@ void MainWindow::initAction()
     openVideoDirAction = new QAction(tr("打开视频文件夹"), this);
     openVideoDirAction->setIcon(QIcon(tr(":/images/images/video.png")));
     openPCDDirAction = new QAction(tr("打开PCD文件夹"), this);
+    openPCDDirAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
     exitAction = new QAction(tr("退出系统"), this);
     //setting
     manualParamterAction = new QAction(tr("手动标注参数设置"), this);
