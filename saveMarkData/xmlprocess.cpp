@@ -3,7 +3,9 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QMessageBox>
+#include <QStringList>
 #include <QDebug>
+#include <iostream>
 
 XMLProcess::XMLProcess(QObject *parent) : QObject(parent)
 {
@@ -21,6 +23,13 @@ int XMLProcess::createXML(const QString &xmlFilePath, const QString &imageFilePa
     int count = objects.size();
     QFileInfo fileInfo(imageFilePath);
     QFile file(xmlFilePath);
+    QStringList pathNameList = fileInfo.absolutePath().split("/");
+    QString folder = "MultipleTarget";
+    if(pathNameList.size() > 0)
+    {
+        folder = pathNameList[pathNameList.size() - 1];
+    }
+    //qDebug() << "imageFilePath:" << fileInfo.absolutePath().split("/");
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate |QIODevice::Text))
     {
         return -1;
@@ -30,7 +39,7 @@ int XMLProcess::createXML(const QString &xmlFilePath, const QString &imageFilePa
     xmlWriter.setAutoFormatting(true);
     xmlWriter.writeStartDocument();
     xmlWriter.writeStartElement("annotation");
-    xmlWriter.writeTextElement("folder", "MultipleTarget");
+    xmlWriter.writeTextElement("folder", folder);
     xmlWriter.writeTextElement("filename", fileInfo.fileName());
     xmlWriter.writeTextElement("path", imageFilePath);
     xmlWriter.writeStartElement("source");
@@ -49,15 +58,15 @@ int XMLProcess::createXML(const QString &xmlFilePath, const QString &imageFilePa
     for(int index = 0; index < count; index++)
     {
         const MyObject object = objects[index];
-        if(object.getShapeType() == ShapeType::RECT)
+        if(object.getShapeType() == ShapeType::RECT_SHAPE)
         {
             writeRectData(object, xmlWriter);
         }
-        else if(object.getShapeType() == ShapeType::LINE)
+        else if(object.getShapeType() == ShapeType::LINE_SHAPE)
         {
             writeLineData(object, xmlWriter);
         }
-        else if(object.getShapeType() == ShapeType::POLYGON)
+        else if(object.getShapeType() == ShapeType::POLYGON_SHAPE)
         {
             writePolygonData(object, xmlWriter);
         }
@@ -185,7 +194,7 @@ MyObject XMLProcess::readRectData(const QDomNodeList &childList)
                 }
             }
             object.setBox(QRect(topPoint, bottomPoint));
-            object.setShapeType(ShapeType::RECT);
+            object.setShapeType(ShapeType::RECT_SHAPE);
         }
     }
     return object;
@@ -252,7 +261,7 @@ MyObject XMLProcess::readLineData(const QDomNodeList &childList)
                 }
             }
             object.setLine(point1, point2);
-            object.setShapeType(ShapeType::LINE);
+            object.setShapeType(ShapeType::LINE_SHAPE);
         }
     }
     return object;
@@ -320,7 +329,7 @@ MyObject XMLProcess::readPolygonData(const QDomNodeList &childList)
                 polygon.append(point);
             }
             object.setPolygon(polygon);
-            object.setShapeType(ShapeType::POLYGON);
+            object.setShapeType(ShapeType::POLYGON_SHAPE);
         }
     }
     return object;

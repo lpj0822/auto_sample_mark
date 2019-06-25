@@ -36,8 +36,9 @@ void MainWindow::slotOpenImageDir()
     else
     {
         dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
+        markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::IMAGE;
-        imageWidget->setMarkDataList(this->openDataDir, processDataList, loadDataType);
+        markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
     }
 }
@@ -55,8 +56,29 @@ void MainWindow::slotOpenVideoDir()
     else
     {
         dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
+        markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::VIDEO;
-        imageWidget->setMarkDataList(this->openDataDir, processDataList, loadDataType);
+        markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
+        centerWidget->setCurrentIndex(loadDataType);
+    }
+}
+
+void MainWindow::slotOpenPCDDir()
+{
+    DirProcess dirProcess;
+    QList<QString> processDataList;
+    processDataList.clear();
+    this->openDataDir = QFileDialog::getExistingDirectory(this, tr("选择文件夹"), openDataDir, QFileDialog::ShowDirsOnly);
+    if(this->openDataDir.trimmed().isEmpty() || !QDir(this->openDataDir).exists())
+    {
+        qDebug() << "打开的文件路径有误:" << this->openDataDir << endl;
+    }
+    else
+    {
+        dirProcess.getDirAllFileName(this->openDataDir, "*.pcd", processDataList);
+        markWindow[loadDataType]->saveMarkDataList();
+        loadDataType = MarkDataType::PCD;
+        markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
     }
 }
@@ -180,13 +202,14 @@ void MainWindow::slotSelectMarkShape(const QString &text)
     switch (loadDataType)
     {
     case MarkDataType::IMAGE:
-        imageWidget->setDrawShape(index);
+        markWindow[MarkDataType::IMAGE]->setDrawShape(index);
         break;
     case MarkDataType::VIDEO:
-        imageWidget->setDrawShape(index);
+        markWindow[MarkDataType::VIDEO]->setDrawShape(index);
+        break;
+    case MarkDataType::PCD:
         break;
     case MarkDataType::UNKNOWN:
-        controlWidget->setDrawShape(index);
         break;
     }
 }
@@ -246,7 +269,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
     if(cameraWindow != NULL)
         cameraWindow->close();
     if(centerWidget != NULL)
+    {
+        centerWidget->currentWidget()->close();
         centerWidget->close();
+    }
     QMainWindow::closeEvent(event);
 }
 
@@ -269,6 +295,7 @@ void MainWindow::initAction()
     openImageDirAction->setIcon(QIcon(tr(":/images/images/open.png")));
     openVideoDirAction = new QAction(tr("打开视频文件夹"), this);
     openVideoDirAction->setIcon(QIcon(tr(":/images/images/video.png")));
+    openPCDDirAction = new QAction(tr("打开PCD文件夹"), this);
     exitAction = new QAction(tr("退出系统"), this);
     //setting
     manualParamterAction = new QAction(tr("手动标注参数设置"), this);
@@ -317,6 +344,7 @@ void MainWindow::initMenuBar()
     fileMenu = new QMenu(tr("文件"), this);
     fileMenu->addAction(openImageDirAction);
     fileMenu->addAction(openVideoDirAction);
+    fileMenu->addAction(openPCDDirAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
     //setting
@@ -355,6 +383,7 @@ void MainWindow::initToolBar()
     fileTool->setIconSize(QSize(30, 30));
     fileTool->addAction(openImageDirAction);
     fileTool->addAction(openVideoDirAction);
+    fileTool->addAction(openPCDDirAction);
     //autoMark
     autoMarkTool = new QToolBar(tr("自动化标注"));
     autoMarkTool->setIconSize(QSize(30, 30));
@@ -372,13 +401,17 @@ void MainWindow::initUI()
 {
    centerWidget = new QStackedWidget(this);
 
-   controlWidget = new ControlWindow(this);
-   controlWidget->setDrawShape(this->shapeBox->currentData().toInt());
-   imageWidget = new ImageControlWindow(this);
-   imageWidget->setDrawShape(this->shapeBox->currentData().toInt());
+   markWindow.clear();
+   markWindow.append(new ControlWindow(this));
+   markWindow.append(new ImageControlWindow(this));
+   markWindow.append(new VideoControlWindow(this));
+   markWindow.append(new PCLControlWindow(this));
 
-   centerWidget->addWidget(controlWidget);
-   centerWidget->addWidget(imageWidget);
+   for(int loop = 0; loop < markWindow.size(); loop++)
+   {
+       markWindow[loop]->setDrawShape(this->shapeBox->currentData().toInt());
+       centerWidget->addWidget(markWindow[loop]);
+   }
    centerWidget->setCurrentIndex(loadDataType);
 
    this->setCentralWidget(centerWidget);
@@ -392,6 +425,7 @@ void MainWindow::initConnect()
     //file
     connect(openImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageDir);
     connect(openVideoDirAction, &QAction::triggered, this, &MainWindow::slotOpenVideoDir);
+    connect(openPCDDirAction, &QAction::triggered, this, &MainWindow::slotOpenPCDDir);
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     //setting
     connect(manualParamterAction, &QAction::triggered, this, &MainWindow::slotManualMarkParamterConfig);
@@ -411,6 +445,8 @@ void MainWindow::initConnect()
 
     connect(shapeBox, &QComboBox::currentTextChanged, this, &MainWindow::slotSelectMarkShape);
 
-    connect(this, &MainWindow::signalManualMarkParamterChanged, controlWidget, &ControlWindow::slotManualMarkParamterChanged);
-    connect(this, &MainWindow::signalManualMarkParamterChanged, imageWidget, &ControlWindow::slotManualMarkParamterChanged);
+    for(int loop = 0; loop < markWindow.size(); loop++)
+    {
+        connect(this, &MainWindow::signalManualMarkParamterChanged, markWindow[loop], &ControlWindow::slotManualMarkParamterChanged);
+    }
 }

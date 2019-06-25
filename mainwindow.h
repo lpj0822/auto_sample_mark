@@ -22,6 +22,7 @@
 #include "controlwindow.h"
 #include "imagecontrolwindow.h"
 #include "videocontrolwindow.h"
+#include "pclcontrolwindow.h"
 
 class MainWindow : public QMainWindow
 {
@@ -37,6 +38,7 @@ public slots:
     //file
     void slotOpenImageDir();
     void slotOpenVideoDir();
+    void slotOpenPCDDir();
     //setting
     void slotManualMarkParamterConfig();
     void slotAutoMarkParamterConfig();
@@ -67,6 +69,7 @@ private:
     //file
     QAction *openImageDirAction;
     QAction *openVideoDirAction;
+    QAction *openPCDDirAction;
     QAction *exitAction;
     //setting
     QAction *manualParamterAction;
@@ -102,8 +105,7 @@ private:
     QComboBox *shapeBox;
 
     QStackedWidget *centerWidget;
-    ControlWindow *controlWidget;
-    ImageControlWindow *imageWidget;
+    QList<ControlWindow *> markWindow;
 
 private:
     AutoSampleMarkWindow *autoSampleMarkWindow;

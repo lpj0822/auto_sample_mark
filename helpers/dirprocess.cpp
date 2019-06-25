@@ -268,7 +268,7 @@ void DirProcess::createInfoNeg(const QString &pathDir, const QString filterPostf
             QFileInfo fileInfo(imageList[loop]);
             QString fileName = fileInfo.fileName();
             QString fileText = negDir + "/" + fileName + "\n";
-            out<< fileText;
+            out << fileText;
         }
         file.close();
     }

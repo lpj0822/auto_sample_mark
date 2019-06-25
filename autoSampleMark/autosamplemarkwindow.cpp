@@ -54,7 +54,7 @@ void AutoSampleMarkWindow::closeEvent(QCloseEvent *event)
     if(sampleMarkThread.isRunning())
     {
         QMessageBox::StandardButton button;
-        button=QMessageBox::question(this,tr("自动化样本标注程序"),QString(tr("自动化样本标注程序正在运行，是否退出？")),
+        button = QMessageBox::question(this,tr("自动化样本标注程序"),QString(tr("自动化样本标注程序正在运行，是否退出？")),
                                      QMessageBox::Yes|QMessageBox::No);
         if(button==QMessageBox::No)
         {

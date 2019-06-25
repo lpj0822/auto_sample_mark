@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include <iostream>
 #include <algorithm>
-#include "manualparamterconfig.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
 DrawLineShape::DrawLineShape(QObject *parent) : QObject(parent)
@@ -99,7 +99,7 @@ int DrawLineShape::drawLineMouseRelease(QWidget *parent, const QPoint point, con
             if (res == QDialog::Accepted)
             {
                 MyObject object;
-                object.setShapeType(ShapeType::LINE);
+                object.setShapeType(ShapeType::LINE_SHAPE);
                 object.setLine(currentLine[0], currentLine[1]);
                 object.setObjectClass(window->getObjectClass());
                 object.setObjectFlag(window->getObjectFlag());

@@ -13,13 +13,14 @@
 #include <QMenu>
 #include <QDebug>
 
-#include "manualparamterconfig.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 
 ControlWindow::ControlWindow(QWidget *parent)
     : QWidget(parent)
 {
     init();
     initUI();
+    connect(showFullButton, &QPushButton::clicked, this, &ControlWindow::slotShowFull);
 }
 
 ControlWindow::~ControlWindow()
@@ -33,9 +34,14 @@ void ControlWindow::setMarkDataList(const QString markDataDir, const QList<QStri
     this->processMarkDataList = markDataList;
 }
 
+void ControlWindow::saveMarkDataList()
+{
+    writeMarkHistory();
+}
+
 void ControlWindow::setDrawShape(int shapeId)
 {
-    this->drawLable->setDrawShape(shapeId);
+    qDebug() << "shape:" << shapeId;
 }
 
 void ControlWindow::resizeEvent(QResizeEvent *e)
@@ -53,6 +59,25 @@ void ControlWindow::contextMenuEvent (QContextMenuEvent * event)
 void ControlWindow::slotManualMarkParamterChanged()
 {
     initMarkClassBox();
+}
+
+void ControlWindow::slotShowFull()
+{
+    if(this->currentIndex >= 0)
+    {
+        if(showFullButton->text().contains(tr("全屏显示")))
+        {
+            drawMarkDataWidget->setWindowFlags(Qt::Window);
+            drawMarkDataWidget->showFullScreen();
+            showFullButton->setText(tr("退出全屏"));
+        }
+        else
+        {
+            drawMarkDataWidget->setWindowFlags(Qt::SubWindow);
+            drawMarkDataWidget->showNormal();
+            showFullButton->setText(tr("全屏显示"));
+        }
+    }
 }
 
 void ControlWindow::updateIsMarkButton(bool isValue)
@@ -93,7 +118,32 @@ void ControlWindow::updateListBox()
     {
         markDataListWidget->setCurrentRow(currentIndex);
     }
+}
 
+void ControlWindow::updateMarkProcessLable()
+{
+    int markCount = 0;
+    int allDataCount = processDataFlagList.size();
+    for(int index = 0; index < allDataCount; index++)
+    {
+        if(processDataFlagList[index] <= 0)
+        {
+            markCount++;
+        }
+    }
+    updateLabelText(markCount);
+}
+
+void ControlWindow::updateLabelText(int markCount)
+{
+    this->markProcessLabel->setText(tr("标注进度:%1/%2 当前索引:%3").arg(markCount).arg(processDataFlagList.size()
+                                                                                ).arg(this->currentIndex));
+}
+
+void ControlWindow::init()
+{
+    initMarkData(".", MarkDataType::UNKNOWN);
+    ManualParamterConfig::loadConfig();
 }
 
 void ControlWindow::initUI()
@@ -121,18 +171,17 @@ void ControlWindow::initUI()
     centerTopLayout->addWidget(isMarkButton);
     centerTopLayout->addWidget(markProcessLabel);
 
-    drawLable = new EditableLabel();
-    drawLableScrollArea = new QScrollArea();
-    drawLableScrollArea->setAlignment(Qt::AlignCenter);
-    drawLableScrollArea->setBackgroundRole(QPalette::Dark);
-    drawLableScrollArea->setAutoFillBackground(true);
-    //drawScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);  //控件大小 小于 视窗大小时，默认不会显示滚动条
-    //drawScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);    //强制显示滚动条。
-    drawLableScrollArea->setWidget(drawLable);
-    initDrawWidget();
-
     drawMarkDataWidget = new MyStackedWidget(this);
-    drawMarkDataWidget->addWidget(drawLableScrollArea);
+    baseLabel = new QLabel();
+    baseLabel->setPixmap(QPixmap::fromImage(currentImage));
+    lableScrollArea = new QScrollArea();
+    lableScrollArea->setAlignment(Qt::AlignCenter);
+    lableScrollArea->setBackgroundRole(QPalette::Dark);
+    lableScrollArea->setAutoFillBackground(true);
+    //lableScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);  //控件大小 小于 视窗大小时，默认不会显示滚动条
+    //lableScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);    //强制显示滚动条。
+    lableScrollArea->setWidget(baseLabel);
+    drawMarkDataWidget->addWidget(lableScrollArea);
     drawMarkDataWidget->setCurrentIndex(0);
 
     QVBoxLayout *centerLayout = new QVBoxLayout();
@@ -166,15 +215,10 @@ void ControlWindow::initUI()
     this->setWindowTitle(tr("样本标注"));
 }
 
-void ControlWindow::init()
-{
-    initMarkData(".", MarkDataType::UNKNOWN);
-}
-
 void ControlWindow::initMarkData(const QString dirPath, const MarkDataType dataType)
 {
-    this->processMarkDataList.clear();
-    this->processDataFlagList.clear();
+    processMarkDataList.clear();
+    processDataFlagList.clear();
     this->markDataType = dataType;
     this->markDataDir = dirPath;
     this->isMark = false;
@@ -192,13 +236,6 @@ void ControlWindow::initMarkClassBox()
     {
         classBox->addItem(classIterator.key());
     }
-}
-
-void ControlWindow::initDrawWidget()
-{
-    drawLable->clearObjects();
-    drawLable->setNewQImage(currentImage);
-    drawLable->setEnabled(false);
 }
 
 void ControlWindow::initExpandLeft()
@@ -269,6 +306,15 @@ void ControlWindow::updateExpandRight()
     {
         markDataListWidget->setMaximumWidth(200);
         leftTabminmumwidth2 = markDataListWidget->width();
+    }
+}
+
+void ControlWindow::readClassConfig(const QString &markDataDir)
+{
+    QString saveAnnotationsDir = markDataDir + "/../" + "class.json";
+    if(ManualParamterConfig::loadClassConfig(saveAnnotationsDir) == 0)
+    {
+        ManualParamterConfig::saveConfig();
     }
 }
 

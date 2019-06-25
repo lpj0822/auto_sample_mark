@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QMenu>
 #include <QMessageBox>
-#include "manualparamterconfig.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 
 EditableLabel::EditableLabel(QWidget *parent):
     QLabel(parent)
@@ -16,7 +16,7 @@ void EditableLabel::slotRemoveObject()
 {
     switch(this->shapeType)
     {
-     case ShapeType::RECT:
+     case ShapeType::RECT_SHAPE:
         {
             bool isDraw = false;
             drawRect.removeRect(isDraw);
@@ -26,7 +26,7 @@ void EditableLabel::slotRemoveObject()
             }
         }
         break;
-     case ShapeType::LINE:
+     case ShapeType::LINE_SHAPE:
         {
             bool isDraw = false;
             drawLine.removeLine(isDraw);
@@ -36,7 +36,7 @@ void EditableLabel::slotRemoveObject()
             }
         }
         break;
-    case ShapeType::POLYGON:
+    case ShapeType::POLYGON_SHAPE:
        {
            bool isDraw = false;
            drawPolygon.removePolygon(isDraw);
@@ -57,17 +57,17 @@ void EditableLabel::contextMenuEvent(QContextMenuEvent * event)
     bool isFind = false;
     switch(this->shapeType)
     {
-     case ShapeType::RECT:
+     case ShapeType::RECT_SHAPE:
         {
             isFind = drawRect.rectListContains(this->mapFromGlobal(QCursor::pos()));
         }
         break;
-     case ShapeType::LINE:
+     case ShapeType::LINE_SHAPE:
         {
             isFind = drawLine.lineListContains(this->mapFromGlobal(QCursor::pos()));
         }
         break;
-    case ShapeType::POLYGON:
+    case ShapeType::POLYGON_SHAPE:
        {
            isFind = drawPolygon.polygonListContains(this->mapFromGlobal(QCursor::pos()));
        }
@@ -96,7 +96,7 @@ void EditableLabel::mousePressEvent(QMouseEvent *e)
     {
         switch(this->shapeType)
         {
-         case ShapeType::RECT:
+         case ShapeType::RECT_SHAPE:
             {
                 bool isDraw = false;
                 int mouseChange = drawRect.drawRectMousePress(e->pos(), isDraw);
@@ -114,7 +114,7 @@ void EditableLabel::mousePressEvent(QMouseEvent *e)
                 }
             }
             break;
-         case ShapeType::LINE:
+         case ShapeType::LINE_SHAPE:
             {
                 bool isDraw = false;
                 int mouseChange = drawLine.drawLineMousePress(e->pos(), isDraw);
@@ -132,7 +132,7 @@ void EditableLabel::mousePressEvent(QMouseEvent *e)
                 }
             }
             break;
-        case ShapeType::POLYGON:
+        case ShapeType::POLYGON_SHAPE:
             {
                 bool isDraw = false;
                 int mouseChange = drawPolygon.drawPolygonMousePress(e->pos(), isDraw);
@@ -163,7 +163,7 @@ void EditableLabel::mouseMoveEvent(QMouseEvent *e)
 
     switch(this->shapeType)
     {
-     case ShapeType::RECT:
+     case ShapeType::RECT_SHAPE:
         {
             bool isDraw = false;
             int mouseChange = drawRect.drawRectMouseMove(e->pos(), isDraw);
@@ -181,7 +181,7 @@ void EditableLabel::mouseMoveEvent(QMouseEvent *e)
             }
         }
         break;
-     case ShapeType::LINE:
+     case ShapeType::LINE_SHAPE:
         {
             bool isDraw = false;
             int mouseChange = drawLine.drawLineMouseMove(e->pos(), isDraw);
@@ -199,7 +199,7 @@ void EditableLabel::mouseMoveEvent(QMouseEvent *e)
             }
         }
         break;
-     case ShapeType::POLYGON:
+     case ShapeType::POLYGON_SHAPE:
         {
             bool isDraw = false;
             int mouseChange = drawPolygon.drawPolygonMouseMove(e->pos(), isDraw);
@@ -231,7 +231,7 @@ void EditableLabel::mouseReleaseEvent(QMouseEvent *e)
     {
         switch(this->shapeType)
         {
-        case ShapeType::RECT:
+        case ShapeType::RECT_SHAPE:
             {
                 bool isDraw = false;
                 drawRect.drawRectMouseRelease(this, e->pos(), this->sampleClass, isDraw);
@@ -241,7 +241,7 @@ void EditableLabel::mouseReleaseEvent(QMouseEvent *e)
                 }
             }
             break;
-        case ShapeType::LINE:
+        case ShapeType::LINE_SHAPE:
             {
                 bool isDraw = false;
                 drawLine.drawLineMouseRelease(this, e->pos(), this->sampleClass, isDraw);
@@ -251,7 +251,7 @@ void EditableLabel::mouseReleaseEvent(QMouseEvent *e)
                 }
             }
             break;
-        case ShapeType::POLYGON:
+        case ShapeType::POLYGON_SHAPE:
             {
                 bool isDraw = false;
                 drawPolygon.drawPolygonMouseRelease(this, e->pos(), this->sampleClass, isDraw);
@@ -317,14 +317,14 @@ void EditableLabel::setDrawShape(int shapeID)
 {
     switch(shapeID)
     {
-     case ShapeType::RECT:
-        this->shapeType = ShapeType::RECT;
+     case ShapeType::RECT_SHAPE:
+        this->shapeType = ShapeType::RECT_SHAPE;
         break;
-     case ShapeType::LINE:
-        this->shapeType = ShapeType::LINE;
+     case ShapeType::LINE_SHAPE:
+        this->shapeType = ShapeType::LINE_SHAPE;
         break;
-     case ShapeType::POLYGON:
-        this->shapeType = ShapeType::POLYGON;
+     case ShapeType::POLYGON_SHAPE:
+        this->shapeType = ShapeType::POLYGON_SHAPE;
         break;
      default:
         this->shapeType = ShapeType::UNSHAPE;
@@ -343,15 +343,15 @@ void EditableLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
     for(int loop = 0; loop < obejcts.count(); loop++)
     {
         const MyObject object = obejcts[loop];
-        if(object.getShapeType() == ShapeType::RECT)
+        if(object.getShapeType() == ShapeType::RECT_SHAPE)
         {
             rectObejcts.append(object);
         }
-        else if(object.getShapeType() == ShapeType::LINE)
+        else if(object.getShapeType() == ShapeType::LINE_SHAPE)
         {
             lineObejcts.append(object);
         }
-        else if(object.getShapeType() == ShapeType::POLYGON)
+        else if(object.getShapeType() == ShapeType::POLYGON_SHAPE)
         {
             polygonObejcts.append(object);
         }
@@ -619,7 +619,7 @@ void EditableLabel::initData()
 
     this->sampleClass = "All";
 
-    this->shapeType = ShapeType::RECT;
+    this->shapeType = ShapeType::RECT_SHAPE;
 
     this->removeRectAction = new QAction(tr("删除标注"), this);
 }

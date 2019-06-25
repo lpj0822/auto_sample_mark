@@ -23,14 +23,14 @@
 #include "saveMarkData/jsonprocessvideo.h"
 #include "utilityGUI/customWindow/wexpand.h"
 #include "utilityGUI/customWindow/customanimation.h"
-#include "utilityGUI/customWindow/myscrollarea.h"
 #include "utilityGUI/customWindow/mystackedwidget.h"
-#include "editablelabel.h"
 
 typedef enum MarkDataType{
     UNKNOWN = 0,
     IMAGE = 1,
-    VIDEO = 2
+    VIDEO = 2,
+    PCD = 3,
+    MAX_CONUT
 }MarkDataType;
 
 
@@ -42,11 +42,13 @@ public:
     ControlWindow(QWidget *parent = 0);
     ~ControlWindow();
 
-    void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType);
-    void setDrawShape(int shapeId);
+    virtual void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType);
+    virtual void saveMarkDataList();
+    virtual void setDrawShape(int shapeId);
 
 public slots:
     void slotManualMarkParamterChanged();
+    void slotShowFull();
 
 protected:
     void resizeEvent(QResizeEvent *e);
@@ -56,18 +58,20 @@ protected:
 
     void updateIsMarkButton(bool isValue);
     void updateListBox();
+    void updateMarkProcessLable();
+    virtual void updateLabelText(int markCount);
 
     void init();
     void initUI();
     void initMarkData(const QString dirPath, const MarkDataType dataType);
     void initMarkClassBox();
-    void initDrawWidget();
 
     void initExpandLeft();
     void initExpandRight();
     void updateExpandLeft();
     void updateExpandRight();
 
+    void readClassConfig(const QString &markDataDir);
     void readMarkHistory();
     void writeMarkHistory();
 
@@ -83,8 +87,8 @@ protected:
     QLabel *markProcessLabel;
 
     MyStackedWidget *drawMarkDataWidget;
-    EditableLabel *drawLable;
-    QScrollArea *drawLableScrollArea;
+    QLabel *baseLabel;
+    QScrollArea *lableScrollArea;
     QListWidget *markDataListWidget;
 
     WExpand *expand1;
@@ -100,8 +104,8 @@ protected:
 
     QList<QString> processMarkDataList;
     QList<int> processDataFlagList;
-    QString markDataDir;
 
+    QString markDataDir;
     bool isMark;
     MarkDataType markDataType;
 

@@ -10,7 +10,7 @@
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include "utilityGUI/customWindow/markclasstablewidget.h"
-#include "manualparamterconfig.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 
 class ManualParamterConfigWindow : public QDialog
 {

@@ -4,7 +4,7 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 
-#include "manualparamterconfig.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 
 SelectMarkClassWindow::SelectMarkClassWindow(QDialog *parent) : QDialog(parent)
 {

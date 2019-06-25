@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "manualparamterconfig.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 #include "autoparamterconfig.h"
 
 AutoSampleMarkThread::AutoSampleMarkThread()

@@ -108,7 +108,7 @@ void KalmanTracker::loadConfig()
     cv::FileStorage fs;
     fs.open("./config/KalmanTrack.xml", cv::FileStorage::READ);
 
-    cv::read(fs["speed"], speed, 0.1);
+    cv::read(fs["speed"], speed, 0.1f);
     cv::read(fs["dt"], dt, 0.01f);
     cv::read(fs["Accel_noise_mag"], Accel_noise_mag, 0.5f);
 

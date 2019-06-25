@@ -1,7 +1,7 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "drawrectshape.h"
 #include <QMessageBox>
-#include "manualparamterconfig.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
 DrawRectShape::DrawRectShape(QObject *parent) : QObject(parent)
@@ -106,7 +106,7 @@ int DrawRectShape::drawRectMouseRelease(QWidget *parent, const QPoint point, con
             if (res == QDialog::Accepted)
             {
                 MyObject object;
-                object.setShapeType(ShapeType::RECT);
+                object.setShapeType(ShapeType::RECT_SHAPE);
                 object.setBox(currentRect);
                 object.setObjectClass(window->getObjectClass());
                 object.setObjectFlag(window->getObjectFlag());

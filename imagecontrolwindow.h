@@ -2,8 +2,8 @@
 #define IMAGECONTROLWINDOW_H
 
 #include "controlwindow.h"
-#include "helpers/videoprocess.h"
-#include "videomultipletracking.h"
+#include "utilityGUI/customWindow/myscrollarea.h"
+#include "drawWidget/editablelabel.h"
 
 class ImageControlWindow : public ControlWindow
 {
@@ -14,79 +14,52 @@ public:
     ~ImageControlWindow();
 
     void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType);
+    void saveMarkDataList();
+    void setDrawShape(int shapeId);
 
 public slots:
 
     void slotIsMark();
     void slotImageItem(QListWidgetItem *item);
     void slotChangeClass(QString classText);
-    void slotShowFull();
-    void slotScrollArea(int keyValue);
+    virtual void slotScrollArea(int keyValue);
 
 protected:
     void closeEvent(QCloseEvent *event);
-    void keyPressEvent(QKeyEvent *e);
+    virtual void keyPressEvent(QKeyEvent *e);
 
 protected:
 
-    void showPrevious();
-    void showNext();
-
-    void nextVideo();
-    void previousVideo();
+    virtual void showPrevious();
+    virtual void showNext();
 
     void updateDrawLabel(bool isValue);
     void updateImage();
-    void updateMarkProcessLable();
 
-    void loadMarkData(const QString dataPath);
-    void saveMarkDataResult();
+    virtual void loadMarkData(const QString dataPath);
+    virtual void saveMarkDataResult();
+    virtual void loadMarkImage();
+    virtual void saveMarkImageResult();
 
+    void initDrawWidget();
+    void initConnect();
+    void initImageList();
+
+protected:
+    EditableLabel *drawLable;
+    QScrollArea *drawLableScrollArea;
+
+private:
     //imageData
     void loadImageData(const QString imagePath, const QString saveAnnotationsDir);
     void saveImageDataResult(const QString &saveAnnotationsDir, const QString &imagePath, const QList<MyObject> &objects);
 
-    //videoData
-    void loadVideoData(const QString videoPath, const QString saveAnnotationsDir);
-    void saveVideoDataResult(const QString &saveAnnotationsDir, const QString &videoPath, const QList<MyObject> &objects);
-    void loadVideoImage();
-    void updateVideoResult(const QList<MyObject> &objects);
-    void initVideoTracking();
-    void videoTracking(const cv::Mat& preFrame, const cv::Mat& frame);
-
-    void setMarkDataParamter();
-
-    void initConnect();
     void initData();
-
     void initImageData();
-    void initVideoData();
-
-    void initMarkClassBox();
-    void initImageList();
 
 private:
-
-    void loadMarkImage();
-    void saveMarkImageResult();
-
-private:
-
-    cv::Mat preFrame;
-
     //imageData
     QString currentImagePath;
-
-    //videoData
-    QString currentVideoPath;
-    int currentFrameNumber;
-    int allCountFrame;
-    int skipFrameNumber;
-    bool videoIsTracking;
-    QMap<int, QList<MyObject> > videoResult;
-
-    VideoMultipletracking *videoMultipletracking;
-    VideoProcess videoProcess;
 
 };
 

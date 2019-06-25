@@ -11,7 +11,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
-#include "videomarkparamterconfig.h"
+#include "sampleMarkParam/videomarkparamterconfig.h"
 
 class VideoMarkParamterWindow : public QDialog
 {

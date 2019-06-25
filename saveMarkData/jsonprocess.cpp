@@ -26,14 +26,19 @@ int JSONProcess::createJSON(const QString &jsonFilePath, const QString &imageFil
     QJsonObject allData;
     QFileInfo fileInfo(imageFilePath);
     QFile file(jsonFilePath);
-
+    QStringList pathNameList = fileInfo.absolutePath().split("/");
+    QString folder = "MultipleTarget";
+    if(pathNameList.size() > 0)
+    {
+        folder = pathNameList[pathNameList.size() - 1];
+    }
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate |QIODevice::Text))
     {
         return -1;
     }
     jsonData.insert("database", "lpj_dataset");
     jsonData.insert("annotation", "Annotations");
-    jsonData.insert("folder", "MultipleTarget");
+    jsonData.insert("folder", folder);
     jsonData.insert("filename", fileInfo.fileName());
     jsonData.insert("path", imageFilePath);
     jsonData.insert("owner", "lpj");
@@ -115,7 +120,7 @@ int JSONProcess::writeRectData(const QList<MyObject>& objects, QJsonObject &json
     int index = 0;
     for(int loop = 0; loop < objects.size(); loop++)
     {
-        if(objects[loop].getShapeType() == ShapeType::RECT)
+        if(objects[loop].getShapeType() == ShapeType::RECT_SHAPE)
         {
             const QRect rect = objects[loop].getBox();
             objectArrays.insert(index, QString::fromLocal8Bit("%1 %2 %3 %4 %5").arg(objects[loop].getObjectClass())
@@ -145,7 +150,7 @@ int JSONProcess::readRectData(const QJsonArray &value, QList<MyObject>& objects)
             object.setObjectClass(dataList[0]);
             object.setBox(QRect(QPoint(dataList[1].toInt(), dataList[2].toInt()),
                     QPoint(dataList[3].toInt(), dataList[4].toInt())));
-            object.setShapeType(ShapeType::RECT);
+            object.setShapeType(ShapeType::RECT_SHAPE);
             objects.append(object);
         }
     }
@@ -159,7 +164,7 @@ int JSONProcess::writeLineData(const QList<MyObject>& objects, QJsonObject &json
     int index = 0;
     for(int loop = 0; loop < objects.count(); loop++)
     {
-        if(objects[loop].getShapeType() == ShapeType::LINE)
+        if(objects[loop].getShapeType() == ShapeType::LINE_SHAPE)
         {
             const QList<QPoint> line = objects[loop].getLine();
             objectArrays.insert(index, QString::fromLocal8Bit("%1 %2 %3 %4 %5").arg(objects[loop].getObjectClass())
@@ -189,7 +194,7 @@ int JSONProcess::readLineData(const QJsonArray &value, QList<MyObject>& objects)
             object.setObjectClass(dataList[0]);
             object.setLine(QPoint(dataList[1].toInt(), dataList[2].toInt()),
                     QPoint(dataList[3].toInt(), dataList[4].toInt()));
-            object.setShapeType(ShapeType::LINE);
+            object.setShapeType(ShapeType::LINE_SHAPE);
             objects.append(object);
         }
     }
@@ -203,7 +208,7 @@ int JSONProcess::writePolygonData(const QList<MyObject>& objects, QJsonObject &j
     int dataIndex = 0;
     for(int loop = 0; loop < objects.size(); loop++)
     {
-        if(objects[loop].getShapeType() == ShapeType::POLYGON)
+        if(objects[loop].getShapeType() == ShapeType::POLYGON_SHAPE)
         {
             const QPolygon polygon = objects[loop].getPolygon();
             QString writeData = QString::fromLocal8Bit("%1").arg(objects[loop].getObjectClass());
@@ -247,7 +252,7 @@ int JSONProcess::readPolygonData(const QJsonArray &value, QList<MyObject>& objec
             }
         }
         object.setPolygon(polygon);
-        object.setShapeType(ShapeType::POLYGON);
+        object.setShapeType(ShapeType::POLYGON_SHAPE);
         objects.append(object);
     }
 

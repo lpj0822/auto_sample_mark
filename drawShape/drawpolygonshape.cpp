@@ -1,7 +1,7 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "drawpolygonshape.h"
 #include <QMessageBox>
-#include "manualparamterconfig.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
 DrawPolygonShape::DrawPolygonShape(QObject *parent) : QObject(parent)
@@ -103,7 +103,7 @@ int DrawPolygonShape::drawPolygonMouseRelease(QWidget *parent, const QPoint poin
                 if (res == QDialog::Accepted)
                 {
                     MyObject object;
-                    object.setShapeType(ShapeType::POLYGON);
+                    object.setShapeType(ShapeType::POLYGON_SHAPE);
                     object.setPolygon(currentPolygon);
                     object.setObjectClass(window->getObjectClass());
                     object.setObjectFlag(window->getObjectFlag());
