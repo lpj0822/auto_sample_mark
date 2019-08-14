@@ -191,7 +191,9 @@ void ImageControlWindow::saveMarkDataResult()
 {
     QDir makeDir;
     QString saveAnnotationsDir = this->markDataDir + "/../" + "Annotations";
+    QString saveSegmentationDir = this->markDataDir + "/../" + "Segmentation";
     QList<MyObject> objects = drawLable->getObjects();
+    QList<MyObject> images = drawLable->getSegment();
     if(objects.size() > 0)
     {
         if(!makeDir.exists(saveAnnotationsDir))
@@ -201,9 +203,17 @@ void ImageControlWindow::saveMarkDataResult()
                 qDebug() << "make Annotations dir fail!" << endl;
             }
         }
+        if(!makeDir.exists(saveSegmentationDir))
+        {
+            if(!makeDir.mkdir(saveSegmentationDir))
+            {
+                qDebug() << "make Segmentation dir fail!" << endl;
+            }
+        }
         if(this->markDataType == MarkDataType::IMAGE)
         {
             saveImageDataResult(saveAnnotationsDir, this->currentImagePath, objects);
+            saveImageSegmentResult(saveSegmentationDir, this->currentImagePath, images);
         }
     }
 }
@@ -211,7 +221,7 @@ void ImageControlWindow::saveMarkDataResult()
 void ImageControlWindow::loadMarkImage()
 {
     QString saveAnnotationsDir = this->markDataDir + "/../" + "Annotations";
-    if(this->markDataType == MarkDataType::IMAGE)
+    if(this->markDataType == MarkDataType::IMAGE && processMarkDataList.size() > 0)
     {
         currentImagePath =  processMarkDataList[currentIndex];
         loadImageData(currentImagePath, saveAnnotationsDir);
@@ -300,7 +310,8 @@ void ImageControlWindow::loadImageData(const QString imagePath, const QString sa
     }
 }
 
-void ImageControlWindow::saveImageDataResult(const QString &saveAnnotationsDir, const QString &imagePath, const QList<MyObject> &objects)
+void ImageControlWindow::saveImageDataResult(const QString &saveAnnotationsDir, const QString &imagePath,
+                                             const QList<MyObject> &objects)
 {
     QFileInfo imageFileInfo(imagePath);
     QString saveXmlPath = saveAnnotationsDir + "/" + imageFileInfo.completeBaseName() + ".xml";
@@ -330,6 +341,27 @@ void ImageControlWindow::saveImageDataResult(const QString &saveAnnotationsDir, 
             QFile tempFile(saveXmlPath);
             tempFile.remove();
         }
+    }
+}
+
+void ImageControlWindow::saveImageSegmentResult(const QString &saveAnnotationsDir, const QString &imagePath,
+                                                const QList<MyObject> &objects)
+{
+    QFileInfo imageFileInfo(imagePath);
+    QString saveImagePath = saveAnnotationsDir + "/" + imageFileInfo.fileName();
+    QFileInfo saveFileInfo(saveImagePath);
+    if(objects.size() > 0)
+    {
+        QImage result = objects[0].getSegmentImage();
+        if(!result.save(saveImagePath))
+        {
+            QMessageBox::information(this, tr("保存Segment图象"), tr("保存Segment图象%1失败！").arg(saveImagePath));
+        }
+    }
+    else if(saveFileInfo.exists())
+    {
+        QFile tempFile(saveImagePath);
+        tempFile.remove();
     }
 }
 

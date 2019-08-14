@@ -70,6 +70,10 @@ int XMLProcess::createXML(const QString &xmlFilePath, const QString &imageFilePa
         {
             writePolygonData(object, xmlWriter);
         }
+        else if(object.getShapeType() == ShapeType::LANE_SEGMENT)
+        {
+            writePointListData(object, xmlWriter);
+        }
     }
     xmlWriter.writeEndElement();
     xmlWriter.writeEndElement();
@@ -129,6 +133,12 @@ int XMLProcess::readXML(const QString &xmlFilePath, QList<MyObject> &objects)
             MyObject object = readPolygonData(childList);
             objects.append(object);
         }
+        else if(element.tagName() == "laneObject")
+        {
+            QDomNodeList childList = element.childNodes();
+            MyObject object = readPointListData(childList);
+            objects.append(object);
+        }
     }
     return 0;
 }
@@ -136,6 +146,7 @@ int XMLProcess::readXML(const QString &xmlFilePath, QList<MyObject> &objects)
 int XMLProcess::writeRectData(const MyObject &object, QXmlStreamWriter &xmlWriter)
 {
     QRect rect = object.getBox();
+    int difficult = static_cast<int>(object.getIsDifficult());
     if(rect.width() <= 0 || rect.height() <= 0)
     {
         qDebug() << "write rect data fail!\n" << endl;
@@ -145,7 +156,7 @@ int XMLProcess::writeRectData(const MyObject &object, QXmlStreamWriter &xmlWrite
     xmlWriter.writeTextElement("name", object.getObjectClass());
     xmlWriter.writeTextElement("pose", "Unspecified");
     xmlWriter.writeTextElement("truncated", QString("%1").arg(0));
-    xmlWriter.writeTextElement("difficult", QString("%1").arg(0));
+    xmlWriter.writeTextElement("difficult", QString("%1").arg(difficult));
     xmlWriter.writeStartElement("bndbox");
     xmlWriter.writeTextElement("xmin", QString("%1").arg(rect.topLeft().x()));
     xmlWriter.writeTextElement("ymin", QString("%1").arg(rect.topLeft().y()));
@@ -166,6 +177,11 @@ MyObject XMLProcess::readRectData(const QDomNodeList &childList)
         if(childElement.tagName() == "name")
         {
             object.setObjectClass(childElement.text());
+        }
+        else if(childElement.tagName() == "difficult")
+        {
+            int difficult = childElement.text().toInt();
+            object.setIsDifficult(static_cast<bool>(difficult));
         }
         else if(childElement.tagName() == "bndbox")
         {
@@ -203,6 +219,7 @@ MyObject XMLProcess::readRectData(const QDomNodeList &childList)
 int XMLProcess::writeLineData(const MyObject &object, QXmlStreamWriter &xmlWriter)
 {
     QList<QPoint> line = object.getLine();
+    int difficult = static_cast<int>(object.getIsDifficult());
     if(line.count() <= 0)
     {
         qDebug() << "write line data fail!\n" << endl;
@@ -212,7 +229,7 @@ int XMLProcess::writeLineData(const MyObject &object, QXmlStreamWriter &xmlWrite
     xmlWriter.writeTextElement("name", object.getObjectClass());
     xmlWriter.writeTextElement("pose", "Unspecified");
     xmlWriter.writeTextElement("truncated", QString("%1").arg(0));
-    xmlWriter.writeTextElement("difficult", QString("%1").arg(0));
+    xmlWriter.writeTextElement("difficult", QString("%1").arg(difficult));
     xmlWriter.writeStartElement("line");
     xmlWriter.writeTextElement("x1", QString("%1").arg(line[0].x()));
     xmlWriter.writeTextElement("y1", QString("%1").arg(line[0].y()));
@@ -233,6 +250,11 @@ MyObject XMLProcess::readLineData(const QDomNodeList &childList)
         if(childElement.tagName() == "name")
         {
             object.setObjectClass(childElement.text());
+        }
+        else if(childElement.tagName() == "difficult")
+        {
+            int difficult = childElement.text().toInt();
+            object.setIsDifficult(static_cast<bool>(difficult));
         }
         else if(childElement.tagName() == "line")
         {
@@ -270,6 +292,7 @@ MyObject XMLProcess::readLineData(const QDomNodeList &childList)
 int XMLProcess::writePolygonData(const MyObject &object, QXmlStreamWriter &xmlWriter)
 {
     QPolygon polygon = object.getPolygon();
+    int difficult = static_cast<int>(object.getIsDifficult());
     if(polygon.count() <= 0)
     {
         qDebug() << "write polygon data fail!\n" << endl;
@@ -279,7 +302,7 @@ int XMLProcess::writePolygonData(const MyObject &object, QXmlStreamWriter &xmlWr
     xmlWriter.writeTextElement("name", object.getObjectClass());
     xmlWriter.writeTextElement("pose", "Unspecified");
     xmlWriter.writeTextElement("truncated", QString("%1").arg(0));
-    xmlWriter.writeTextElement("difficult", QString("%1").arg(0));
+    xmlWriter.writeTextElement("difficult", QString("%1").arg(difficult));
     xmlWriter.writeTextElement("pointCount", QString("%1").arg(polygon.count()));
     xmlWriter.writeStartElement("polygon");
     for(int loop = 0; loop < polygon.count(); loop++)
@@ -302,6 +325,11 @@ MyObject XMLProcess::readPolygonData(const QDomNodeList &childList)
         if(childElement.tagName() == "name")
         {
             object.setObjectClass(childElement.text());
+        }
+        else if(childElement.tagName() == "difficult")
+        {
+            int difficult = childElement.text().toInt();
+            object.setIsDifficult(static_cast<bool>(difficult));
         }
         else if(childElement.tagName() == "polygon")
         {
@@ -330,6 +358,80 @@ MyObject XMLProcess::readPolygonData(const QDomNodeList &childList)
             }
             object.setPolygon(polygon);
             object.setShapeType(ShapeType::POLYGON_SHAPE);
+        }
+    }
+    return object;
+}
+
+int XMLProcess::writePointListData(const MyObject &object, QXmlStreamWriter &xmlWriter)
+{
+    QList<QPoint> pointList = object.getPointList();
+    int difficult = static_cast<int>(object.getIsDifficult());
+    if(pointList.count() <= 0)
+    {
+        qDebug() << "write pointList data fail!\n" << endl;
+        return -1;
+    }
+    xmlWriter.writeStartElement("laneObject");
+    xmlWriter.writeTextElement("name", object.getObjectClass());
+    xmlWriter.writeTextElement("pose", "Unspecified");
+    xmlWriter.writeTextElement("truncated", QString("%1").arg(0));
+    xmlWriter.writeTextElement("difficult", QString("%1").arg(difficult));
+    xmlWriter.writeTextElement("pointCount", QString("%1").arg(pointList.count()));
+    xmlWriter.writeStartElement("lane");
+    for(int loop = 0; loop < pointList.count(); loop++)
+    {
+        xmlWriter.writeTextElement(QString("x%1").arg(loop), QString("%1").arg(pointList[loop].x()));
+        xmlWriter.writeTextElement(QString("y%1").arg(loop), QString("%1").arg(pointList[loop].y()));
+    }
+    xmlWriter.writeEndElement();
+    xmlWriter.writeEndElement();
+    return 0;
+}
+
+MyObject XMLProcess::readPointListData(const QDomNodeList &childList)
+{
+    MyObject object;
+    for(int loop = 0; loop < childList.count(); loop++)
+    {
+        QDomNode childDomNode = childList.item(loop);
+        QDomElement childElement = childDomNode.toElement();
+        if(childElement.tagName() == "name")
+        {
+            object.setObjectClass(childElement.text());
+        }
+        else if(childElement.tagName() == "difficult")
+        {
+            int difficult = childElement.text().toInt();
+            object.setIsDifficult(static_cast<bool>(difficult));
+        }
+        else if(childElement.tagName() == "lane")
+        {
+            int index = 0;
+            QList<QPoint> pointList;
+            QDomNodeList boxList = childElement.childNodes();
+            pointList.clear();
+            for(int loop1 = 0; loop1 < boxList.size(); loop1++)
+            {
+                QDomNode boxDomNode = boxList.item(loop1);
+                QDomElement boxElement = boxDomNode.toElement();
+                QPoint point;
+                if(boxElement.tagName() == QString("x%1").arg(index))
+                {
+                    point.setX(boxElement.text().toInt());
+                }
+                loop1++;
+                boxDomNode = boxList.item(loop1);
+                boxElement = boxDomNode.toElement();
+                if(boxElement.tagName() == QString("y%1").arg(index))
+                {
+                    point.setY(boxElement.text().toInt());
+                }
+                index++;
+                pointList.append(point);
+            }
+            object.setPointList(pointList);
+            object.setShapeType(ShapeType::LANE_SEGMENT);
         }
     }
     return object;

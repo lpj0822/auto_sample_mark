@@ -4,7 +4,7 @@
 #include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
-DrawPolygonShape::DrawPolygonShape(QObject *parent) : QObject(parent)
+DrawPolygonShape::DrawPolygonShape(QObject *parent) : DrawShape(parent)
 {
     initDraw();
 }
@@ -29,7 +29,7 @@ void DrawPolygonShape::initDraw()
     listPolygon.clear();
 }
 
-int DrawPolygonShape::drawPolygonMousePress(const QPoint point, bool &isDraw)
+int DrawPolygonShape::drawMousePress(const QPoint point, bool &isDraw)
 {
     int mouseChange = 0;
     if(nearPolygonIndex >= 0)
@@ -61,7 +61,7 @@ int DrawPolygonShape::drawPolygonMousePress(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawPolygonShape::drawPolygonMouseMove(const QPoint point, bool &isDraw)
+int DrawPolygonShape::drawMouseMove(const QPoint point, bool &isDraw)
 {
     int mouseChange = 0;
     isDraw = false;
@@ -86,7 +86,7 @@ int DrawPolygonShape::drawPolygonMouseMove(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawPolygonShape::drawPolygonMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
+int DrawPolygonShape::drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
 {
     if(finishDrawPolygon)
     {
@@ -106,6 +106,7 @@ int DrawPolygonShape::drawPolygonMouseRelease(QWidget *parent, const QPoint poin
                     object.setShapeType(ShapeType::POLYGON_SHAPE);
                     object.setPolygon(currentPolygon);
                     object.setObjectClass(window->getObjectClass());
+                    object.setIsDifficult(window->getIsDifficult());
                     object.setObjectFlag(window->getObjectFlag());
                     listPolygon.append(object);
                 }
@@ -156,24 +157,18 @@ int DrawPolygonShape::drawPolygonMouseRelease(QWidget *parent, const QPoint poin
     return 0;
 }
 
-QPolygon DrawPolygonShape::getCurrentPolygon(bool &isDraw)
+void DrawPolygonShape::removeShape(bool &isDraw)
 {
-    isDraw = true;
-    return this->currentPolygon;
+    isDraw = false;
+    if(removePolygonIndex >= 0 && removePolygonIndex < listPolygon.count())
+    {
+        this->listPolygon.removeAt(removePolygonIndex);
+        removePolygonIndex = -1;
+        isDraw = true;
+    }
 }
 
-void DrawPolygonShape::getPolygonList(QList<MyObject> &list)
-{
-    list = this->listPolygon;
-}
-
-void DrawPolygonShape::setPolygonList(QList<MyObject> list)
-{
-    this->listPolygon.clear();
-    this->listPolygon = list;
-}
-
-bool DrawPolygonShape::polygonListContains(const QPoint point)
+bool DrawPolygonShape::isInShape(const QPoint &point)
 {
     bool isFind = false;
     removePolygonIndex = listPolygon.count();
@@ -190,15 +185,98 @@ bool DrawPolygonShape::polygonListContains(const QPoint point)
     return isFind;
 }
 
-void DrawPolygonShape::removePolygon(bool &isDraw)
+void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter)
 {
-    isDraw = false;
-    if(removePolygonIndex >= 0 && removePolygonIndex < listPolygon.count())
+    QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
+    QFont font("Decorative", 15);
+    painter.setPen(pen);
+    painter.setFont(font);
+    painter.setBrush(QColor("#3CFF55"));
+
+    bool isDraw = false;
+    QPolygon currentPolygon = getCurrentPolygon(isDraw);
+
+    for(int i=0; i< this->listPolygon.count(); i++)
     {
-        this->listPolygon.removeAt(removePolygonIndex);
-        removePolygonIndex = -1;
-        isDraw = true;
+        QString color = ManualParamterConfig::getMarkClassColor(this->listPolygon[i].getObjectClass());
+        QColor drawColor(color);
+        if(drawColor.isValid())
+        {
+            pen.setColor(drawColor);
+            painter.setPen(pen);
+        }
+        else
+        {
+            drawColor = QColor("#000000");
+            pen.setColor(drawColor);
+            painter.setPen(pen);
+        }
+        if(sampleClass == "All")
+        {
+            QPolygon drawpoints = this->listPolygon[i].getPolygon();
+            drawpoints.append(drawpoints.at(0));
+            QPainterPath path;
+            path.addPolygon(this->listPolygon[i].getPolygon());
+            painter.fillPath(path, QBrush(QColor(drawColor.red(), drawColor.green(),
+                                                drawColor.blue(), 80)));
+            foreach (QPoint var, this->listPolygon[i].getPolygon())
+            {
+                painter.drawEllipse(var, 2, 2);
+            }
+            painter.drawPolyline(QPolygon(drawpoints));
+            painter.drawText(drawpoints.at(0), this->listPolygon[i].getObjectClass());
+        }
+        else
+        {
+            if(this->listPolygon[i].getObjectClass().contains(sampleClass))
+            {
+                QPolygon drawpoints = this->listPolygon[i].getPolygon();
+                drawpoints.append(drawpoints.at(0));
+                QPainterPath path;
+                path.addPolygon(this->listPolygon[i].getPolygon());
+                painter.fillPath(path, QBrush(QColor(drawColor.red(),drawColor.green(),
+                                                    drawColor.blue(), 80)));
+                foreach (QPoint var, this->listPolygon[i].getPolygon())
+                {
+                    painter.drawEllipse(var, 2, 2);
+                }
+                painter.drawPolyline(QPolygon(drawpoints));
+                painter.drawText(drawpoints.at(0), this->listPolygon[i].getObjectClass());
+            }
+        }
     }
+    if(isDraw)
+    {
+        if(!currentPolygon.isEmpty())
+        {
+            painter.setBrush(QColor("#3CFF55"));
+            foreach (QPoint var, currentPolygon)
+            {
+                painter.drawEllipse(var, 2, 2);
+            }
+
+            QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
+            painter.setPen(pen);
+            painter.drawPolyline(QPolygonF(currentPolygon));
+        }
+    }
+}
+
+void DrawPolygonShape::setObjectList(QList<MyObject> list)
+{
+    this->listPolygon.clear();
+    this->listPolygon = list;
+}
+
+void DrawPolygonShape::getObjectList(QList<MyObject> &list)
+{
+    list = this->listPolygon;
+}
+
+QPolygon DrawPolygonShape::getCurrentPolygon(bool &isDraw)
+{
+    isDraw = true;
+    return this->currentPolygon;
 }
 
 int DrawPolygonShape::nearPolygonPoint(const QPoint point)

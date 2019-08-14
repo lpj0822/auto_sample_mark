@@ -6,7 +6,7 @@
 #include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
-DrawLineShape::DrawLineShape(QObject *parent) : QObject(parent)
+DrawLineShape::DrawLineShape(QObject *parent) : DrawShape(parent)
 {
     initDraw();
 }
@@ -27,7 +27,7 @@ void DrawLineShape::initDraw()
     listLine.clear();
 }
 
-int DrawLineShape::drawLineMousePress(const QPoint point, bool &isDraw)
+int DrawLineShape::drawMousePress(const QPoint point, bool &isDraw)
 {
     int mouseChange = 0;
     nearLineIndex = nearLinePoint(point);
@@ -50,7 +50,7 @@ int DrawLineShape::drawLineMousePress(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawLineShape::drawLineMouseMove(const QPoint point, bool &isDraw)
+int DrawLineShape::drawMouseMove(const QPoint point, bool &isDraw)
 {
     int mouseChange = 0;
     isDraw = false;
@@ -84,7 +84,7 @@ int DrawLineShape::drawLineMouseMove(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawLineShape::drawLineMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
+int DrawLineShape::drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
 {
     if(drawMousePressed)
     {
@@ -102,6 +102,7 @@ int DrawLineShape::drawLineMouseRelease(QWidget *parent, const QPoint point, con
                 object.setShapeType(ShapeType::LINE_SHAPE);
                 object.setLine(currentLine[0], currentLine[1]);
                 object.setObjectClass(window->getObjectClass());
+                object.setIsDifficult(window->getIsDifficult());
                 object.setObjectFlag(window->getObjectFlag());
                 listLine.append(object);
             }
@@ -132,7 +133,18 @@ int DrawLineShape::drawLineMouseRelease(QWidget *parent, const QPoint point, con
     return 0;
 }
 
-bool DrawLineShape::lineListContains(const QPoint point)
+void DrawLineShape::removeShape(bool &isDraw)
+{
+    isDraw = false;
+    if(removeLineIndex >= 0 && removeLineIndex < listLine.size())
+    {
+        this->listLine.removeAt(removeLineIndex);
+        removeLineIndex = -1;
+        isDraw = true;
+    }
+}
+
+bool DrawLineShape::isInShape(const QPoint &point)
 {
     bool isFind = false;
     removeLineIndex = listLine.size();
@@ -161,15 +173,87 @@ bool DrawLineShape::lineListContains(const QPoint point)
     return isFind;
 }
 
-void DrawLineShape::removeLine(bool &isDraw)
+void DrawLineShape::drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter)
 {
-    isDraw = false;
-    if(removeLineIndex >= 0 && removeLineIndex < listLine.size())
+    QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
+    QFont font("Decorative", 15);
+    painter.setPen(pen);
+    painter.setFont(font);
+
+    bool isDraw = false;
+    QPoint currentLine[2];
+    getCurrentLine(currentLine, isDraw);
+
+    for(int i = 0; i < this->listLine.size(); i++)
     {
-        this->listLine.removeAt(removeLineIndex);
-        removeLineIndex = -1;
-        isDraw = true;
+        QList<QPoint> line = this->listLine[i].getLine();
+        QString color = ManualParamterConfig::getMarkClassColor(this->listLine[i].getObjectClass());
+        QColor drawColor(color);
+        if(drawColor.isValid())
+        {
+            pen.setColor(drawColor);
+            painter.setPen(pen);
+        }
+        else
+        {
+            drawColor = QColor("#000000");
+            pen.setColor(drawColor);
+            painter.setPen(pen);
+        }
+        if(sampleClass == "All")
+        {
+            painter.drawLine(line[0], line[1]);
+            painter.drawText(line[0], this->listLine[i].getObjectClass());
+
+            painter.save();
+            pen.setColor(QColor("#3CFF55"));
+            painter.setPen(pen);
+            painter.setBrush(QColor("#3CFF55"));
+            painter.drawEllipse(line[0], 2, 2);
+            painter.drawEllipse(line[1], 2, 2);
+            painter.restore();
+        }
+        else
+        {
+            if(this->listLine[i].getObjectClass().contains(sampleClass))
+            {
+                painter.drawLine(line[0], line[1]);
+                painter.drawText(line[0], this->listLine[i].getObjectClass());
+
+                painter.save();
+                pen.setColor(QColor("#3CFF55"));
+                painter.setPen(pen);
+                painter.setBrush(QColor("#3CFF55"));
+                painter.drawEllipse(line[0], 2, 2);
+                painter.drawEllipse(line[1], 2, 2);
+                painter.restore();
+            }
+        }
     }
+
+    if(isDraw)
+    {
+        painter.drawLine(currentLine[0], currentLine[1]);
+
+        painter.save();
+        pen.setColor(QColor("#3CFF55"));
+        painter.setPen(pen);
+        painter.setBrush(QColor("#3CFF55"));
+        painter.drawEllipse(currentLine[0], 2, 2);
+        painter.drawEllipse(currentLine[1], 2, 2);
+        painter.restore();
+    }
+}
+
+void DrawLineShape::setObjectList(QList<MyObject> list)
+{
+    this->listLine.clear();
+    this->listLine = list;
+}
+
+void DrawLineShape::getObjectList(QList<MyObject> &list)
+{
+    list = this->listLine;
 }
 
 void DrawLineShape::getCurrentLine(QPoint *line, bool &isDraw)
@@ -184,17 +268,6 @@ void DrawLineShape::getCurrentLine(QPoint *line, bool &isDraw)
     }
     line[0] = currentLine[0];
     line[1] = currentLine[1];
-}
-
-void DrawLineShape::getLineList(QList<MyObject> &list)
-{
-    list = this->listLine;
-}
-
-void DrawLineShape::setLineList(QList<MyObject> list)
-{
-    this->listLine.clear();
-    this->listLine = list;
 }
 
 int DrawLineShape::nearLinePoint(const QPoint point)

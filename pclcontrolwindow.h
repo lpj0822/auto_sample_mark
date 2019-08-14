@@ -10,9 +10,9 @@ class PCLControlWindow : public ControlWindow
 
 public:
     PCLControlWindow(QWidget *parent = 0);
-    ~PCLControlWindow();
+    ~PCLControlWindow() override;
 
-    void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType);
+    void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType) override;
 
 public slots:
 
@@ -21,8 +21,8 @@ public slots:
     void slotScrollArea(int keyValue);
 
 protected:
-    void closeEvent(QCloseEvent *event);
-    void keyPressEvent(QKeyEvent *e);
+    void closeEvent(QCloseEvent *event) override;
+    void keyPressEvent(QKeyEvent *e) override;
 
 private:
     void showPrevious();

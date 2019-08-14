@@ -199,7 +199,7 @@ void VideoControlWindow::saveMarkDataResult()
 
 void VideoControlWindow::loadMarkImage()
 {
-    if(this->markDataType == MarkDataType::VIDEO)
+    if(this->markDataType == MarkDataType::VIDEO && currentIndex >= 0)
     {
         loadVideoImage();
     }

@@ -37,6 +37,8 @@ private:
     int writePolygonData(const MyObject &object, QXmlStreamWriter &xmlWriter);
     MyObject readPolygonData(const QDomNodeList &childList);
 
+    int writePointListData(const MyObject &object, QXmlStreamWriter &xmlWriter);
+    MyObject readPointListData(const QDomNodeList &childList);
 };
 
 #endif // XMLPROCESS_H

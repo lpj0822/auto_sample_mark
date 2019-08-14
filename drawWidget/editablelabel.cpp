@@ -14,67 +14,18 @@ EditableLabel::EditableLabel(QWidget *parent):
 
 void EditableLabel::slotRemoveObject()
 {
-    switch(this->shapeType)
+    bool isDraw = false;
+    drawList[this->shapeType]->removeShape(isDraw);
+    if(isDraw)
     {
-     case ShapeType::RECT_SHAPE:
-        {
-            bool isDraw = false;
-            drawRect.removeRect(isDraw);
-            if(isDraw)
-            {
-                drawPixmap();
-            }
-        }
-        break;
-     case ShapeType::LINE_SHAPE:
-        {
-            bool isDraw = false;
-            drawLine.removeLine(isDraw);
-            if(isDraw)
-            {
-                drawPixmap();
-            }
-        }
-        break;
-    case ShapeType::POLYGON_SHAPE:
-       {
-           bool isDraw = false;
-           drawPolygon.removePolygon(isDraw);
-           if(isDraw)
-           {
-               drawPixmap();
-           }
-       }
-       break;
-    default:
-        break;
+        drawPixmap();
     }
 }
 
 void EditableLabel::contextMenuEvent(QContextMenuEvent * event)
 {
     QMenu* popMenu = new QMenu(this);
-    bool isFind = false;
-    switch(this->shapeType)
-    {
-     case ShapeType::RECT_SHAPE:
-        {
-            isFind = drawRect.rectListContains(this->mapFromGlobal(QCursor::pos()));
-        }
-        break;
-     case ShapeType::LINE_SHAPE:
-        {
-            isFind = drawLine.lineListContains(this->mapFromGlobal(QCursor::pos()));
-        }
-        break;
-    case ShapeType::POLYGON_SHAPE:
-       {
-           isFind = drawPolygon.polygonListContains(this->mapFromGlobal(QCursor::pos()));
-       }
-       break;
-    default:
-        break;
-    }
+    bool isFind = drawList[this->shapeType]->isInShape(this->mapFromGlobal(QCursor::pos()));
     if(isFind)
     {
         popMenu->addAction(removeRectAction);
@@ -94,62 +45,19 @@ void EditableLabel::mousePressEvent(QMouseEvent *e)
 
     if(e->button() == Qt::LeftButton)
     {
-        switch(this->shapeType)
+        bool isDraw = false;
+        int mouseChange = drawList[this->shapeType]->drawMousePress(e->pos(), isDraw);
+        if(mouseChange == 1)
         {
-         case ShapeType::RECT_SHAPE:
-            {
-                bool isDraw = false;
-                int mouseChange = drawRect.drawRectMousePress(e->pos(), isDraw);
-                if(mouseChange == 1)
-                {
-                    this->setCursor(Qt::CrossCursor);
-                }
-                else if(mouseChange == 2)
-                {
-                    this->setCursor(Qt::SizeAllCursor);
-                }
-                if(isDraw)
-                {
-                    drawPixmap();
-                }
-            }
-            break;
-         case ShapeType::LINE_SHAPE:
-            {
-                bool isDraw = false;
-                int mouseChange = drawLine.drawLineMousePress(e->pos(), isDraw);
-                if(mouseChange == 1)
-                {
-                    this->setCursor(Qt::CrossCursor);
-                }
-                else if(mouseChange == 2)
-                {
-                    this->setCursor(Qt::SizeAllCursor);
-                }
-                if(isDraw)
-                {
-                    drawPixmap();
-                }
-            }
-            break;
-        case ShapeType::POLYGON_SHAPE:
-            {
-                bool isDraw = false;
-                int mouseChange = drawPolygon.drawPolygonMousePress(e->pos(), isDraw);
-                if(mouseChange == 1)
-                {
-                    this->setCursor(Qt::CrossCursor);
-                }
-                else if(mouseChange == 2)
-                {
-                    this->setCursor(Qt::SizeAllCursor);
-                }
-                if(isDraw)
-                {
-                    drawPixmap();
-                }
-            }
-            break;
+            this->setCursor(Qt::CrossCursor);
+        }
+        else if(mouseChange == 2)
+        {
+            this->setCursor(Qt::SizeAllCursor);
+        }
+        if(isDraw)
+        {
+            drawPixmap();
         }
     }
 }
@@ -160,63 +68,19 @@ void EditableLabel::mouseMoveEvent(QMouseEvent *e)
     {
         return;
     }
-
-    switch(this->shapeType)
+    bool isDraw = false;
+    int mouseChange = drawList[this->shapeType]->drawMouseMove(e->pos(), isDraw);
+    if(mouseChange == 1)
     {
-     case ShapeType::RECT_SHAPE:
-        {
-            bool isDraw = false;
-            int mouseChange = drawRect.drawRectMouseMove(e->pos(), isDraw);
-            if(mouseChange == 1)
-            {
-                this->setCursor(Qt::CrossCursor);
-            }
-            else if(mouseChange == 2)
-            {
-                this->setCursor(Qt::SizeAllCursor);
-            }
-            if(isDraw)
-            {
-                drawPixmap();
-            }
-        }
-        break;
-     case ShapeType::LINE_SHAPE:
-        {
-            bool isDraw = false;
-            int mouseChange = drawLine.drawLineMouseMove(e->pos(), isDraw);
-            if(mouseChange == 1)
-            {
-                this->setCursor(Qt::CrossCursor);
-            }
-            else if(mouseChange == 2)
-            {
-                this->setCursor(Qt::SizeAllCursor);
-            }
-            if(isDraw)
-            {
-                drawPixmap();
-            }
-        }
-        break;
-     case ShapeType::POLYGON_SHAPE:
-        {
-            bool isDraw = false;
-            int mouseChange = drawPolygon.drawPolygonMouseMove(e->pos(), isDraw);
-            if(mouseChange == 1)
-            {
-                this->setCursor(Qt::CrossCursor);
-            }
-            else if(mouseChange == 2)
-            {
-                this->setCursor(Qt::SizeAllCursor);
-            }
-            if(isDraw)
-            {
-                drawPixmap();
-            }
-        }
-       break;
+        this->setCursor(Qt::CrossCursor);
+    }
+    else if(mouseChange == 2)
+    {
+        this->setCursor(Qt::SizeAllCursor);
+    }
+    if(isDraw)
+    {
+        drawPixmap();
     }
 }
 
@@ -229,38 +93,11 @@ void EditableLabel::mouseReleaseEvent(QMouseEvent *e)
 
     if(e->button() == Qt::LeftButton)
     {
-        switch(this->shapeType)
+        bool isDraw = false;
+        drawList[this->shapeType]->drawMouseRelease(this, e->pos(), this->sampleClass, isDraw);
+        if(isDraw)
         {
-        case ShapeType::RECT_SHAPE:
-            {
-                bool isDraw = false;
-                drawRect.drawRectMouseRelease(this, e->pos(), this->sampleClass, isDraw);
-                if(isDraw)
-                {
-                    drawPixmap();
-                }
-            }
-            break;
-        case ShapeType::LINE_SHAPE:
-            {
-                bool isDraw = false;
-                drawLine.drawLineMouseRelease(this, e->pos(), this->sampleClass, isDraw);
-                if(isDraw)
-                {
-                    drawPixmap();
-                }
-            }
-            break;
-        case ShapeType::POLYGON_SHAPE:
-            {
-                bool isDraw = false;
-                drawPolygon.drawPolygonMouseRelease(this, e->pos(), this->sampleClass, isDraw);
-                if(isDraw)
-                {
-                    drawPixmap();
-                }
-            }
-            break;
+            drawPixmap();
         }
     }
 }
@@ -301,9 +138,10 @@ void EditableLabel::paintEvent(QPaintEvent *e)
 
 void EditableLabel::clearObjects()
 {
-    drawRect.initDraw();
-    drawLine.initDraw();
-    drawPolygon.initDraw();
+    for(int loop = 0; loop < ShapeType::MAX_SHAPE_TYPE; loop++)
+    {
+        drawList[loop]->initDraw();
+    }
     drawPixmap();
 }
 
@@ -315,19 +153,13 @@ void EditableLabel::setNewQImage(QImage &image)
 
 void EditableLabel::setDrawShape(int shapeID)
 {
-    switch(shapeID)
+    if(shapeID >= 0 && shapeID < ShapeType::MAX_SHAPE_TYPE)
     {
-     case ShapeType::RECT_SHAPE:
-        this->shapeType = ShapeType::RECT_SHAPE;
-        break;
-     case ShapeType::LINE_SHAPE:
-        this->shapeType = ShapeType::LINE_SHAPE;
-        break;
-     case ShapeType::POLYGON_SHAPE:
-        this->shapeType = ShapeType::POLYGON_SHAPE;
-        break;
-     default:
-        this->shapeType = ShapeType::UNSHAPE;
+        this->shapeType = static_cast<ShapeType>(shapeID);
+        drawPixmap();
+    }
+    else
+    {
         QMessageBox::information(this, tr("标注形状"), tr("选择的标注形状有误！"));
     }
 }
@@ -337,9 +169,11 @@ void EditableLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
     QList<MyObject> rectObejcts;
     QList<MyObject> lineObejcts;
     QList<MyObject> polygonObejcts;
+    QList<MyObject> laneObejcts;
     rectObejcts.clear();
     lineObejcts.clear();
     polygonObejcts.clear();
+    laneObejcts.clear();
     for(int loop = 0; loop < obejcts.count(); loop++)
     {
         const MyObject object = obejcts[loop];
@@ -355,10 +189,15 @@ void EditableLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
         {
             polygonObejcts.append(object);
         }
+        else if(object.getShapeType() == ShapeType::LANE_SEGMENT)
+        {
+            laneObejcts.append(object);
+        }
     }
-    this->drawRect.setRectList(rectObejcts);
-    this->drawLine.setLineList(lineObejcts);
-    this->drawPolygon.setPolygonList(polygonObejcts);
+    drawList[ShapeType::RECT_SHAPE]->setObjectList(rectObejcts);
+    drawList[ShapeType::LINE_SHAPE]->setObjectList(lineObejcts);
+    drawList[ShapeType::POLYGON_SHAPE]->setObjectList(polygonObejcts);
+    drawList[ShapeType::LANE_SEGMENT]->setObjectList(laneObejcts);
     this->sampleClass = sampleClass;
     drawPixmap();
 }
@@ -366,23 +205,29 @@ void EditableLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
 QList<MyObject> EditableLabel::getObjects()
 {
     QList<MyObject> allObject;
-    QList<MyObject> rectObjects;
-    QList<MyObject> lineObjects;
-    QList<MyObject> polygonObjects;
     allObject.clear();
 
-    rectObjects.clear();
-    drawRect.getRectList(rectObjects);
-    allObject.append(rectObjects);
+    for(int loop = 0; loop < ShapeType::MAX_SHAPE_TYPE; loop++)
+    {
+        QList<MyObject> tempObject;
+        tempObject.clear();
+        drawList[loop]->getObjectList(tempObject);
+        allObject.append(tempObject);
+    }
+    return allObject;
+}
 
-    lineObjects.clear();
-    drawLine.getLineList(lineObjects);
-    allObject.append(lineObjects);
-
-    polygonObjects.clear();
-    drawPolygon.getPolygonList(polygonObjects);
-    allObject.append(polygonObjects);
-
+QList<MyObject> EditableLabel::getSegment()
+{
+    QList<MyObject> allObject;
+    allObject.clear();
+    for(int loop = 0; loop < ShapeType::MAX_SHAPE_TYPE; loop++)
+    {
+        if(loop == ShapeType::LANE_SEGMENT && drawList[loop]->getObjectSize() > 0)
+        {
+            allObject.append(drawList[loop]->getSegmentImage());
+        }
+    }
     return allObject;
 }
 
@@ -393,223 +238,13 @@ void EditableLabel::drawPixmap()
     painter.begin(&tempPixmap);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    drawRectPixmap(painter);
-    drawLinePixmap(painter);
-    drawPolygonPixmap(painter);
+    for(int loop = 0; loop < ShapeType::MAX_SHAPE_TYPE; loop++)
+    {
+        drawList[loop]->drawPixmap(this->sampleClass, this->shapeType, painter);
+    }
 
     painter.end();
     this->update();
-}
-
-void EditableLabel::drawRectPixmap(QPainter &painter)
-{
-    QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
-    QFont font("Decorative", 15);
-    painter.setPen(pen);
-    painter.setFont(font);
-
-    QList<MyObject> listObject;
-    bool isDraw = false;
-    QRect currentRect;
-    QList<QPoint> points = drawRect.getRectListPoints(this->sampleClass);
-    drawRect.getRectList(listObject);
-    drawRect.getCurrentRect(currentRect, isDraw);
-
-    for(int i = 0; i < listObject.size(); i++)
-    {
-        QString color = ManualParamterConfig::getMarkClassColor(listObject[i].getObjectClass());
-        QColor drawColor(color);
-        if(drawColor.isValid())
-        {
-            pen.setColor(drawColor);
-            painter.setPen(pen);
-        }
-        else
-        {
-            drawColor = QColor("#000000");
-            pen.setColor(drawColor);
-            painter.setPen(pen);
-        }
-        if(this->sampleClass == "All")
-        {
-            painter.drawRect(listObject[i].getBox());
-            painter.drawText(listObject[i].getBox().topLeft(), listObject[i].getObjectClass());
-        }
-        else
-        {
-            if(listObject[i].getObjectClass().contains(this->sampleClass))
-            {
-                painter.drawRect(listObject[i].getBox());
-                painter.drawText(listObject[i].getBox().topLeft(), listObject[i].getObjectClass());
-            }
-        }
-    }
-
-    if(isDraw)
-    {
-        painter.drawRect(currentRect);
-    }
-
-    pen.setColor(QColor("#3CFF55"));
-    painter.setPen(pen);
-    painter.setBrush(QColor("#3CFF55"));
-    for(int i = 0; i < points.size(); i++)
-    {
-        painter.drawEllipse(points[i], 2, 2);
-    }
-}
-
-void EditableLabel::drawLinePixmap(QPainter &painter)
-{
-    QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
-    QFont font("Decorative", 15);
-    painter.setPen(pen);
-    painter.setFont(font);
-
-    QList<MyObject> listObject;
-    bool isDraw = false;
-    QPoint currentLine[2];
-    drawLine.getCurrentLine(currentLine, isDraw);
-    drawLine.getLineList(listObject);
-
-    for(int i = 0; i < listObject.size(); i++)
-    {
-        QList<QPoint> line = listObject[i].getLine();
-        QString color = ManualParamterConfig::getMarkClassColor(listObject[i].getObjectClass());
-        QColor drawColor(color);
-        if(drawColor.isValid())
-        {
-            pen.setColor(drawColor);
-            painter.setPen(pen);
-        }
-        else
-        {
-            drawColor = QColor("#000000");
-            pen.setColor(drawColor);
-            painter.setPen(pen);
-        }
-        if(this->sampleClass == "All")
-        {
-            painter.drawLine(line[0], line[1]);
-            painter.drawText(line[0], listObject[i].getObjectClass());
-
-            painter.save();
-            pen.setColor(QColor("#3CFF55"));
-            painter.setPen(pen);
-            painter.setBrush(QColor("#3CFF55"));
-            painter.drawEllipse(line[0], 2, 2);
-            painter.drawEllipse(line[1], 2, 2);
-            painter.restore();
-        }
-        else
-        {
-            if(listObject[i].getObjectClass().contains(this->sampleClass))
-            {
-                painter.drawLine(line[0], line[1]);
-                painter.drawText(line[0], listObject[i].getObjectClass());
-
-                painter.save();
-                pen.setColor(QColor("#3CFF55"));
-                painter.setPen(pen);
-                painter.setBrush(QColor("#3CFF55"));
-                painter.drawEllipse(line[0], 2, 2);
-                painter.drawEllipse(line[1], 2, 2);
-                painter.restore();
-            }
-        }
-    }
-
-    if(isDraw)
-    {
-        painter.drawLine(currentLine[0], currentLine[1]);
-
-        painter.save();
-        pen.setColor(QColor("#3CFF55"));
-        painter.setPen(pen);
-        painter.setBrush(QColor("#3CFF55"));
-        painter.drawEllipse(currentLine[0], 2, 2);
-        painter.drawEllipse(currentLine[1], 2, 2);
-        painter.restore();
-    }
-}
-
-void EditableLabel::drawPolygonPixmap(QPainter &painter)
-{
-    QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
-    QFont font("Decorative", 15);
-    painter.setPen(pen);
-    painter.setFont(font);
-    painter.setBrush(QColor("#3CFF55"));
-
-    QList<MyObject> listObject;
-    bool isDraw = false;
-    QPolygon currentPolygon = drawPolygon.getCurrentPolygon(isDraw);
-    drawPolygon.getPolygonList(listObject);
-
-    for(int i=0; i< listObject.count(); i++)
-    {
-        QString color = ManualParamterConfig::getMarkClassColor(listObject[i].getObjectClass());
-        QColor drawColor(color);
-        if(drawColor.isValid())
-        {
-            pen.setColor(drawColor);
-            painter.setPen(pen);
-        }
-        else
-        {
-            drawColor = QColor("#000000");
-            pen.setColor(drawColor);
-            painter.setPen(pen);
-        }
-        if(this->sampleClass == "All")
-        {
-            QPolygon drawpoints = listObject[i].getPolygon();
-            drawpoints.append(drawpoints.at(0));
-            QPainterPath path;
-            path.addPolygon(listObject[i].getPolygon());
-            painter.fillPath(path, QBrush(QColor(drawColor.red(), drawColor.green(),
-                                                drawColor.blue(), 80)));
-            foreach (QPoint var, listObject[i].getPolygon())
-            {
-                painter.drawEllipse(var, 2, 2);
-            }
-            painter.drawPolyline(QPolygon(drawpoints));
-            painter.drawText(drawpoints.at(0), listObject[i].getObjectClass());
-        }
-        else
-        {
-            if(listObject[i].getObjectClass().contains(this->sampleClass))
-            {
-                QPolygon drawpoints = listObject[i].getPolygon();
-                drawpoints.append(drawpoints.at(0));
-                QPainterPath path;
-                path.addPolygon(listObject[i].getPolygon());
-                painter.fillPath(path, QBrush(QColor(drawColor.red(),drawColor.green(),
-                                                    drawColor.blue(), 80)));
-                foreach (QPoint var, listObject[i].getPolygon())
-                {
-                    painter.drawEllipse(var, 2, 2);
-                }
-                painter.drawPolyline(QPolygon(drawpoints));
-                painter.drawText(drawpoints.at(0), listObject[i].getObjectClass());
-            }
-        }
-    }
-    if(isDraw)
-    {
-        if(!currentPolygon.isEmpty())
-        {
-            painter.setBrush(QColor("#3CFF55"));
-            foreach (QPoint var, currentPolygon)
-            {
-                painter.drawEllipse(var, 2, 2);
-            }
-
-            QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
-            painter.setPen(pen);
-            painter.drawPolyline(QPolygonF(currentPolygon));
-        }
-    }
 }
 
 void EditableLabel::initData()
@@ -622,6 +257,11 @@ void EditableLabel::initData()
     this->shapeType = ShapeType::RECT_SHAPE;
 
     this->removeRectAction = new QAction(tr("删除标注"), this);
+
+    drawList.append(new DrawRectShape());
+    drawList.append(new DrawLineShape());
+    drawList.append(new DrawPolygonShape());
+    drawList.append(new DrawLaneShape());
 }
 
 void EditableLabel::initConnect()

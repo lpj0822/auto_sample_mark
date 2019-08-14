@@ -1,11 +1,9 @@
 ﻿#ifndef DRAWPOLYGONSHAPE_H
 #define DRAWPOLYGONSHAPE_H
 
-#include <QObject>
-#include "myobject.h"
-#include "baseAlgorithm/geometryalgorithm.h"
+#include "drawshape.h"
 
-class DrawPolygonShape : public QObject
+class DrawPolygonShape : public DrawShape
 {
     Q_OBJECT
 public:
@@ -15,16 +13,18 @@ public:
     void initDraw();
 
     //polygon
-    int drawPolygonMousePress(const QPoint point, bool &isDraw);
-    int drawPolygonMouseMove(const QPoint point, bool &isDraw);
-    int drawPolygonMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw);
+    int drawMousePress(const QPoint point, bool &isDraw);
+    int drawMouseMove(const QPoint point, bool &isDraw);
+    int drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw);
+    void removeShape(bool &isDraw);
+    bool isInShape(const QPoint &point);
 
-    bool polygonListContains(const QPoint point);
-    void removePolygon(bool &isDraw);
+    void drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter);
+
+    void setObjectList(QList<MyObject> list);
+    void getObjectList(QList<MyObject> &list);
 
     QPolygon getCurrentPolygon(bool &isDraw);
-    void getPolygonList(QList<MyObject> &list);
-    void setPolygonList(QList<MyObject> list);
 
 signals:
 
@@ -37,9 +37,6 @@ private:
 
 private:
 
-    bool drawMousePressed;
-    bool moveMousePressed;
-
     bool nearFirstPoint;
     bool finishDrawPolygon;
 
@@ -49,8 +46,6 @@ private:
     QPoint firstPoint;
     QPolygon currentPolygon;
     QList<MyObject> listPolygon;
-
-    GeometryAlgorithm geometryAlgorithm;
 };
 
 #endif // DRAWPOLYGONSHAPE_H

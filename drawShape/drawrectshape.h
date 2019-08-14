@@ -1,10 +1,9 @@
 ﻿#ifndef DRAWRECTSHAPE_H
 #define DRAWRECTSHAPE_H
 
-#include <QObject>
-#include "myobject.h"
+#include "drawshape.h"
 
-class DrawRectShape : public QObject
+class DrawRectShape : public DrawShape
 {
     Q_OBJECT
 public:
@@ -14,17 +13,19 @@ public:
     void initDraw();
 
     //rect
-    int drawRectMousePress(const QPoint point, bool &isDraw);
-    int drawRectMouseMove(const QPoint point, bool &isDraw);
-    int drawRectMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw);
+    int drawMousePress(const QPoint point, bool &isDraw);
+    int drawMouseMove(const QPoint point, bool &isDraw);
+    int drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw);
+    void removeShape(bool &isDraw);
+    bool isInShape(const QPoint &point);
 
-    bool rectListContains(const QPoint point);
-    void removeRect(bool &isDraw);
+    void drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter);
+
+    void setObjectList(QList<MyObject> list);
+    void getObjectList(QList<MyObject> &list);
 
     void getCurrentRect(QRect &rect, bool &isDraw);
-    void getRectList(QList<MyObject> &list);
     QList<QPoint> getRectListPoints(const QString sampleClass);
-    void setRectList(QList<MyObject> list);
 
 signals:
 
@@ -36,10 +37,6 @@ private:
     void updateRect(const QPoint point);
 
 private:
-
-    bool drawMousePressed;
-    bool moveMousePressed;
-
     int perScale;
     int scale;
 

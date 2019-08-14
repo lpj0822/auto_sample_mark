@@ -52,6 +52,16 @@ QPolygon MyObject::getPolygon() const
     return this->polygon;
 }
 
+void MyObject::setPointList(QList<QPoint> &pointList)
+{
+    this->pointList = pointList;
+}
+
+QList<QPoint> MyObject::getPointList() const
+{
+    return this->pointList;
+}
+
 void MyObject::setObjectClass(QString objectClass)
 {
     this->obejctClass = objectClass;
@@ -60,6 +70,16 @@ void MyObject::setObjectClass(QString objectClass)
 QString MyObject::getObjectClass() const
 {
     return this->obejctClass;
+}
+
+void MyObject::setIsDifficult(bool flag)
+{
+    this->isDifficult = flag;
+}
+
+bool MyObject::getIsDifficult() const
+{
+    return this->isDifficult;
 }
 
 void MyObject::setObjectFlag(int flag)
@@ -82,6 +102,16 @@ bool MyObject::getIsTrackingObject() const
     return this->isTrackingObject;
 }
 
+void MyObject::setSegmentImage(const QImage &image)
+{
+    maskImage = image.copy();
+}
+
+QImage MyObject::getSegmentImage() const
+{
+    return maskImage;
+}
+
 void MyObject::init()
 {
     this->shapeType = ShapeType::UNSHAPE;
@@ -89,4 +119,5 @@ void MyObject::init()
     this->polygon.clear();
     this->objectFlag = 0;
     this->isTrackingObject = false;
+    this->isDifficult = false;
 }

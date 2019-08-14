@@ -1,4 +1,4 @@
-#ifndef GEOMETRYALGORITHM_H
+﻿#ifndef GEOMETRYALGORITHM_H
 #define GEOMETRYALGORITHM_H
 
 #include <QPolygon>

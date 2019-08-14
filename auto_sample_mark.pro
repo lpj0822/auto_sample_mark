@@ -56,7 +56,14 @@ SOURCES += main.cpp\
     drawWidget/pclviewer.cpp \
     pclcontrolwindow.cpp \
     sampleMarkParam/manualparamterconfig.cpp \
-    sampleMarkParam/videomarkparamterconfig.cpp
+    sampleMarkParam/videomarkparamterconfig.cpp \
+    videoTools/imageconverterthread.cpp \
+    videoTools/imageconverterwindow.cpp \
+    drawShape/drawlaneshape.cpp \
+    drawShape/drawshape.cpp \
+    imagesegmentcontrolwindow.cpp \
+    drawWidget/segmentlabel.cpp \
+    saveMarkData/segmentimagesave.cpp
 
 HEADERS  += controlwindow.h \
     videoparameterwindow.h \
@@ -92,7 +99,14 @@ HEADERS  += controlwindow.h \
     pclcontrolwindow.h \
     sampleMarkParam/drawmarkcolor.h \
     sampleMarkParam/manualparamterconfig.h \
-    sampleMarkParam/videomarkparamterconfig.h
+    sampleMarkParam/videomarkparamterconfig.h \
+    videoTools/imageconverterthread.h \
+    videoTools/imageconverterwindow.h \
+    drawShape/drawlaneshape.h \
+    drawShape/drawshape.h \
+    imagesegmentcontrolwindow.h \
+    drawWidget/segmentlabel.h \
+    saveMarkData/segmentimagesave.h
 
 RESOURCES += \
     style.qrc \

@@ -8,7 +8,8 @@ HEADERS += \
     $$PWD/customWindow/mytextbrowser.h \
     $$PWD/customWindow/markclasstablewidget.h \
     $$PWD/customWindow/modellabeltablewidget.h \
-    $$PWD/customWindow/mystackedwidget.h
+    $$PWD/customWindow/mystackedwidget.h \
+    $$PWD/customWindow/markclasstreewidget.h
 
 SOURCES += \
     $$PWD/customWindow/customanimation.cpp \
@@ -20,4 +21,5 @@ SOURCES += \
     $$PWD/customWindow/mytextbrowser.cpp \
     $$PWD/customWindow/markclasstablewidget.cpp \
     $$PWD/customWindow/modellabeltablewidget.cpp \
-    $$PWD/customWindow/mystackedwidget.cpp
+    $$PWD/customWindow/mystackedwidget.cpp \
+    $$PWD/customWindow/markclasstreewidget.cpp

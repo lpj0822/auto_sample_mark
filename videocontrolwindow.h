@@ -11,30 +11,30 @@ class VideoControlWindow : public ImageControlWindow
 
 public:
     VideoControlWindow(QWidget *parent = 0);
-    ~VideoControlWindow();
+    ~VideoControlWindow() override;
 
-    void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType);
+    void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType) override;
 
 public slots:
 
-    void slotScrollArea(int keyValue);
+    void slotScrollArea(int keyValue) override;
 
 protected:
-    void keyPressEvent(QKeyEvent *e);
+    void keyPressEvent(QKeyEvent *e) override;
 
 private:
-    void showPrevious();
-    void showNext();
+    void showPrevious() override;
+    void showNext() override;
 
     void nextVideo();
     void previousVideo();
 
-    void updateLabelText(int markCount);
+    void updateLabelText(int markCount) override;
 
-    void loadMarkData(const QString dataPath);
-    void saveMarkDataResult();
-    void loadMarkImage();
-    void saveMarkImageResult();
+    void loadMarkData(const QString dataPath) override;
+    void saveMarkDataResult() override;
+    void loadMarkImage() override;
+    void saveMarkImageResult() override;
 
     //videoData
     void loadVideoData(const QString videoPath, const QString saveAnnotationsDir);

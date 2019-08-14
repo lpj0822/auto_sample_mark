@@ -311,8 +311,8 @@ void ControlWindow::updateExpandRight()
 
 void ControlWindow::readClassConfig(const QString &markDataDir)
 {
-    QString saveAnnotationsDir = markDataDir + "/../" + "class.json";
-    if(ManualParamterConfig::loadClassConfig(saveAnnotationsDir) == 0)
+    QString saveClassPath = markDataDir + "/../" + "class.json";
+    if(ManualParamterConfig::loadClassConfig(saveClassPath) == 0)
     {
         ManualParamterConfig::saveConfig();
     }

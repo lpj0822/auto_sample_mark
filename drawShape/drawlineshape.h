@@ -1,11 +1,9 @@
 ﻿#ifndef DRAWLINESHAPE_H
 #define DRAWLINESHAPE_H
 
-#include <QObject>
-#include "myobject.h"
-#include "baseAlgorithm/geometryalgorithm.h"
+#include "drawshape.h"
 
-class DrawLineShape : public QObject
+class DrawLineShape : public DrawShape
 {
     Q_OBJECT
 public:
@@ -14,17 +12,18 @@ public:
 
     void initDraw();
 
-    //line
-    int drawLineMousePress(const QPoint point, bool &isDraw);
-    int drawLineMouseMove(const QPoint point, bool &isDraw);
-    int drawLineMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw);
+    int drawMousePress(const QPoint point, bool &isDraw);
+    int drawMouseMove(const QPoint point, bool &isDraw);
+    int drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw);
+    void removeShape(bool &isDraw);
+    bool isInShape(const QPoint &point);
 
-    bool lineListContains(const QPoint point);
-    void removeLine(bool &isDraw);
+    void drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter);
+
+    void setObjectList(QList<MyObject> list);
+    void getObjectList(QList<MyObject> &list);
 
     void getCurrentLine(QPoint *line, bool &isDraw);
-    void getLineList(QList<MyObject> &list);
-    void setLineList(QList<MyObject> list);
 
 signals:
 
@@ -37,16 +36,11 @@ private:
 
 private:
 
-    bool drawMousePressed;
-    bool moveMousePressed;
-
     int nearLineIndex;
     int linePointIndex;
     int removeLineIndex;
     QPoint currentLine[2];
     QList<MyObject> listLine;
-
-    GeometryAlgorithm geometryAlgorithm;
 };
 
 #endif // DRAWLINESHAPE_H

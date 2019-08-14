@@ -22,6 +22,8 @@ public:
 
     static int getMinWidth();
     static int getMinHeight();
+    static int getMinSacle();
+    static int getMaxScale();
     static int getNearPointLenght();
     static QMap<QString, QString> getMarkClass();
     static QString getMarkClassColor(QString className);

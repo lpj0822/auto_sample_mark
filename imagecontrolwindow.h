@@ -11,11 +11,11 @@ class ImageControlWindow : public ControlWindow
 
 public:
     ImageControlWindow(QWidget *parent = 0);
-    ~ImageControlWindow();
+    virtual ~ImageControlWindow() override;
 
-    void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType);
-    void saveMarkDataList();
-    void setDrawShape(int shapeId);
+    void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType) override;
+    void saveMarkDataList() override;
+    void setDrawShape(int shapeId) override;
 
 public slots:
 
@@ -25,8 +25,8 @@ public slots:
     virtual void slotScrollArea(int keyValue);
 
 protected:
-    void closeEvent(QCloseEvent *event);
-    virtual void keyPressEvent(QKeyEvent *e);
+    void closeEvent(QCloseEvent *event) override;
+    virtual void keyPressEvent(QKeyEvent *e) override;
 
 protected:
 
@@ -53,6 +53,7 @@ private:
     //imageData
     void loadImageData(const QString imagePath, const QString saveAnnotationsDir);
     void saveImageDataResult(const QString &saveAnnotationsDir, const QString &imagePath, const QList<MyObject> &objects);
+    void saveImageSegmentResult(const QString &saveAnnotationsDir, const QString &imagePath, const QList<MyObject> &objects);
 
     void initData();
     void initImageData();

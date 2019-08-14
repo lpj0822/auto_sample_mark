@@ -6,8 +6,10 @@
 #include <QSpinBox>
 #include <QComboBox>
 #include <QLineEdit>
+#include <QCheckBox>
 #include <QPushButton>
 #include <QListWidget>
+#include <QGroupBox>
 
 class SelectMarkClassWindow : public QDialog
 {
@@ -17,6 +19,7 @@ public:
 
     void setObjectRect(const QString sampleClass);
     QString getObjectClass();
+    bool getIsDifficult();
     int getObjectFlag();
 
 signals:
@@ -34,6 +37,8 @@ private:
     QPushButton *cancelButton;
     QListWidget *classListWidget;
     QLabel *objectFlagLabel;
+    QGroupBox *flagGroundBox;
+    QCheckBox *isDifficultBox;
     QComboBox *objectFlagBox;
 
     QList<QString> classList;

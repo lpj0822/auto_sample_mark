@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QStackedWidget>
 #include <QKeyEvent>
+#include <QWheelEvent>
 #include <QString>
 
 class MyStackedWidget : public QStackedWidget

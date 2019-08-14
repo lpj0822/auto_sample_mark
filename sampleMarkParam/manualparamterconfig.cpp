@@ -79,6 +79,16 @@ int ManualParamterConfig::getMinHeight()
     return MIN_HEIGHT;
 }
 
+int ManualParamterConfig::getMinSacle()
+{
+    return MIN_SCALE;
+}
+
+int ManualParamterConfig::getMaxScale()
+{
+    return MAX_SCALE;
+}
+
 int ManualParamterConfig::getNearPointLenght()
 {
     return NEAR_POINT_LENGTH;

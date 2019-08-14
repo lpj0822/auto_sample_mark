@@ -63,6 +63,26 @@ void MainWindow::slotOpenVideoDir()
     }
 }
 
+void MainWindow::slotOpenImageSegmentDir()
+{
+    DirProcess dirProcess;
+    QList<QString> processDataList;
+    processDataList.clear();
+    this->openDataDir = QFileDialog::getExistingDirectory(this, tr("选择文件夹"), openDataDir, QFileDialog::ShowDirsOnly);
+    if(this->openDataDir.trimmed().isEmpty() || !QDir(this->openDataDir).exists())
+    {
+        qDebug() << "打开的文件路径有误:" << this->openDataDir << endl;
+    }
+    else
+    {
+        dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
+        markWindow[loadDataType]->saveMarkDataList();
+        loadDataType = MarkDataType::SEGMENT;
+        markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
+        centerWidget->setCurrentIndex(loadDataType);
+    }
+}
+
 void MainWindow::slotOpenPCDDir()
 {
     DirProcess dirProcess;
@@ -176,6 +196,16 @@ void MainWindow::slotVideoCutting()
     videoCuttingWindow->show();
 }
 
+void MainWindow::slotImageConverter()
+{
+    if(imageConverterWindow == NULL)
+    {
+        imageConverterWindow = new ImageConverterWindow();
+        connect(imageConverterWindow, &ImageConverterWindow::signalCloseImageConverterWindow, this, &MainWindow::slotCloseOtherWindow);
+    }
+    imageConverterWindow->show();
+}
+
 void MainWindow::slotCamera()
 {
     if(cameraWindow == NULL)
@@ -206,6 +236,8 @@ void MainWindow::slotSelectMarkShape(const QString &text)
         break;
     case MarkDataType::VIDEO:
         markWindow[MarkDataType::VIDEO]->setDrawShape(index);
+        break;
+    case MarkDataType::SEGMENT:
         break;
     case MarkDataType::PCD:
         break;
@@ -246,6 +278,12 @@ void MainWindow::slotCloseOtherWindow(QString flag)
         delete videoCuttingWindow;
         videoCuttingWindow = NULL;
     }
+    else if(flag.contains("imageConverter"))
+    {
+        disconnect(imageConverterWindow, &ImageConverterWindow::signalCloseImageConverterWindow, this, &MainWindow::slotCloseOtherWindow);
+        delete imageConverterWindow;
+        imageConverterWindow =NULL;
+    }
     else if(flag.contains("camera"))
     {
         disconnect(cameraWindow, &QCameraWindow::signalCloseCameraWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -266,6 +304,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         videoCroppingWindow->close();
     if(videoCuttingWindow != NULL)
         videoCuttingWindow->close();
+    if(imageConverterWindow != NULL)
+        imageConverterWindow->close();
     if(cameraWindow != NULL)
         cameraWindow->close();
     if(centerWidget != NULL)
@@ -283,6 +323,7 @@ void MainWindow::initData()
     videoFromPictureWindow = NULL;
     videoCuttingWindow = NULL;
     videoCroppingWindow = NULL;
+    imageConverterWindow = NULL;
     cameraWindow = NULL;
     openDataDir = ".";
     loadDataType = MarkDataType::UNKNOWN;
@@ -295,6 +336,8 @@ void MainWindow::initAction()
     openImageDirAction->setIcon(QIcon(tr(":/images/images/open.png")));
     openVideoDirAction = new QAction(tr("打开视频文件夹"), this);
     openVideoDirAction->setIcon(QIcon(tr(":/images/images/video.png")));
+    openSegmentImageDirAction = new QAction(tr("打开图片分割文件夹"), this);
+    openSegmentImageDirAction->setIcon(QIcon(tr(":/images/images/open.png")));
     openPCDDirAction = new QAction(tr("打开PCD文件夹"), this);
     openPCDDirAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
     exitAction = new QAction(tr("退出系统"), this);
@@ -314,6 +357,8 @@ void MainWindow::initAction()
     videoCuttingAction->setIcon(QIcon(tr(":/images/images/videoCut.png")));
     videoCroppingAction = new QAction(tr("视频剪辑"), this);
     videoCroppingAction->setIcon(QIcon(tr(":/images/images/crop.png")));
+    imageConverterAction = new QAction(tr("图片格式转换"), this);
+    imageConverterAction->setIcon(QIcon(tr(":/images/images/play.png")));
     cameraAction = new QAction(tr("视频采集"), this);
     cameraAction->setIcon(QIcon(tr(":/images/images/record.png")));
     //about
@@ -345,6 +390,7 @@ void MainWindow::initMenuBar()
     fileMenu = new QMenu(tr("文件"), this);
     fileMenu->addAction(openImageDirAction);
     fileMenu->addAction(openVideoDirAction);
+    fileMenu->addAction(openSegmentImageDirAction);
     fileMenu->addAction(openPCDDirAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
@@ -362,6 +408,7 @@ void MainWindow::initMenuBar()
     toolMenu->addAction(videoFromPictureAction);
     toolMenu->addAction(videoCuttingAction);
     toolMenu->addAction(videoCroppingAction);
+    toolMenu->addAction(imageConverterAction);
     toolMenu->addAction(cameraAction);
     //about
     aboutMenu = new QMenu(tr("关于"), this);
@@ -384,6 +431,7 @@ void MainWindow::initToolBar()
     fileTool->setIconSize(QSize(30, 30));
     fileTool->addAction(openImageDirAction);
     fileTool->addAction(openVideoDirAction);
+    fileTool->addAction(openSegmentImageDirAction);
     fileTool->addAction(openPCDDirAction);
     //autoMark
     autoMarkTool = new QToolBar(tr("自动化标注"));
@@ -406,6 +454,7 @@ void MainWindow::initUI()
    markWindow.append(new ControlWindow(this));
    markWindow.append(new ImageControlWindow(this));
    markWindow.append(new VideoControlWindow(this));
+   markWindow.append(new ImageSegmentControlWindow(this));
    markWindow.append(new PCLControlWindow(this));
 
    for(int loop = 0; loop < markWindow.size(); loop++)
@@ -426,6 +475,7 @@ void MainWindow::initConnect()
     //file
     connect(openImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageDir);
     connect(openVideoDirAction, &QAction::triggered, this, &MainWindow::slotOpenVideoDir);
+    connect(openSegmentImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageSegmentDir);
     connect(openPCDDirAction, &QAction::triggered, this, &MainWindow::slotOpenPCDDir);
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     //setting
@@ -439,6 +489,7 @@ void MainWindow::initConnect()
     connect(videoFromPictureAction, &QAction::triggered, this, &MainWindow::slotVideoFromPicture);
     connect(videoCuttingAction, &QAction::triggered, this, &MainWindow::slotVideoCutting);
     connect(videoCroppingAction, &QAction::triggered, this, &MainWindow::slotVideoCropping);
+    connect(imageConverterAction, &QAction::triggered, this, &MainWindow::slotImageConverter);
     connect(cameraAction, &QAction::triggered, this, &MainWindow::slotCamera);
     //about
     connect(aboutAction, &QAction::triggered, this, &MainWindow::slotAbout);

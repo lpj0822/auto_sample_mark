@@ -16,12 +16,14 @@
 #include "videoTools/frompicturetovideowindow.h"
 #include "videoTools/videocuttingwindow.h"
 #include "videoTools/videocroppingwindow.h"
+#include "videoTools/imageconverterwindow.h"
 #include "videoTools/qcamerawindow.h"
 #include "autoSampleMark/autosamplemarkwindow.h"
 #include "drawShape/myshape.h"
 #include "controlwindow.h"
 #include "imagecontrolwindow.h"
 #include "videocontrolwindow.h"
+#include "imagesegmentcontrolwindow.h"
 #include "pclcontrolwindow.h"
 
 class MainWindow : public QMainWindow
@@ -38,6 +40,7 @@ public slots:
     //file
     void slotOpenImageDir();
     void slotOpenVideoDir();
+    void slotOpenImageSegmentDir();
     void slotOpenPCDDir();
     //setting
     void slotManualMarkParamterConfig();
@@ -50,6 +53,7 @@ public slots:
     void slotVideoFromPicture();
     void slotVideoCropping();
     void slotVideoCutting();
+    void slotImageConverter();
     void slotCamera();
     //about
     void slotAbout();
@@ -69,6 +73,7 @@ private:
     //file
     QAction *openImageDirAction;
     QAction *openVideoDirAction;
+    QAction *openSegmentImageDirAction;
     QAction *openPCDDirAction;
     QAction *exitAction;
     //setting
@@ -82,6 +87,7 @@ private:
     QAction *videoFromPictureAction;
     QAction *videoCuttingAction;
     QAction *videoCroppingAction;
+    QAction *imageConverterAction;
     QAction *cameraAction;
     //about
     QAction *aboutAction;
@@ -114,6 +120,7 @@ private:
     FromPictureToVideoWindow *videoFromPictureWindow;
     VideoCuttingWindow *videoCuttingWindow;
     VideoCroppingWindow *videoCroppingWindow;
+    ImageConverterWindow *imageConverterWindow;
     QCameraWindow *cameraWindow;
 
     MarkDataType loadDataType;

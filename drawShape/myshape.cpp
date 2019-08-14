@@ -34,4 +34,5 @@ void MyShape::init()
     shape.insert(ShapeType::RECT_SHAPE, QObject::tr("矩形"));
     shape.insert(ShapeType::LINE_SHAPE, QObject::tr("直线"));
     shape.insert(ShapeType::POLYGON_SHAPE, QObject::tr("多边形"));
+    shape.insert(ShapeType::LANE_SEGMENT, QObject::tr("车道线"));
 }

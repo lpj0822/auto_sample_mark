@@ -21,6 +21,7 @@
 #include "helpers/recordhistorydata.h"
 #include "saveMarkData/xmlprocess.h"
 #include "saveMarkData/jsonprocessvideo.h"
+#include "saveMarkData/segmentimagesave.h"
 #include "utilityGUI/customWindow/wexpand.h"
 #include "utilityGUI/customWindow/customanimation.h"
 #include "utilityGUI/customWindow/mystackedwidget.h"
@@ -29,7 +30,8 @@ typedef enum MarkDataType{
     UNKNOWN = 0,
     IMAGE = 1,
     VIDEO = 2,
-    PCD = 3,
+    SEGMENT = 3,
+    PCD = 4,
     MAX_CONUT
 }MarkDataType;
 
@@ -40,7 +42,7 @@ class ControlWindow : public QWidget
 
 public:
     ControlWindow(QWidget *parent = 0);
-    ~ControlWindow();
+    virtual ~ControlWindow();
 
     virtual void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType);
     virtual void saveMarkDataList();
@@ -114,6 +116,8 @@ protected:
 
     JSONProcessVideo jsonProcess;
     XMLProcess xmlProcess;
+    SegmentImageSave segmentImageProcess;
+
     RecordHistoryData historyProcess;
 };
 
