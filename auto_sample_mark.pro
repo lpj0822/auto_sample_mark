@@ -116,6 +116,10 @@ RESOURCES += \
 
 RC_ICONS = appico.ico
 
+win32{
+
+win32:DEFINES+=_CRT_SECURE_NO_WARNINGS
+
 INCLUDEPATH+= D:\opencv\opencv400\MyBuild\install\include
 
 INCLUDEPATH+= D:\PCL_1_8_1\3rdParty\Boost\include\boost-1_64
@@ -567,4 +571,75 @@ LIBS+=D:\opencv\opencv400\MyBuild\install\x64\vc14\lib\opencv_calib3d400.lib
 LIBS+=D:\opencv\opencv400\MyBuild\install\x64\vc14\lib\opencv_bioinspired400.lib
 LIBS+=D:\opencv\opencv400\MyBuild\install\x64\vc14\lib\opencv_bgsegm400.lib
 LIBS+=D:\opencv\opencv400\MyBuild\install\x64\vc14\lib\opencv_aruco400.lib
+}
+}
+
+unix{
+
+INCLUDEPATH+= /home/lpj/Software/opencv34/include
+
+LIBS+=-L/home/lpj/Software/opencv34/lib \
+    -lopencv_stitching \
+    -lopencv_superres \
+    -lopencv_cudacodec \
+    -lopencv_videostab \
+    -lopencv_bgsegm \
+    -lopencv_bioinspired \
+    -lopencv_ccalib \
+    -lopencv_dnn_objdetect \
+    -lopencv_dpm \
+    -lopencv_face \
+    -lopencv_freetype \
+    -lopencv_fuzzy \
+    -lopencv_hdf \
+    -lopencv_hfs \
+    -lopencv_img_hash \
+    -lopencv_line_descriptor \
+    -lopencv_optflow \
+    -lopencv_reg \
+    -lopencv_rgbd \
+    -lopencv_saliency \
+    -lopencv_sfm \
+    -lopencv_stereo \
+    -lopencv_structured_light \
+    -lopencv_viz \
+    -lopencv_phase_unwrapping \
+    -lopencv_surface_matching \
+    -lopencv_tracking \
+    -lopencv_datasets \
+    -lopencv_text \
+    -lopencv_dnn \
+    -lopencv_plot \
+    -lopencv_xfeatures2d \
+    -lopencv_shape \
+    -lopencv_video \
+    -lopencv_ml \
+    -lopencv_ximgproc \
+    -lopencv_xobjdetect \
+    -lopencv_objdetect \
+    -lopencv_calib3d \
+    -lopencv_features2d \
+    -lopencv_highgui \
+    -lopencv_videoio \
+    -lopencv_imgcodecs \
+    -lopencv_flann \
+    -lopencv_xphoto \
+    -lopencv_photo \
+    -lopencv_imgproc \
+    -lopencv_core
+
+#Eigen
+INCLUDEPATH += /usr/include/eigen3
+
+#Boost
+INCLUDEPATH += /usr/include/boost
+LIBS += /usr/lib/x86_64-linux-gnu/libboost_*.so
+
+#VTK
+INCLUDEPATH += /home/lpj/Software/vtk_8_1_2/include/vtk-8.1
+LIBS += /home/lpj/Software/vtk_8_1_2/lib/libvtk*.so
+
+#PCL Header
+INCLUDEPATH += /home/lpj/Software/pcl_1_9/include/pcl-1.9
+LIBS += /home/lpj/Software/pcl_1_9/lib/libpcl_*.so
 }
