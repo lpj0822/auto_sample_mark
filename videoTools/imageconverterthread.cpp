@@ -1,4 +1,4 @@
-#include "imageconverterthread.h"
+﻿#include "imageconverterthread.h"
 #include <iostream>
 #include <QFileInfo>
 #include <QDir>
