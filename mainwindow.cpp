@@ -243,6 +243,8 @@ void MainWindow::slotSelectMarkShape(const QString &text)
         break;
     case MarkDataType::UNKNOWN:
         break;
+    case MarkDataType::MAX_CONUT:
+        break;
     }
 }
 

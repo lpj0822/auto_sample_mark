@@ -20,9 +20,11 @@
 
 // Visualization Toolkit (VTK)
 #include <vtkRenderWindow.h>
+#ifdef WIN32
 #include <vtkAutoInit.h>
 VTK_MODULE_INIT(vtkRenderingOpenGL);
 VTK_MODULE_INIT(vtkInteractionStyle);
+#endif
 #include <QVTKWidget.h>
 
 class PCLViewer : public QVTKWidget

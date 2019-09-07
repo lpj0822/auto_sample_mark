@@ -13,8 +13,6 @@ public:
     ~CurveAlgorithm();
 
     bool polynomialCurveFit(const QList<QPoint> &pointList, int n, cv::Mat& A);
-
-    bool reversePolynomialCurveFit(const QList<QPoint> &pointList, int n, cv::Mat& A);
 };
 
 #endif // CURVEALGORITHM_H
