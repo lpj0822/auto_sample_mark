@@ -11,10 +11,12 @@
 #include <QList>
 #include <QAction>
 #include <QWheelEvent>
+#include <QList>
 
 #include "drawShape/drawrectshape.h"
 #include "drawShape/drawlineshape.h"
 #include "drawShape/drawpolygonshape.h"
+#include "drawShape/drawlaneshape.h"
 
 class EditableLabel : public QLabel
 {
@@ -26,6 +28,7 @@ public:
     void setDrawShape(int shapeID);
     void setOjects(QList<MyObject> obejcts, QString sampleClass);
     QList<MyObject> getObjects();
+    QList<MyObject> getSegment();
 
 public slots:
 
@@ -44,9 +47,6 @@ protected:
 private:
 
     void drawPixmap();
-    void drawRectPixmap(QPainter &painter);
-    void drawLinePixmap(QPainter &painter);
-    void drawPolygonPixmap(QPainter &painter);
 
     void initData();
     void initConnect();
@@ -62,9 +62,7 @@ private:
     QPixmap mp;
     QPixmap tempPixmap;
 
-    DrawRectShape drawRect;
-    DrawLineShape drawLine;
-    DrawPolygonShape drawPolygon;
+    QList<DrawShape*> drawList;
 };
 
 #endif // EDITABLELABEL_H

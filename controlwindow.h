@@ -18,20 +18,21 @@
 #include <QToolButton>
 #include <QMap>
 
-#include "helpers/videoprocess.h"
 #include "helpers/recordhistorydata.h"
 #include "saveMarkData/xmlprocess.h"
 #include "saveMarkData/jsonprocessvideo.h"
+#include "saveMarkData/segmentimagesave.h"
 #include "utilityGUI/customWindow/wexpand.h"
 #include "utilityGUI/customWindow/customanimation.h"
-#include "utilityGUI/customWindow/myscrollarea.h"
-#include "videomultipletracking.h"
-#include "editablelabel.h"
+#include "utilityGUI/customWindow/mystackedwidget.h"
 
 typedef enum MarkDataType{
-    UNKNOWN = -1,
-    IMAGE = 0,
-    VIDEO = 1
+    UNKNOWN = 0,
+    IMAGE = 1,
+    VIDEO = 2,
+    SEGMENT = 3,
+    PCD = 4,
+    MAX_CONUT
 }MarkDataType;
 
 
@@ -41,83 +42,42 @@ class ControlWindow : public QWidget
 
 public:
     ControlWindow(QWidget *parent = 0);
-    ~ControlWindow();
+    virtual ~ControlWindow();
 
-    void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType);
-
-    void setDrawShape(int shapeId);
+    virtual void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType);
+    virtual void saveMarkDataList();
+    virtual void setDrawShape(int shapeId);
 
 public slots:
-
-    void slotIsMark();
-    void slotImageItem(QListWidgetItem *item);
-    void slotChangeClass(QString classText);
-    void slotShowFull();
-    void slotScrollArea(int keyValue);
-
     void slotManualMarkParamterChanged();
+    void slotShowFull();
+
+protected:
+    void resizeEvent(QResizeEvent *e);
+    void contextMenuEvent (QContextMenuEvent * event);
 
 protected:
 
-    void closeEvent(QCloseEvent *event);
-    void resizeEvent(QResizeEvent *e);
-    void contextMenuEvent (QContextMenuEvent * event);
-    void keyPressEvent(QKeyEvent *e);
-
-private:
-
-    void showPrevious();
-    void showNext();
-
-    void nextVideo();
-    void previousVideo();
-
-    void updateDrawLabel(bool isValue);
     void updateIsMarkButton(bool isValue);
-    void updateImage();
     void updateListBox();
     void updateMarkProcessLable();
+    virtual void updateLabelText(int markCount);
 
-    void loadMarkData(const QString dataPath);
-    void saveMarkDataResult();
-
-    void loadMarkImage();
-    void saveMarkImageResult();
-
-    //imageData
-    void loadImageData(const QString imagePath, const QString saveAnnotationsDir);
-    void saveImageDataResult(const QString &saveAnnotationsDir, const QString &imagePath, const QList<MyObject> &objects);
-
-    //videoData
-    void loadVideoData(const QString videoPath, const QString saveAnnotationsDir);
-    void saveVideoDataResult(const QString &saveAnnotationsDir, const QString &videoPath, const QList<MyObject> &objects);
-    void loadVideoImage();
-    void updateVideoResult(const QList<MyObject> &objects);
-    void initVideoTracking();
-    void videoTracking(const cv::Mat& preFrame, const cv::Mat& frame);
-
-    void setMarkDataParamter();
-
+    void init();
     void initUI();
-    void initConnect();
-    void initData();
-
     void initMarkData(const QString dirPath, const MarkDataType dataType);
-    void initImageData();
-    void initVideoData();
-
     void initMarkClassBox();
-    void initImageList();
 
     void initExpandLeft();
     void initExpandRight();
     void updateExpandLeft();
     void updateExpandRight();
 
+    void readClassConfig(const QString &markDataDir);
     void readMarkHistory();
     void writeMarkHistory();
 
-private: 
+protected:
 
     QGroupBox *centerTopBox;
 
@@ -128,9 +88,10 @@ private:
     QPushButton *isMarkButton;
     QLabel *markProcessLabel;
 
-    EditableLabel *drawLable;
-    MyScrollArea *drawScrollArea;
-    QListWidget *imageListWidget;
+    MyStackedWidget *drawMarkDataWidget;
+    QLabel *baseLabel;
+    QScrollArea *lableScrollArea;
+    QListWidget *markDataListWidget;
 
     WExpand *expand1;
     CustomAnimation *customAnimation1;
@@ -141,35 +102,22 @@ private:
     bool leftTabXxpanded2;
     int leftTabminmumwidth2;
 
-private:
+protected:
 
     QList<QString> processMarkDataList;
     QList<int> processDataFlagList;
-    QString markDataDir;
 
+    QString markDataDir;
     bool isMark;
     MarkDataType markDataType;
 
-    cv::Mat preFrame;
     QImage currentImage;
     int currentIndex;
 
-    //imageData
-    QString currentImagePath;
-
-    //videoData
-    QString currentVideoPath;
-    int currentFrameNumber;
-    int allCountFrame;
-    int skipFrameNumber;
-    bool videoIsTracking;
-    QMap<int, QList<MyObject> > videoResult;
-
-    VideoMultipletracking *videoMultipletracking;
-
     JSONProcessVideo jsonProcess;
     XMLProcess xmlProcess;
-    VideoProcess videoProcess;
+    SegmentImageSave segmentImageProcess;
+
     RecordHistoryData historyProcess;
 };
 

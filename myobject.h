@@ -5,6 +5,7 @@
 #include <QString>
 #include <QList>
 #include <QPolygon>
+#include <QImage>
 #include "drawShape/myshape.h"
 
 class MyObject
@@ -25,8 +26,14 @@ public:
     void setPolygon(QPolygon polygon);
     QPolygon getPolygon() const;
 
+    void setPointList(QList<QPoint> &pointList);
+    QList<QPoint> getPointList() const;
+
     void setObjectClass(QString objectClass);
     QString getObjectClass() const;
+
+    void setIsDifficult(bool flag);
+    bool getIsDifficult() const;
 
     void setObjectFlag(int flag);
     int getObjectFlag() const;
@@ -34,12 +41,18 @@ public:
     void setIsTrackingObject(bool flag);
     bool getIsTrackingObject() const;
 
+    void setSegmentImage(const QImage &image);
+    QImage getSegmentImage() const;
+
 private:
     int objectFlag;
+    bool isDifficult;
     bool isTrackingObject;
     QRect box;
     QList<QPoint> line;
+    QList<QPoint> pointList;
     QPolygon polygon;
+    QImage maskImage;
     QString obejctClass;
     ShapeType shapeType;
 

@@ -1,10 +1,10 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "drawrectshape.h"
 #include <QMessageBox>
-#include "manualparamterconfig.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
-DrawRectShape::DrawRectShape(QObject *parent) : QObject(parent)
+DrawRectShape::DrawRectShape(QObject *parent) : DrawShape(parent)
 {
     initDraw();
 }
@@ -28,7 +28,7 @@ void DrawRectShape::initDraw()
     listRect.clear();
 }
 
-int DrawRectShape::drawRectMousePress(const QPoint point, bool &isDraw)
+int DrawRectShape::drawMousePress(const QPoint point, bool &isDraw)
 {
     int mouseChange = 0;
     nearRectIndex = nearRectPiont(point);
@@ -51,7 +51,7 @@ int DrawRectShape::drawRectMousePress(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawRectShape::drawRectMouseMove(const QPoint point, bool &isDraw)
+int DrawRectShape::drawMouseMove(const QPoint point, bool &isDraw)
 {
     int mouseChange = 0;
     isDraw = false;
@@ -85,7 +85,7 @@ int DrawRectShape::drawRectMouseMove(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawRectShape::drawRectMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
+int DrawRectShape::drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
 {
     if(drawMousePressed)
     {
@@ -106,9 +106,10 @@ int DrawRectShape::drawRectMouseRelease(QWidget *parent, const QPoint point, con
             if (res == QDialog::Accepted)
             {
                 MyObject object;
-                object.setShapeType(ShapeType::RECT);
+                object.setShapeType(ShapeType::RECT_SHAPE);
                 object.setBox(currentRect);
                 object.setObjectClass(window->getObjectClass());
+                object.setIsDifficult(window->getIsDifficult());
                 object.setObjectFlag(window->getObjectFlag());
                 listRect.append(object);
             }
@@ -141,7 +142,18 @@ int DrawRectShape::drawRectMouseRelease(QWidget *parent, const QPoint point, con
     return 0;
 }
 
-bool DrawRectShape::rectListContains(const QPoint point)
+void DrawRectShape::removeShape(bool &isDraw)
+{
+    isDraw = false;
+    if(removeRectIndex >= 0 && removeRectIndex < listRect.size())
+    {
+        this->listRect.removeAt(removeRectIndex);
+        removeRectIndex = -1;
+        isDraw = true;
+    }
+}
+
+bool DrawRectShape::isInShape(const QPoint &point)
 {
     bool isFind = false;
     removeRectIndex = listRect.size();
@@ -158,15 +170,71 @@ bool DrawRectShape::rectListContains(const QPoint point)
     return isFind;
 }
 
-void DrawRectShape::removeRect(bool &isDraw)
+void DrawRectShape::drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter)
 {
-    isDraw = false;
-    if(removeRectIndex >= 0 && removeRectIndex < listRect.size())
+    QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
+    QFont font("Decorative", 15);
+    painter.setPen(pen);
+    painter.setFont(font);
+
+    bool isDraw = false;
+    QRect currentRect;
+    QList<QPoint> points = getRectListPoints(sampleClass);
+    getCurrentRect(currentRect, isDraw);
+
+    for(int i = 0; i < this->listRect.size(); i++)
     {
-        this->listRect.removeAt(removeRectIndex);
-        removeRectIndex = -1;
-        isDraw = true;
+        QString color = ManualParamterConfig::getMarkClassColor(this->listRect[i].getObjectClass());
+        QColor drawColor(color);
+        if(drawColor.isValid())
+        {
+            pen.setColor(drawColor);
+            painter.setPen(pen);
+        }
+        else
+        {
+            drawColor = QColor("#000000");
+            pen.setColor(drawColor);
+            painter.setPen(pen);
+        }
+        if(sampleClass == "All")
+        {
+            painter.drawRect(this->listRect[i].getBox());
+            painter.drawText(this->listRect[i].getBox().topLeft(), this->listRect[i].getObjectClass());
+        }
+        else
+        {
+            if(this->listRect[i].getObjectClass().contains(sampleClass))
+            {
+                painter.drawRect(this->listRect[i].getBox());
+                painter.drawText(this->listRect[i].getBox().topLeft(), this->listRect[i].getObjectClass());
+            }
+        }
     }
+
+    if(isDraw)
+    {
+        painter.drawRect(currentRect);
+    }
+
+    pen.setColor(QColor("#3CFF55"));
+    painter.setPen(pen);
+    painter.setBrush(QColor("#3CFF55"));
+    for(int i = 0; i < points.size(); i++)
+    {
+        painter.drawEllipse(points[i], 2, 2);
+    }
+}
+
+void DrawRectShape::setObjectList(QList<MyObject> list)
+{
+    this->listRect.clear();
+    this->listRect = list;
+}
+
+void DrawRectShape::getObjectList(QList<MyObject> &list)
+{
+    list = this->listRect;
 }
 
 void DrawRectShape::getCurrentRect(QRect &rect, bool &isDraw)
@@ -180,11 +248,6 @@ void DrawRectShape::getCurrentRect(QRect &rect, bool &isDraw)
         isDraw = false;
     }
     rect = this->currentRect;
-}
-
-void DrawRectShape::getRectList(QList<MyObject> &list)
-{
-    list = this->listRect;
 }
 
 QList<QPoint> DrawRectShape::getRectListPoints(const QString sampleClass)
@@ -218,12 +281,6 @@ QList<QPoint> DrawRectShape::getRectListPoints(const QString sampleClass)
         pointList.append(currentRect.bottomRight());
     }
     return pointList;
-}
-
-void DrawRectShape::setRectList(QList<MyObject> list)
-{
-    this->listRect.clear();
-    this->listRect = list;
 }
 
 int DrawRectShape::nearRectPiont(const QPoint point)

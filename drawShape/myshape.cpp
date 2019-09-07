@@ -31,7 +31,8 @@ QMap<int, QString> MyShape::getAllShape() const
 void MyShape::init()
 {
     shape.clear();
-    shape.insert(ShapeType::RECT, QObject::tr("矩形"));
-    shape.insert(ShapeType::LINE, QObject::tr("直线"));
-    shape.insert(ShapeType::POLYGON, QObject::tr("多边形"));
+    shape.insert(ShapeType::RECT_SHAPE, QObject::tr("矩形"));
+    shape.insert(ShapeType::LINE_SHAPE, QObject::tr("直线"));
+    shape.insert(ShapeType::POLYGON_SHAPE, QObject::tr("多边形"));
+    shape.insert(ShapeType::LANE_SEGMENT, QObject::tr("车道线"));
 }

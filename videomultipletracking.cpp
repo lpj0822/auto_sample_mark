@@ -42,10 +42,10 @@ void VideoMultipletracking::tracking(const cv::Mat preFrame, const cv::Mat &next
                 leaveObjects(nextObject);
                 if(!hasObjects)
                 {
-                    trackingObjects = getTrackingObjects(preObjects, ShapeType::RECT);
+                    trackingObjects = getTrackingObjects(preObjects, ShapeType::RECT_SHAPE);
                     multipleTracker->mutilpleTracking(preFrame, nextFrame, trackingObjects);
                 }
-                trackingObjects = getTrackingObjects(updateObjects, ShapeType::RECT);
+                trackingObjects = getTrackingObjects(updateObjects, ShapeType::RECT_SHAPE);
                 multipleTracker->mutilpleTracking(preFrame, nextFrame, trackingObjects);
             }
             break;
@@ -57,7 +57,7 @@ void VideoMultipletracking::tracking(const cv::Mat preFrame, const cv::Mat &next
             {
                 std::vector<TrackingObject> trackingObjects;
                 QList<MyObject> updateObjects = updateRectTrackingObjects(preObjects);
-                trackingObjects = getTrackingObjects(updateObjects, ShapeType::RECT);
+                trackingObjects = getTrackingObjects(updateObjects, ShapeType::RECT_SHAPE);
                 multipleTracker->mutilpleTracking(preFrame, nextFrame, trackingObjects);
             }
             break;
@@ -92,7 +92,7 @@ QList<MyObject> VideoMultipletracking::getTrackingResult()
             MyObject object;
             object.setObjectClass(QString::fromStdString(trackingObjects[loop].objectClass));
             object.setBox(QRect(rect.x, rect.y, rect.width + 1, rect.height + 1));
-            object.setShapeType(ShapeType::RECT);
+            object.setShapeType(ShapeType::RECT_SHAPE);
             object.setIsTrackingObject(true);
             result.append(object);
         }
@@ -109,14 +109,14 @@ QList<MyObject> VideoMultipletracking::updateRectTrackingObjects(const QList<MyO
     result.clear();
     for(int preIndex = 0; preIndex < preCount; preIndex++)
     {
-        if(preObjects[preIndex].getShapeType() == ShapeType::RECT && \
+        if(preObjects[preIndex].getShapeType() == ShapeType::RECT_SHAPE && \
                 !preObjects[preIndex].getIsTrackingObject())
         {
             QRect rect1 = preObjects[preIndex].getBox();
             int nextIndex = 0;
             for(; nextIndex < nextCount; nextIndex++)
             {
-                if(nextObjects[nextIndex].getShapeType() == ShapeType::RECT)
+                if(nextObjects[nextIndex].getShapeType() == ShapeType::RECT_SHAPE)
                 {
                     QRect rect2 = nextObjects[nextIndex].getBox();
                     if(geometryAlgorithm.rectOverlap(rect1, rect2) >= 0.45f)
@@ -142,7 +142,7 @@ QList<MyObject> VideoMultipletracking::updateRectTrackingObjects(const QList<MyO
     result.clear();
     for(int preIndex = 0; preIndex < preCount; preIndex++)
     {
-        if(preObjects[preIndex].getShapeType() == ShapeType::RECT && \
+        if(preObjects[preIndex].getShapeType() == ShapeType::RECT_SHAPE && \
                 !preObjects[preIndex].getIsTrackingObject())
         {
             result.append(preObjects[preIndex]);
@@ -177,7 +177,7 @@ void VideoMultipletracking::leaveObjects(const QList<MyObject> &nextObjects)
 {
     for(int loop = 0; loop < nextObjects.count(); loop++)
     {
-        if(nextObjects[loop].getShapeType() != ShapeType::RECT)
+        if(nextObjects[loop].getShapeType() != ShapeType::RECT_SHAPE)
         {
             listObjects.append(nextObjects[loop]);
         }

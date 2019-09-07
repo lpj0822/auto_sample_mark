@@ -5,12 +5,15 @@
 #include <QDialog>
 #include <QSpinBox>
 #include <QLabel>
+#include <QComboBox>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
+#include <QStackedWidget>
 #include "utilityGUI/customWindow/markclasstablewidget.h"
-#include "manualparamterconfig.h"
+#include "utilityGUI/customWindow/markclasstreewidget.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 
 class ManualParamterConfigWindow : public QDialog
 {
@@ -24,17 +27,23 @@ signals:
 public slots:
 
     void slotOk();
+    void slotClassModelSelect(QString text);
 
 protected:
-
     void closeEvent(QCloseEvent *event);
 
 private:
+    QLabel *classModelSelectLabel;
+    QComboBox *classModelSelectBox;
     QLabel *minWidthLabel;
     QSpinBox *minWidthBox;
     QLabel *minHeightLabel;
     QSpinBox *minHeightBox;
+
+    QStackedWidget *classModelWidget;
     MarkClassTableWidget *markClassTable;
+    MarkClassTreeWidget *markClassTree;
+
     QPushButton *loadDefaultButton;
     QPushButton *saveButton;
     QPushButton *cancelButton;
@@ -47,7 +56,9 @@ private:
     void initUI();
     void initConnect();
 
+    void initModelSelect();
     void initTable();
+    void initTree();
 
     void loadDefaultValue();
 };

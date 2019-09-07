@@ -9,6 +9,8 @@
 #include <QFileInfo>
 #include <QVariant>
 
+#include "drawmarkcolor.h"
+
 int ManualParamterConfig::MIN_WIDTH = 20;
 int ManualParamterConfig::MIN_HEIGHT = 20;
 int ManualParamterConfig::NEAR_POINT_LENGTH = 10;
@@ -77,6 +79,16 @@ int ManualParamterConfig::getMinHeight()
     return MIN_HEIGHT;
 }
 
+int ManualParamterConfig::getMinSacle()
+{
+    return MIN_SCALE;
+}
+
+int ManualParamterConfig::getMaxScale()
+{
+    return MAX_SCALE;
+}
+
 int ManualParamterConfig::getNearPointLenght()
 {
     return NEAR_POINT_LENGTH;
@@ -97,6 +109,46 @@ QString ManualParamterConfig::getMarkClassColor(QString className)
     {
         return "";
     }
+}
+
+int ManualParamterConfig::loadClassConfig(const QString &classPath)
+{
+    QByteArray data;
+    QFile file;
+    file.setFileName(classPath);
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        return -1;
+    }
+    data = file.readAll();
+    file.close();
+    QJsonParseError jsonError;
+    QJsonDocument parseDoucment = QJsonDocument::fromJson(QString(data).toUtf8(), &jsonError);
+    if(jsonError.error == QJsonParseError::NoError)
+    {
+        if (!(parseDoucment.isNull() || parseDoucment.isEmpty()))
+        {
+            if (parseDoucment.isObject())
+            {
+                QMap<QString, QVariant> readMarkClass = parseDoucment.object().toVariantMap();
+                int index = 0;
+                QString color = "#000000";
+                markClass.clear();
+                for(QMap<QString, QVariant>::const_iterator iter = readMarkClass.constBegin();
+                    iter != readMarkClass.constEnd(); ++iter)
+                {
+                    index = iter.key().toInt();
+                    color = drawMarkColor[index % DRAW_MARK_COLOR_COUNT];
+                    markClass.insert(iter.value().toString(), color);
+                }
+            }
+        }
+    }
+    else
+    {
+        return -2;
+    }
+    return 0;
 }
 
 int ManualParamterConfig::loadConfig()

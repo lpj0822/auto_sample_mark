@@ -36,6 +36,12 @@ void ManualParamterConfigWindow::slotOk()
     this->accept();
 }
 
+void ManualParamterConfigWindow::slotClassModelSelect(QString text)
+{
+    int index = this->classModelSelectBox->currentData().toInt();
+    classModelWidget->setCurrentIndex(index);
+}
+
 void ManualParamterConfigWindow::init()
 {
     paramterConfig.loadConfig();
@@ -43,6 +49,14 @@ void ManualParamterConfigWindow::init()
 
 void ManualParamterConfigWindow::initUI()
 {
+    classModelSelectLabel = new QLabel(tr("目标属性模式选择："));
+    classModelSelectBox = new QComboBox();
+    initModelSelect();
+    QHBoxLayout *modelLayout = new QHBoxLayout();
+    modelLayout->setSpacing(10);
+    modelLayout->addWidget(classModelSelectLabel);
+    modelLayout->addWidget(classModelSelectBox);
+
     minWidthLabel = new QLabel(tr("最小可标注宽度"));
     minWidthBox = new QSpinBox();
     minWidthBox->setSingleStep(10);
@@ -64,8 +78,14 @@ void ManualParamterConfigWindow::initUI()
     topLayout->addWidget(minHeightLabel);
     topLayout->addWidget(minHeightBox);
 
+    classModelWidget = new QStackedWidget(this);
     markClassTable = new MarkClassTableWidget();
     initTable();
+    markClassTree = new MarkClassTreeWidget();
+    initTree();
+    classModelWidget->addWidget(markClassTable);
+    classModelWidget->addWidget(markClassTree);
+    classModelWidget->setCurrentIndex(0);
 
     loadDefaultButton = new QPushButton(tr("恢复默认值"));
     saveButton = new QPushButton(tr("保存"));
@@ -80,8 +100,9 @@ void ManualParamterConfigWindow::initUI()
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(10);
+    mainLayout->addLayout(modelLayout);
     mainLayout->addLayout(topLayout);
-    mainLayout->addWidget(markClassTable);
+    mainLayout->addWidget(classModelWidget);
     mainLayout->addLayout(bottomLayout);
 
     this->setLayout(mainLayout);
@@ -95,6 +116,13 @@ void ManualParamterConfigWindow::initConnect()
     connect(loadDefaultButton, &QPushButton::clicked, this, &ManualParamterConfigWindow::loadDefaultValue);
     connect(saveButton, &QPushButton::clicked, this, &ManualParamterConfigWindow::slotOk);
     connect(cancelButton, &QPushButton::clicked, this, &ManualParamterConfigWindow::reject);
+    connect(classModelSelectBox, &QComboBox::currentTextChanged, this, &ManualParamterConfigWindow::slotClassModelSelect);
+}
+
+void ManualParamterConfigWindow::initModelSelect()
+{
+    classModelSelectBox->addItem(tr("单级属性模式"), 0);
+    classModelSelectBox->addItem(tr("多级属性模式"), 1);
 }
 
 void ManualParamterConfigWindow::initTable()
@@ -127,6 +155,12 @@ void ManualParamterConfigWindow::initTable()
         markClassTable->setItem(row, 1, tableItem1);
         row++;
     }
+}
+
+void ManualParamterConfigWindow::initTree()
+{
+    markClassTree->clear();
+    markClassTree->setHeaderLabel(tr("类别属性添加"));
 }
 
 void ManualParamterConfigWindow::loadDefaultValue()

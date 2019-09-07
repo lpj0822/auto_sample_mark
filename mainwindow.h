@@ -11,14 +11,20 @@
 #include <QToolBar>
 #include <QAction>
 #include <QComboBox>
+#include <QStackedWidget>
 #include "videoTools/fromvideotopicturewindow.h"
 #include "videoTools/frompicturetovideowindow.h"
 #include "videoTools/videocuttingwindow.h"
 #include "videoTools/videocroppingwindow.h"
+#include "videoTools/imageconverterwindow.h"
 #include "videoTools/qcamerawindow.h"
 #include "autoSampleMark/autosamplemarkwindow.h"
-#include "controlwindow.h"
 #include "drawShape/myshape.h"
+#include "controlwindow.h"
+#include "imagecontrolwindow.h"
+#include "videocontrolwindow.h"
+#include "imagesegmentcontrolwindow.h"
+#include "pclcontrolwindow.h"
 
 class MainWindow : public QMainWindow
 {
@@ -34,6 +40,8 @@ public slots:
     //file
     void slotOpenImageDir();
     void slotOpenVideoDir();
+    void slotOpenImageSegmentDir();
+    void slotOpenPCDDir();
     //setting
     void slotManualMarkParamterConfig();
     void slotAutoMarkParamterConfig();
@@ -45,6 +53,7 @@ public slots:
     void slotVideoFromPicture();
     void slotVideoCropping();
     void slotVideoCutting();
+    void slotImageConverter();
     void slotCamera();
     //about
     void slotAbout();
@@ -64,6 +73,8 @@ private:
     //file
     QAction *openImageDirAction;
     QAction *openVideoDirAction;
+    QAction *openSegmentImageDirAction;
+    QAction *openPCDDirAction;
     QAction *exitAction;
     //setting
     QAction *manualParamterAction;
@@ -76,6 +87,7 @@ private:
     QAction *videoFromPictureAction;
     QAction *videoCuttingAction;
     QAction *videoCroppingAction;
+    QAction *imageConverterAction;
     QAction *cameraAction;
     //about
     QAction *aboutAction;
@@ -98,7 +110,8 @@ private:
     QLabel *shapeLabel;
     QComboBox *shapeBox;
 
-    ControlWindow *centerWidget;
+    QStackedWidget *centerWidget;
+    QList<ControlWindow *> markWindow;
 
 private:
     AutoSampleMarkWindow *autoSampleMarkWindow;
@@ -107,8 +120,10 @@ private:
     FromPictureToVideoWindow *videoFromPictureWindow;
     VideoCuttingWindow *videoCuttingWindow;
     VideoCroppingWindow *videoCroppingWindow;
+    ImageConverterWindow *imageConverterWindow;
     QCameraWindow *cameraWindow;
 
+    MarkDataType loadDataType;
     MyShape myShape;
 
     QString openDataDir;

@@ -36,7 +36,6 @@ void KalmanMultipleTracker::mutilpleTracking(const cv::Mat& preFrame, const cv::
         for (int i = 0; i < listTrackers.size(); i++)
         {
             listTrackers[i]->kalmanPrediction();
-            listTrackers[i]->kalmanUpdate(TrackingObject(), false);
             if (listTrackers[i]->getTraceSize() > maxTraceLength)
             {
                 listTrackers[i]->eraseTrace(maxTraceLength);
@@ -141,18 +140,15 @@ void KalmanMultipleTracker::mutilpleTracking(const cv::Mat& preFrame, const cv::
     // Update Kalman Filters state
     for (int i = 0; i<assignment.size(); i++)
     {
-        // If tracker updated less than one time, than filter state is not correct.
-        listTrackers[i]->kalmanPrediction();
-
         if (assignment[i] != -1) // If we have assigned detect, then update using its coordinates,
         {
             TrackingObject object = objects[assignment[i]];
             listTrackers[i]->setSkippedFrame(0);
-            listTrackers[i]->kalmanUpdate(object, true);
+            listTrackers[i]->kalmanUpdate(object);
         }
-        else				  // if not continue using predictions
+        else // if not continue using predictions
         {
-            listTrackers[i]->kalmanUpdate(TrackingObject(), false);
+            listTrackers[i]->kalmanPrediction();
         }
 
         if (listTrackers[i]->getTraceSize() > maxTraceLength)
@@ -202,7 +198,7 @@ float KalmanMultipleTracker::computeRectDistance(const TrackingObject &object1, 
     float centerY2 = object2.rect.y + object2.rect.height / 2.0f;
     float diffX = centerX1 - centerX2;
     float diffY = centerY1 - centerY2;
-    float dist = std::sqrtf(diffX * diffX + diffY * diffY);
+    float dist = std::sqrt(diffX * diffX + diffY * diffY);
     return dist;
 }
 

@@ -10,7 +10,8 @@
 ## Depend
 * [MSVC2015_64](https://www.visualstudio.com/zh-hans/downloads/)
 * [Qt5](https://www.qt.io/download-open-source/#section-2)
-* [OpenCV4.0+opencv_contrib](https://github.com/opencv/opencv)
+* [OpenCV>=3.4.6+opencv_contrib](https://github.com/opencv/opencv)
+* [PCL>=1.8+VTK](https://github.com/PointCloudLibrary/pcl/releases)
 * [C++11](https://en.wikipedia.org/wiki/C%2B%2B11)
 
 ## Discuss

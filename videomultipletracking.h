@@ -4,7 +4,7 @@
 #include "myobject.h"
 #include "multipletracking/imultipletracker.h"
 #include "baseAlgorithm/geometryalgorithm.h"
-#include "videomarkparamterconfig.h"
+#include "sampleMarkParam/videomarkparamterconfig.h"
 
 class VideoMultipletracking
 {

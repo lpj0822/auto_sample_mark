@@ -3,7 +3,7 @@
 #include <QMessageBox>
 #include <QString>
 #include <QStringList>
-#include "manualparamterconfig.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 
 ModelLabelWindow::ModelLabelWindow(QDialog *parent) : QDialog(parent)
 {

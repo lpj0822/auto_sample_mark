@@ -4,7 +4,7 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 
-#include "manualparamterconfig.h"
+#include "sampleMarkParam/manualparamterconfig.h"
 
 SelectMarkClassWindow::SelectMarkClassWindow(QDialog *parent) : QDialog(parent)
 {
@@ -16,6 +16,11 @@ SelectMarkClassWindow::SelectMarkClassWindow(QDialog *parent) : QDialog(parent)
 QString SelectMarkClassWindow::getObjectClass()
 {
     return classText->text();
+}
+
+bool SelectMarkClassWindow::getIsDifficult()
+{
+    return isDifficultBox->isChecked();
 }
 
 int SelectMarkClassWindow::getObjectFlag()
@@ -91,6 +96,9 @@ void SelectMarkClassWindow::initUI()
         classListWidget->insertItem(index, item);
     }
 
+    isDifficultBox = new QCheckBox(tr("是否是困难样本"));
+    isDifficultBox->setCheckable(false);
+
     objectFlagLabel = new QLabel(tr("目标备注："));
     objectFlagBox = new QComboBox();
     initObjectFlagBox();
@@ -99,14 +107,21 @@ void SelectMarkClassWindow::initUI()
     bottomLayout->addWidget(objectFlagLabel);
     bottomLayout->addWidget(objectFlagBox);
 
+    flagGroundBox = new QGroupBox(tr("属性"));
+    QVBoxLayout *flagLayout = new QVBoxLayout();
+    flagLayout->setSpacing(10);
+    flagLayout->addWidget(isDifficultBox);
+    flagLayout->addLayout(bottomLayout);
+    flagGroundBox->setLayout(flagLayout);
+
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(20);
     mainLayout->addLayout(topLayout);
     mainLayout->addWidget(classListWidget);
-    mainLayout->addLayout(bottomLayout);
+    mainLayout->addWidget(flagGroundBox);
     this->setLayout(mainLayout);
-    this->setMaximumSize(200, 300);
-    this->setMinimumSize(200, 300);
+    this->setMaximumSize(200, 400);
+    this->setMinimumSize(200, 400);
     this->setWindowTitle(tr("样本类别选择"));
 }
 
