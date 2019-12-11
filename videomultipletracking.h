@@ -1,7 +1,7 @@
 #ifndef VIDEOMULTIPLETRACKING_H
 #define VIDEOMULTIPLETRACKING_H
 
-#include "myobject.h"
+#include "dataType/myobject.h"
 #include "multipletracking/imultipletracker.h"
 #include "baseAlgorithm/geometryalgorithm.h"
 #include "sampleMarkParam/videomarkparamterconfig.h"

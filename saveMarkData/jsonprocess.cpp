@@ -90,7 +90,7 @@ int JSONProcess::readJSON(const QString &jsonFilePath, QList<MyObject> &objects)
                     QJsonObject allData = jsonObject.take("objects").toObject();
                     if(allData.contains("rectObject"))
                     {
-                        QJsonArray rectValue = allData.take("skipNumber").toArray();
+                        QJsonArray rectValue = allData.take("rectObject").toArray();
                         readRectData(rectValue, objects);
                     }
                     if(allData.contains("lineObject"))
@@ -102,6 +102,11 @@ int JSONProcess::readJSON(const QString &jsonFilePath, QList<MyObject> &objects)
                     {
                         QJsonArray polygonValue = allData.take("polygonObject").toArray();
                         readPolygonData(polygonValue, objects);
+                    }
+                    if(allData.contains("rect3DObject"))
+                    {
+                        QJsonArray rect3DValue = allData.take("rect3DObject").toArray();
+                        readRect3Ddata(rect3DValue, objects);
                     }
                 }
             }
@@ -256,5 +261,29 @@ int JSONProcess::readPolygonData(const QJsonArray &value, QList<MyObject>& objec
         objects.append(object);
     }
 
+    return 0;
+}
+
+int JSONProcess::readRect3Ddata(const QJsonArray &value, QList<MyObject>& objects)
+{
+    for(int loop = 0; loop < value.size(); loop++)
+    {
+        QJsonObject objectData = value.at(loop).toObject();
+        MyObject object;
+        MyRect3D rect3d;
+        QString className;
+        rect3d.center[0] = objectData.take("centerX").toVariant().toFloat();
+        rect3d.center[1] = objectData.take("centerY").toVariant().toFloat();
+        rect3d.center[2] = objectData.take("centerZ").toVariant().toFloat();
+        rect3d.size[0] = objectData.take("length").toVariant().toFloat();
+        rect3d.size[1] = objectData.take("width").toVariant().toFloat();
+        rect3d.size[2] = objectData.take("height").toVariant().toFloat();
+        rect3d.theta = objectData.take("yaw").toVariant().toFloat();
+        className = objectData.take("class").toVariant().toString();
+        object.setObjectClass(className);
+        object.setBox3D(rect3d);
+        object.setShapeType(ShapeType::RECT3D_SHAPE);
+        objects.append(object);
+    }
     return 0;
 }

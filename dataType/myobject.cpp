@@ -30,6 +30,16 @@ QRect MyObject::getBox() const
     return this->box;
 }
 
+void MyObject::setBox3D(MyRect3D box)
+{
+    this->box3D = box;
+}
+
+MyRect3D MyObject::getBox3D() const
+{
+    return this->box3D;
+}
+
 void MyObject::setLine(QPoint startPoint, QPoint stopPoint)
 {
     this->line.clear();

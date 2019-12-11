@@ -28,8 +28,10 @@ private:
     void showPrevious();
     void showNext();
 
-    void loadPointCloud();
+    void loadMarkPointCloud();
     void loadPointCloudData(const QString pcdFilePath);
+
+    void updatePointCloud();
 
     void initDrawWidget();
     void initData();

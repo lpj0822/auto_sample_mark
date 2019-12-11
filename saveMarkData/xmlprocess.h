@@ -8,7 +8,7 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 
-#include "myobject.h"
+#include "dataType/myobject.h"
 
 class XMLProcess : public QObject
 {

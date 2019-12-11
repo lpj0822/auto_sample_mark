@@ -7,7 +7,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
-#include "myobject.h"
+#include "dataType/myobject.h"
 
 class JSONProcess : public QObject
 {
@@ -35,6 +35,8 @@ protected:
 
     int writePolygonData(const QList<MyObject>& objects, QJsonObject &jsonData);
     int readPolygonData(const QJsonArray &value, QList<MyObject>& objects);
+
+    int readRect3Ddata(const QJsonArray &value, QList<MyObject>& objects);
 
 };
 

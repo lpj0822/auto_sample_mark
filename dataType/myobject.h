@@ -6,6 +6,7 @@
 #include <QList>
 #include <QPolygon>
 #include <QImage>
+#include "myrect3d.h"
 #include "drawShape/myshape.h"
 
 class MyObject
@@ -19,6 +20,9 @@ public:
 
     void setBox(QRect box);
     QRect getBox() const;
+
+    void setBox3D(MyRect3D box);
+    MyRect3D getBox3D() const;
 
     void setLine(QPoint startPoint, QPoint stopPoint);
     QList<QPoint> getLine() const;
@@ -48,6 +52,7 @@ private:
     int objectFlag;
     bool isDifficult;
     bool isTrackingObject;
+    MyRect3D box3D;
     QRect box;
     QList<QPoint> line;
     QList<QPoint> pointList;

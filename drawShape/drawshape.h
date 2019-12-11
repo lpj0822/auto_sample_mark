@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QPainter>
-#include "myobject.h"
+#include "dataType/myobject.h"
 #include "baseAlgorithm/geometryalgorithm.h"
 
 class DrawShape : public QObject

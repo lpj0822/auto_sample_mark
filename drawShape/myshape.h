@@ -11,7 +11,8 @@ typedef enum ShapeType{
     LINE_SHAPE = 1,
     POLYGON_SHAPE = 2,
     LANE_SEGMENT = 3,
-    MAX_SHAPE_TYPE
+    MAX_SHAPE_TYPE = 4,
+    RECT3D_SHAPE = 5
 }ShapeType;
 
 class MyShape

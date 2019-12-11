@@ -2,7 +2,7 @@
 #define SEGMENTIMAGESAVE_H
 
 #include <QObject>
-#include "myobject.h"
+#include "dataType/myobject.h"
 
 class SegmentImageSave : public QObject
 {
@@ -17,6 +17,7 @@ public:
 signals:
 
 public slots:
+
 };
 
 #endif // SEGMENTIMAGESAVE_H

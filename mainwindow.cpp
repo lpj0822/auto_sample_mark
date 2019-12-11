@@ -80,6 +80,7 @@ void MainWindow::slotOpenImageSegmentDir()
         loadDataType = MarkDataType::SEGMENT;
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
+        shapeTool->setEnabled(false);
     }
 }
 
@@ -100,6 +101,7 @@ void MainWindow::slotOpenPCDDir()
         loadDataType = MarkDataType::PCD;
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
+        shapeTool->setEnabled(false);
     }
 }
 

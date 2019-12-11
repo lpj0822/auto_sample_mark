@@ -27,6 +27,9 @@ VTK_MODULE_INIT(vtkInteractionStyle);
 #endif
 #include <QVTKWidget.h>
 
+#include "dataType/myobject.h"
+#include "baseAlgorithm/common_transform.h"
+
 class PCLViewer : public QVTKWidget
 {
     Q_OBJECT
@@ -41,6 +44,7 @@ public:
 
     void setIsSelect(bool isSelect);
     void setNewPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud);
+    void setOjects(const QList<MyObject> &obejcts, QString sampleClass);
     void clearPoints();
     void getPoints(pcl::PointCloud<pcl::PointXYZI>::Ptr &result);
 
@@ -52,6 +56,9 @@ protected:
 
 private:
 
+    void drawShape(const QList<MyObject> &obejcts);
+    void drawObject(const MyObject &object, int id);
+
     void initData();
     void initConnect();
     void initCloud();
@@ -61,8 +68,12 @@ private:
     PointCloudT::Ptr srcCloud;
     PointCloudT::Ptr clickedPoints;
 
+    QString sampleClass;
+
     QCursor myDrawCursor;
     bool isSelect;
+
+    Transform transform;
 };
 
 #endif // PCLVIEWER_H

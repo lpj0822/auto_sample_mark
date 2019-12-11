@@ -41,6 +41,21 @@ void PCLViewer::setNewPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
     this->update();
 }
 
+void PCLViewer::setOjects(const QList<MyObject> &obejcts, QString sampleClass)
+{
+    QList<MyObject> rect3DObejcts;
+    rect3DObejcts.clear();
+    for(int loop = 0; loop < obejcts.count(); loop++)
+    {
+        const MyObject object = obejcts[loop];
+        if(object.getShapeType() == ShapeType::RECT3D_SHAPE)
+        {
+            rect3DObejcts.append(object);
+        }
+    }
+    this->sampleClass = sampleClass;
+}
+
 void PCLViewer::clearPoints()
 {
     if(clickedPoints->size() > 0)
@@ -121,6 +136,44 @@ void PCLViewer::clickedPointCallback(const pcl::visualization::PointPickingEvent
     }
 }
 
+void PCLViewer::drawShape(const QList<MyObject> &obejcts)
+{
+    viewer->removeAllShapes();
+    for(int loop = 0; loop < obejcts.count(); loop++)
+    {
+        if(sampleClass == "All")
+        {
+            drawObject(obejcts[loop], loop);
+        }
+        else
+        {
+            if(obejcts[loop].getObjectClass().contains(sampleClass))
+            {
+                drawObject(obejcts[loop], loop);
+            }
+        }
+    }
+    this->update();
+}
+
+void PCLViewer::drawObject(const MyObject &object, int id)
+{
+    pcl::PointXYZ point;
+    const MyRect3D rect3d = object.getBox3D();
+    QString boxId = QString("box_%1").arg(id);
+    Rotation yaw = transform.getRotation(0, 0, rect3d.theta);
+    double length = static_cast<double>(rect3d.size[0]);
+    double width = static_cast<double>(rect3d.size[1]);
+    double height = static_cast<double>(rect3d.size[2]);
+    point.x = rect3d.center[0];
+    point.y = rect3d.center[1];
+    point.z = rect3d.center[2];
+    viewer->addText3D<pcl::PointXYZ>(object.getObjectClass().toStdString(), point, 1.0, \
+                                     255, 255, 0, QString("text_%1").arg(id).toStdString());
+    viewer->addCube(rect3d.center, yaw, length, width, height, boxId.toStdString());
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 0, 0, boxId.toStdString());
+}
+
 void PCLViewer::initData()
 {
     viewer.reset (new pcl::visualization::PCLVisualizer("cloud", false));
@@ -132,9 +185,9 @@ void PCLViewer::initData()
 
     this->SetRenderWindow(viewer->getRenderWindow());
     viewer->setupInteractor(this->GetInteractor (), this->GetRenderWindow ());
+
     viewer->setBackgroundColor(0, 0, 0);
     viewer->setCameraPosition(0, 0, 0, 0, 0, 0, 0, 0, -1);
-
     viewer->addCoordinateSystem(1.0);
     viewer->initCameraParameters();
     viewer->resetCamera();
@@ -142,6 +195,8 @@ void PCLViewer::initData()
     viewer->registerPointPickingCallback(boost::bind(&PCLViewer::clickedPointCallback, this, _1));
 
     this->update();
+
+    sampleClass = "All";
 
     isSelect = false;
     myDrawCursor = QCursor(QPixmap(tr(":/images/images/cross.png")));

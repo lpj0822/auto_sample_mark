@@ -235,7 +235,7 @@ void VideoControlWindow::loadVideoData(const QString videoPath, const QString sa
         QFileInfo videoFileInfo(currentVideoPath);
         QString readJsonPath= saveAnnotationsDir + "/" + videoFileInfo.completeBaseName() + ".json";
         QFileInfo jsonFileInfo(readJsonPath);
-        if(jsonFileInfo.exists() && jsonProcess.readJSON(readJsonPath, videoResult, skipFrameNumber) == 0)
+        if(jsonFileInfo.exists() && jsonProcessVideo.readJSON(readJsonPath, videoResult, skipFrameNumber) == 0)
         {
             ;
         }
@@ -260,7 +260,7 @@ void VideoControlWindow::saveVideoDataResult(const QString &saveAnnotationsDir, 
     videoProcess.closeVideo();
     if(videoResult.size() > 0)
     {
-        if(jsonProcess.createJSON(saveJsonPath, currentVideoPath, videoResult, skipFrameNumber) == 0)
+        if(jsonProcessVideo.createJSON(saveJsonPath, currentVideoPath, videoResult, skipFrameNumber) == 0)
         {
             if(currentIndex >= 0)
             {

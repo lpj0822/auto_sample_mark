@@ -39,7 +39,6 @@ SOURCES += main.cpp\
     autoSampleMark/modellabelwindow.cpp \
     autoSampleMark/autoparamterconfigwindow.cpp \
     videomarkparamterwindow.cpp \
-    myobject.cpp \
     drawShape/myshape.cpp \
     drawShape/drawrectshape.cpp \
     drawShape/drawlineshape.cpp \
@@ -62,7 +61,9 @@ SOURCES += main.cpp\
     drawShape/drawshape.cpp \
     imagesegmentcontrolwindow.cpp \
     drawWidget/segmentlabel.cpp \
-    saveMarkData/segmentimagesave.cpp
+    saveMarkData/segmentimagesave.cpp \
+    dataType/myobject.cpp \
+    dataType/myrect3d.cpp
 
 HEADERS  += controlwindow.h \
     videoparameterwindow.h \
@@ -81,7 +82,6 @@ HEADERS  += controlwindow.h \
     autoSampleMark/modellabelwindow.h \
     autoSampleMark/autoparamterconfigwindow.h \
     videomarkparamterwindow.h \
-    myobject.h \
     drawShape/myshape.h \
     drawShape/drawrectshape.h \
     drawShape/drawlineshape.h \
@@ -105,7 +105,9 @@ HEADERS  += controlwindow.h \
     drawShape/drawshape.h \
     imagesegmentcontrolwindow.h \
     drawWidget/segmentlabel.h \
-    saveMarkData/segmentimagesave.h
+    saveMarkData/segmentimagesave.h \
+    dataType/myobject.h \
+    dataType/myrect3d.h
 
 RESOURCES += \
     style.qrc \

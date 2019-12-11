@@ -114,7 +114,8 @@ protected:
     QImage currentImage;
     int currentIndex;
 
-    JSONProcessVideo jsonProcess;
+    JSONProcessVideo jsonProcessVideo;
+    JSONProcess jsonProcess;
     XMLProcess xmlProcess;
     SegmentImageSave segmentImageProcess;
 
