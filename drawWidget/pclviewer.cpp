@@ -21,24 +21,21 @@ void PCLViewer::setIsSelect(bool isSelect)
     this->isSelect = isSelect;
 }
 
-void PCLViewer::setNewPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
+int PCLViewer::setNewPointCloud(const QString &pcdFilePath)
 {
-    float scale = 5;
-    srcCloud->clear();
-    // Fill the cloud with some points
-    for (size_t i = 0; i < cloud->points.size (); ++i)
+    int version;
+//    pcl::PointCloud<pcl::PointXYZI>::Ptr currentCloud(new pcl::PointCloud<pcl::PointXYZI>);
+//    if(pcl::io::loadPCDFile(pcdFilePath.toStdString(), *currentCloud) == -1)
+//    {
+//        return -1;
+//    }
+    srcCloud.reset (new pcl::PCLPointCloud2);
+    if(pcd.read(pcdFilePath.toStdString(), *srcCloud, origin, orientation, version) < 0)
     {
-      PointT point;
-      point.x = cloud->points[i].x;
-      point.y = cloud->points[i].y;
-      point.z = cloud->points[i].z;
-      point.r = static_cast<unsigned char>(cloud->points[i].intensity * scale);
-      point.g = static_cast<unsigned char>(cloud->points[i].intensity * scale);
-      point.b = static_cast<unsigned char>(cloud->points[i].intensity * scale);
-      srcCloud->push_back(point);
+        return -1;
     }
-    viewer->updatePointCloud(srcCloud, "srcCloud");
-    this->update();
+    drawRandomColorPointCloud();
+    return 0;
 }
 
 void PCLViewer::setOjects(const QList<MyObject> &obejcts, QString sampleClass)
@@ -54,10 +51,13 @@ void PCLViewer::setOjects(const QList<MyObject> &obejcts, QString sampleClass)
         }
     }
     this->sampleClass = sampleClass;
+    drawShape(rect3DObejcts);
 }
 
 void PCLViewer::clearPoints()
 {
+    viewer->removeAllShapes();
+    viewer->removePointCloud("srcCloud");
     if(clickedPoints->size() > 0)
     {
         clickedPoints->clear();
@@ -69,7 +69,7 @@ void PCLViewer::clearPoints()
 void PCLViewer::getPoints(pcl::PointCloud<pcl::PointXYZI>::Ptr &result)
 {
     result->clear();
-    for(const PointT &point: clickedPoints->points)
+    for(const pcl::PointXYZRGB &point: clickedPoints->points)
     {
         pcl::PointXYZI tempPoint;
         tempPoint.x = point.x;
@@ -104,7 +104,7 @@ void PCLViewer::clickedPointCallback(const pcl::visualization::PointPickingEvent
     if(isSelect)
     {
         bool isIn = false;
-        PointT currentPoint;
+        pcl::PointXYZRGB currentPoint;
         if (event.getPointIndex() == -1)
             return;
         event.getPoint(currentPoint.x, currentPoint.y, currentPoint.z);
@@ -134,6 +134,35 @@ void PCLViewer::clickedPointCallback(const pcl::visualization::PointPickingEvent
 
         std::cout << "point:" << currentPoint.x << " " << currentPoint.y << " " << currentPoint.z << std::endl;
     }
+}
+
+void PCLViewer::drawRandomColorPointCloud()
+{
+    viewer->removePointCloud("srcCloud");
+    colorHandler.reset (new pcl::visualization::PointCloudColorHandlerRandom<pcl::PCLPointCloud2>(srcCloud));
+    geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerXYZ<pcl::PCLPointCloud2>(srcCloud));
+    //geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerSurfaceNormal<pcl::PCLPointCloud2>(srcCloud));
+    viewer->addPointCloud(srcCloud, geometryHandler, colorHandler, origin, orientation, "srcCloud", 0);
+}
+
+void PCLViewer::drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
+{
+    float scale = 5;
+    rgbCloud->clear();
+    // Fill the cloud with some points
+    for (size_t i = 0; i < cloud->points.size (); ++i)
+    {
+      pcl::PointXYZRGB point;
+      point.x = cloud->points[i].x;
+      point.y = cloud->points[i].y;
+      point.z = cloud->points[i].z;
+      point.r = static_cast<unsigned char>(cloud->points[i].intensity * scale);
+      point.g = static_cast<unsigned char>(cloud->points[i].intensity * scale);
+      point.b = static_cast<unsigned char>(cloud->points[i].intensity * scale);
+      rgbCloud->push_back(point);
+    }
+    viewer->updatePointCloud(rgbCloud, "srcCloud");
+    this->update();
 }
 
 void PCLViewer::drawShape(const QList<MyObject> &obejcts)
@@ -167,10 +196,12 @@ void PCLViewer::drawObject(const MyObject &object, int id)
     double height = static_cast<double>(rect3d.size[2]);
     point.x = rect3d.center[0];
     point.y = rect3d.center[1];
-    point.z = rect3d.center[2];
+    point.z = rect3d.center[2] + static_cast<float>(height / 2.0);
     viewer->addText3D<pcl::PointXYZ>(object.getObjectClass().toStdString(), point, 1.0, \
                                      255, 255, 0, QString("text_%1").arg(id).toStdString());
     viewer->addCube(rect3d.center, yaw, length, width, height, boxId.toStdString());
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, boxId.toStdString());
     viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 0, 0, boxId.toStdString());
 }
 
@@ -179,9 +210,11 @@ void PCLViewer::initData()
     viewer.reset (new pcl::visualization::PCLVisualizer("cloud", false));
     initCloud();
 
-    pcl::visualization::PointCloudColorHandlerRGBField<PointT> colorHandler(srcCloud);
-    viewer->addPointCloud<PointT>(srcCloud, colorHandler, "srcCloud", 0);
+    colorHandler.reset (new pcl::visualization::PointCloudColorHandlerRandom<pcl::PCLPointCloud2>(srcCloud));
+    geometryHandler.reset (new pcl::visualization::PointCloudGeometryHandlerXYZ<pcl::PCLPointCloud2>(srcCloud));
+    viewer->addPointCloud (srcCloud, geometryHandler, colorHandler, origin, orientation, "srcCloud", 0);
     viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "srcCloud", 0);
+    viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_IMMEDIATE_RENDERING, 1.0, "srcCloud");
 
     this->SetRenderWindow(viewer->getRenderWindow());
     viewer->setupInteractor(this->GetInteractor (), this->GetRenderWindow ());
@@ -190,9 +223,15 @@ void PCLViewer::initData()
     viewer->setCameraPosition(0, 0, 0, 0, 0, 0, 0, 0, -1);
     viewer->addCoordinateSystem(1.0);
     viewer->initCameraParameters();
+    viewer->cameraParamsSet ();
+    viewer->cameraFileLoaded ();
+    viewer->resetCameraViewpoint("srcCloud");
     viewer->resetCamera();
 
     viewer->registerPointPickingCallback(boost::bind(&PCLViewer::clickedPointCallback, this, _1));
+
+    // Set whether or not we should be using the vtkVertexBufferObjectMapper
+    viewer->setUseVbos(true);
 
     this->update();
 
@@ -209,22 +248,6 @@ void PCLViewer::initConnect()
 
 void PCLViewer::initCloud()
 {
-    // Setup the cloud pointer
-    srcCloud.reset (new PointCloudT);
-    // The number of points in the cloud
-    srcCloud->points.resize(10);
-
-    // Fill the cloud with some points
-    for (size_t i = 0; i < srcCloud->points.size (); ++i)
-    {
-        srcCloud->points[i].x = 1024 * rand() / (RAND_MAX + 1.0f);
-        srcCloud->points[i].y = 1024 * rand() / (RAND_MAX + 1.0f);
-        srcCloud->points[i].z = 1024 * rand() / (RAND_MAX + 1.0f);
-
-        srcCloud->points[i].r = static_cast<unsigned char>(255 *(1024 * rand() / (RAND_MAX + 1.0f)));
-        srcCloud->points[i].g = static_cast<unsigned char>(255 *(1024 * rand() / (RAND_MAX + 1.0f)));
-        srcCloud->points[i].b = static_cast<unsigned char>(255 *(1024 * rand() / (RAND_MAX + 1.0f)));
-    }
-
-    clickedPoints.reset(new PointCloudT);
+    srcCloud.reset (new pcl::PCLPointCloud2);
+    clickedPoints.reset(new pcl::PointCloud<pcl::PointXYZRGB>);
 }

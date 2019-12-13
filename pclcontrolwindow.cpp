@@ -138,14 +138,14 @@ void PCLControlWindow::loadMarkPointCloud()
 
 void PCLControlWindow::loadPointCloudData(const QString pcdFilePath)
 {
-    currentCloud->clear();
-    if(pcl::io::loadPCDFile(pcdFilePath.toStdString(), *currentCloud) != -1)
+    drawPointCloud->clearPoints();
+    if(drawPointCloud->setNewPointCloud(pcdFilePath) != -1)
     {
         currentPCDPath = pcdFilePath;
-        updatePointCloud();
         QFileInfo pcdFileInfo(currentPCDPath);
         QString saveAnnotationsDir = this->markDataDir + "/../" + "Annotations";
         QString readJsonPath= saveAnnotationsDir + "/" + pcdFileInfo.completeBaseName() + ".json";
+        qDebug() << readJsonPath << endl;
         QFileInfo jsonFileInfo(readJsonPath);
         QList<MyObject> objects;
         if(jsonFileInfo.exists() && jsonProcess.readJSON(readJsonPath, objects) == 0)
@@ -160,12 +160,6 @@ void PCLControlWindow::loadPointCloudData(const QString pcdFilePath)
     updateListBox();
 }
 
-void PCLControlWindow::updatePointCloud()
-{
-    drawPointCloud->clearPoints();
-    drawPointCloud->setNewPointCloud(currentCloud);
-}
-
 void PCLControlWindow::initDrawWidget()
 {
     drawPointCloud = new PCLViewer(this);
@@ -177,7 +171,6 @@ void PCLControlWindow::initData()
 {
     initMarkData(".", MarkDataType::PCD);
     currentPCDPath = "";
-    currentCloud.reset(new pcl::PointCloud<pcl::PointXYZI>);
 }
 
 void PCLControlWindow::initConnect()

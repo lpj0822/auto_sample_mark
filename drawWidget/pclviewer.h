@@ -10,13 +10,20 @@
 
 #define PCL_NO_PRECOMPILE
 
-// Point Cloud Library
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
+#include <pcl/common/common.h>
 #include <pcl/io/pcd_io.h>
+#include <cfloat>
+#include <pcl/visualization/eigen.h>
+#include <pcl/visualization/point_cloud_handlers.h>
 #include <pcl/visualization/pcl_visualizer.h>
-#include <pcl/visualization/mouse_event.h>
+#include <pcl/visualization/image_viewer.h>
+#include <pcl/visualization/histogram_visualizer.h>
+#if VTK_MAJOR_VERSION>=6 || (VTK_MAJOR_VERSION==5 && VTK_MINOR_VERSION>6)
+#include <pcl/visualization/pcl_plotter.h>
+#endif
 #include <pcl/visualization/point_picking_event.h>
+#include <pcl/search/kdtree.h>
+#include <vtkPolyDataReader.h>
 
 // Visualization Toolkit (VTK)
 #include <vtkRenderWindow.h>
@@ -36,14 +43,19 @@ class PCLViewer : public QVTKWidget
 
 public:
 
-    typedef pcl::PointXYZRGB PointT;
-    typedef pcl::PointCloud<PointT> PointCloudT;
+    typedef pcl::visualization::PointCloudColorHandler<pcl::PCLPointCloud2> ColorHandler;
+    typedef ColorHandler::Ptr ColorHandlerPtr;
+    typedef ColorHandler::ConstPtr ColorHandlerConstPtr;
+
+    typedef pcl::visualization::PointCloudGeometryHandler<pcl::PCLPointCloud2> GeometryHandler;
+    typedef GeometryHandler::Ptr GeometryHandlerPtr;
+    typedef GeometryHandler::ConstPtr GeometryHandlerConstPtr;
 
     PCLViewer(QWidget *parent = 0);
     ~PCLViewer();
 
     void setIsSelect(bool isSelect);
-    void setNewPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud);
+    int setNewPointCloud(const QString &pcdFilePath);
     void setOjects(const QList<MyObject> &obejcts, QString sampleClass);
     void clearPoints();
     void getPoints(pcl::PointCloud<pcl::PointXYZI>::Ptr &result);
@@ -56,6 +68,9 @@ protected:
 
 private:
 
+    void drawRandomColorPointCloud();
+    void drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud);
+
     void drawShape(const QList<MyObject> &obejcts);
     void drawObject(const MyObject &object, int id);
 
@@ -64,9 +79,19 @@ private:
     void initCloud();
 
 private:
+    pcl::PCDReader pcd;
+    ColorHandlerPtr colorHandler;
+    GeometryHandlerPtr geometryHandler;
     pcl::visualization::PCLVisualizer::Ptr viewer;
-    PointCloudT::Ptr srcCloud;
-    PointCloudT::Ptr clickedPoints;
+
+    Eigen::Vector4f origin;
+    Eigen::Quaternionf orientation;
+    pcl::PCLPointCloud2::Ptr srcCloud;
+
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr rgbCloud;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr clickedPoints;
+
+    pcl::search::KdTree<pcl::PointXYZ> search;
 
     QString sampleClass;
 

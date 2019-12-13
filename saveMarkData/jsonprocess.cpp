@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QVariant>
+#include <QDebug>
 
 JSONProcess::JSONProcess(QObject *parent) : QObject(parent)
 {
@@ -114,6 +115,7 @@ int JSONProcess::readJSON(const QString &jsonFilePath, QList<MyObject> &objects)
     }
     else
     {
+        qDebug() << "error:" << jsonError.errorString() << endl;
         return -2;
     }
     return 0;
