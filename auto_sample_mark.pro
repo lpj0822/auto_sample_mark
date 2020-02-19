@@ -63,7 +63,8 @@ SOURCES += main.cpp\
     drawWidget/segmentlabel.cpp \
     saveMarkData/segmentimagesave.cpp \
     dataType/myobject.cpp \
-    dataType/myrect3d.cpp
+    dataType/myrect3d.cpp \
+    drawShape/segmentshape.cpp
 
 HEADERS  += controlwindow.h \
     videoparameterwindow.h \
@@ -107,15 +108,19 @@ HEADERS  += controlwindow.h \
     drawWidget/segmentlabel.h \
     saveMarkData/segmentimagesave.h \
     dataType/myobject.h \
-    dataType/myrect3d.h
+    dataType/myrect3d.h \
+    drawShape/segmentshape.h
 
 RESOURCES += \
     style.qrc \
     images.qrc \
     QtAwesome.qrc \
-    document.qrc
+    document.qrc \
+    qm.qrc
 
 RC_ICONS = appico.ico
+
+TRANSLATIONS = zh.ts en.ts ja.ts
 
 win32{
 

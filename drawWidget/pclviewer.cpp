@@ -165,9 +165,33 @@ void PCLViewer::drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
     this->update();
 }
 
+void PCLViewer::drawCircle()
+{
+    pcl::ModelCoefficients circleCoeff1;
+    circleCoeff1.values.resize(3);
+    circleCoeff1.values[0] = 0;
+    circleCoeff1.values[1] = 0;
+    circleCoeff1.values[2] = 50.0f;
+    viewer->addCircle(circleCoeff1, "circle1", 0);
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "circle1");
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 0, 0, "circle1");
+
+    pcl::ModelCoefficients circleCoeff2;
+    circleCoeff2.values.resize(3);
+    circleCoeff2.values[0] = 0;
+    circleCoeff2.values[1] = 0;
+    circleCoeff2.values[2] = 100.0f;
+    viewer->addCircle(circleCoeff2, "circle2", 0);
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
+                                        pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, "circle2");
+    viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "circle2");
+}
+
 void PCLViewer::drawShape(const QList<MyObject> &obejcts)
 {
     viewer->removeAllShapes();
+    drawCircle();
     for(int loop = 0; loop < obejcts.count(); loop++)
     {
         if(sampleClass == "All")

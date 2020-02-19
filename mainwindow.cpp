@@ -35,6 +35,7 @@ void MainWindow::slotOpenImageDir()
     }
     else
     {
+        initImageMarkShape();
         dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
         markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::IMAGE;
@@ -55,6 +56,7 @@ void MainWindow::slotOpenVideoDir()
     }
     else
     {
+        initImageMarkShape();
         dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
         markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::VIDEO;
@@ -75,12 +77,12 @@ void MainWindow::slotOpenImageSegmentDir()
     }
     else
     {
+        initSegmentMarkShape();
         dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
         markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::SEGMENT;
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
-        shapeTool->setEnabled(false);
     }
 }
 
@@ -96,12 +98,12 @@ void MainWindow::slotOpenPCDDir()
     }
     else
     {
+        initPointCloudMarkShape();
         dirProcess.getDirAllFileName(this->openDataDir, "*.pcd", processDataList);
         markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::PCD;
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
-        shapeTool->setEnabled(false);
     }
 }
 
@@ -370,15 +372,10 @@ void MainWindow::initAction()
     userManualAction = new QAction(tr("系统说明"), this);
 
     //shapeTool
-    QMap<int, QString> shapeDatas = myShape.getAllShape();
+
     shapeWidget = new QWidget(this);
     shapeLabel = new QLabel(tr("选择标注形状"));
     shapeBox = new QComboBox();
-    for(QMap<int, QString>::const_iterator iter = shapeDatas.constBegin();
-        iter != shapeDatas.constEnd(); ++iter)
-    {
-        shapeBox->addItem(iter.value(), iter.key());
-    }
     QHBoxLayout *shapLayout = new QHBoxLayout();
     shapLayout->setSpacing(10);
     shapLayout->addWidget(shapeLabel);
@@ -505,4 +502,25 @@ void MainWindow::initConnect()
     {
         connect(this, &MainWindow::signalManualMarkParamterChanged, markWindow[loop], &ControlWindow::slotManualMarkParamterChanged);
     }
+}
+
+void MainWindow::initImageMarkShape()
+{
+    QMap<int, QString> shapeDatas = myShape.getAllShape();
+    shapeBox->clear();
+    for(QMap<int, QString>::const_iterator iter = shapeDatas.constBegin();
+        iter != shapeDatas.constEnd(); ++iter)
+    {
+        shapeBox->addItem(iter.value(), iter.key());
+    }
+}
+
+void MainWindow::initSegmentMarkShape()
+{
+    shapeBox->clear();
+}
+
+void MainWindow::initPointCloudMarkShape()
+{
+    shapeBox->clear();
 }

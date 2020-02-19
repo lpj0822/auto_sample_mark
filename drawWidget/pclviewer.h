@@ -70,6 +70,7 @@ private:
 
     void drawRandomColorPointCloud();
     void drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud);
+    void drawCircle();
 
     void drawShape(const QList<MyObject> &obejcts);
     void drawObject(const MyObject &object, int id);

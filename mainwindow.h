@@ -136,6 +136,10 @@ private:
     void initUI();
     void initConnect();
 
+    void initImageMarkShape();
+    void initSegmentMarkShape();
+    void initPointCloudMarkShape();
+
 };
 
 #endif // MAINWINDOW_H
