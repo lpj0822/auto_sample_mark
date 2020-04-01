@@ -75,6 +75,10 @@ private:
     void drawShape(const QList<MyObject> &obejcts);
     void drawObject(const MyObject &object, int id);
 
+    int readPCDFile(const QString &filePath);
+    int readBinFile(const QString &filePath,
+                    pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud);
+
     void initData();
     void initConnect();
     void initCloud();
@@ -88,7 +92,6 @@ private:
     Eigen::Vector4f origin;
     Eigen::Quaternionf orientation;
     pcl::PCLPointCloud2::Ptr srcCloud;
-
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr rgbCloud;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr clickedPoints;
 

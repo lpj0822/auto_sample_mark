@@ -18,6 +18,7 @@
 #include "videoTools/videocroppingwindow.h"
 #include "videoTools/imageconverterwindow.h"
 #include "videoTools/qcamerawindow.h"
+#include "pcTools/pcdconverterwindow.h"
 #include "autoSampleMark/autosamplemarkwindow.h"
 #include "drawShape/myshape.h"
 #include "controlwindow.h"
@@ -44,8 +45,10 @@ public slots:
     void slotOpenPCDDir();
     //setting
     void slotManualMarkParamterConfig();
+    void slotSegmentMarkParamterConfig();
     void slotAutoMarkParamterConfig();
     void slotVideoMarkParamterConfig();
+    void slotPointCloudParamterConfig();
     //autoMark
     void slotAutoSampleMark();
     //tool
@@ -55,6 +58,9 @@ public slots:
     void slotVideoCutting();
     void slotImageConverter();
     void slotCamera();
+
+    void slotPcdConverter();
+
     //about
     void slotAbout();
     void slotUserManual();
@@ -78,8 +84,10 @@ private:
     QAction *exitAction;
     //setting
     QAction *manualParamterAction;
+    QAction *segmentParamterAction;
     QAction *autoParamterAction;
     QAction *videoMarkParamterAction;
+    QAction *pointcloudParamterAction;
     //autoMark
     QAction *autoMarkAction;
     //tool
@@ -89,6 +97,7 @@ private:
     QAction *videoCroppingAction;
     QAction *imageConverterAction;
     QAction *cameraAction;
+    QAction *pcdConverterAction;
     //about
     QAction *aboutAction;
     QAction *userManualAction;
@@ -122,6 +131,8 @@ private:
     VideoCroppingWindow *videoCroppingWindow;
     ImageConverterWindow *imageConverterWindow;
     QCameraWindow *cameraWindow;
+
+    PCDConverterWindow *pcdConverterWindow;
 
     MarkDataType loadDataType;
     MyShape myShape;

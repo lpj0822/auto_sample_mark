@@ -23,8 +23,6 @@ include(multipletracking/multipletracking.pri)
 
 SOURCES += main.cpp\
         controlwindow.cpp \
-    videoparameterwindow.cpp \
-    manualparamterconfigwindow.cpp \
     markclasswindow.cpp \
     mainwindow.cpp \
     selectmarkclasswindow.cpp \
@@ -38,7 +36,6 @@ SOURCES += main.cpp\
     videoTools/frompicturetovideowindow.cpp \
     autoSampleMark/modellabelwindow.cpp \
     autoSampleMark/autoparamterconfigwindow.cpp \
-    videomarkparamterwindow.cpp \
     drawShape/myshape.cpp \
     drawShape/drawrectshape.cpp \
     drawShape/drawlineshape.cpp \
@@ -55,6 +52,7 @@ SOURCES += main.cpp\
     pclcontrolwindow.cpp \
     sampleMarkParam/manualparamterconfig.cpp \
     sampleMarkParam/videomarkparamterconfig.cpp \
+    sampleMarkParam/segmentparamterconfig.cpp \
     videoTools/imageconverterthread.cpp \
     videoTools/imageconverterwindow.cpp \
     drawShape/drawlaneshape.cpp \
@@ -64,11 +62,17 @@ SOURCES += main.cpp\
     saveMarkData/segmentimagesave.cpp \
     dataType/myobject.cpp \
     dataType/myrect3d.cpp \
-    drawShape/segmentshape.cpp
+    drawShape/segmentshape.cpp \
+    paramWindow/manualparamterconfigwindow.cpp \
+    paramWindow/segmentparamterconfigwindow.cpp \
+    paramWindow/videoparameterwindow.cpp \
+    paramWindow/videomarkparamterwindow.cpp \
+    pcTools/pcdconverterthread.cpp \
+    pcTools/pcdconverterwindow.cpp \
+    sampleMarkParam/pointcloudparamterconfig.cpp \
+    paramWindow/pointcloudmarkparamterwindow.cpp
 
 HEADERS  += controlwindow.h \
-    videoparameterwindow.h \
-    manualparamterconfigwindow.h \
     markclasswindow.h \
     mainwindow.h \
     selectmarkclasswindow.h \
@@ -82,7 +86,6 @@ HEADERS  += controlwindow.h \
     videoTools/frompicturetovideowindow.h \
     autoSampleMark/modellabelwindow.h \
     autoSampleMark/autoparamterconfigwindow.h \
-    videomarkparamterwindow.h \
     drawShape/myshape.h \
     drawShape/drawrectshape.h \
     drawShape/drawlineshape.h \
@@ -100,6 +103,7 @@ HEADERS  += controlwindow.h \
     sampleMarkParam/drawmarkcolor.h \
     sampleMarkParam/manualparamterconfig.h \
     sampleMarkParam/videomarkparamterconfig.h \
+    sampleMarkParam/segmentparamterconfig.h \
     videoTools/imageconverterthread.h \
     videoTools/imageconverterwindow.h \
     drawShape/drawlaneshape.h \
@@ -109,7 +113,15 @@ HEADERS  += controlwindow.h \
     saveMarkData/segmentimagesave.h \
     dataType/myobject.h \
     dataType/myrect3d.h \
-    drawShape/segmentshape.h
+    drawShape/segmentshape.h \
+    paramWindow/manualparamterconfigwindow.h \
+    paramWindow/segmentparamterconfigwindow.h \
+    paramWindow/videoparameterwindow.h \
+    paramWindow/videomarkparamterwindow.h \
+    pcTools/pcdconverterthread.h \
+    pcTools/pcdconverterwindow.h \
+    sampleMarkParam/pointcloudparamterconfig.h \
+    paramWindow/pointcloudmarkparamterwindow.h
 
 RESOURCES += \
     style.qrc \

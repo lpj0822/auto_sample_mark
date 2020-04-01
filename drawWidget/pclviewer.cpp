@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <boost/bind.hpp>
+#include"sampleMarkParam/pointcloudparamterconfig.h"
 
 PCLViewer::PCLViewer(QWidget *parent) : QVTKWidget(parent)
 {
@@ -23,19 +24,19 @@ void PCLViewer::setIsSelect(bool isSelect)
 
 int PCLViewer::setNewPointCloud(const QString &pcdFilePath)
 {
-    int version;
-//    pcl::PointCloud<pcl::PointXYZI>::Ptr currentCloud(new pcl::PointCloud<pcl::PointXYZI>);
-//    if(pcl::io::loadPCDFile(pcdFilePath.toStdString(), *currentCloud) == -1)
-//    {
-//        return -1;
-//    }
-    srcCloud.reset (new pcl::PCLPointCloud2);
-    if(pcd.read(pcdFilePath.toStdString(), *srcCloud, origin, orientation, version) < 0)
+    int errorCode = 0;
+    if(PointCloudParamterConfig::getFileType() == PointCloudFileType::PCD_FILE)
     {
-        return -1;
+        errorCode = readPCDFile(pcdFilePath);
+        drawRandomColorPointCloud();
     }
-    drawRandomColorPointCloud();
-    return 0;
+    else if(PointCloudParamterConfig::getFileType() == PointCloudFileType::BIN_FILE)
+    {
+        pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
+        errorCode = readBinFile(pcdFilePath, cloud);
+        drawRGBPointCloud(cloud);
+    }
+    return errorCode;
 }
 
 void PCLViewer::setOjects(const QList<MyObject> &obejcts, QString sampleClass)
@@ -143,11 +144,13 @@ void PCLViewer::drawRandomColorPointCloud()
     geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerXYZ<pcl::PCLPointCloud2>(srcCloud));
     //geometryHandler.reset(new pcl::visualization::PointCloudGeometryHandlerSurfaceNormal<pcl::PCLPointCloud2>(srcCloud));
     viewer->addPointCloud(srcCloud, geometryHandler, colorHandler, origin, orientation, "srcCloud", 0);
+    this->update();
 }
 
 void PCLViewer::drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
 {
-    float scale = 5;
+    float scale = 10;
+    viewer->removePointCloud("srcCloud");
     rgbCloud->clear();
     // Fill the cloud with some points
     for (size_t i = 0; i < cloud->points.size (); ++i)
@@ -161,7 +164,28 @@ void PCLViewer::drawRGBPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
       point.b = static_cast<unsigned char>(cloud->points[i].intensity * scale);
       rgbCloud->push_back(point);
     }
-    viewer->updatePointCloud(rgbCloud, "srcCloud");
+    viewer->addPointCloud(rgbCloud, "srcCloud");
+    this->update();
+}
+
+void PCLViewer::drawShape(const QList<MyObject> &obejcts)
+{
+    viewer->removeAllShapes();
+    drawCircle();
+    for(int loop = 0; loop < obejcts.count(); loop++)
+    {
+        if(sampleClass == "All")
+        {
+            drawObject(obejcts[loop], loop);
+        }
+        else
+        {
+            if(obejcts[loop].getObjectClass().contains(sampleClass))
+            {
+                drawObject(obejcts[loop], loop);
+            }
+        }
+    }
     this->update();
 }
 
@@ -188,27 +212,6 @@ void PCLViewer::drawCircle()
     viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 255, 0, "circle2");
 }
 
-void PCLViewer::drawShape(const QList<MyObject> &obejcts)
-{
-    viewer->removeAllShapes();
-    drawCircle();
-    for(int loop = 0; loop < obejcts.count(); loop++)
-    {
-        if(sampleClass == "All")
-        {
-            drawObject(obejcts[loop], loop);
-        }
-        else
-        {
-            if(obejcts[loop].getObjectClass().contains(sampleClass))
-            {
-                drawObject(obejcts[loop], loop);
-            }
-        }
-    }
-    this->update();
-}
-
 void PCLViewer::drawObject(const MyObject &object, int id)
 {
     pcl::PointXYZ point;
@@ -227,6 +230,62 @@ void PCLViewer::drawObject(const MyObject &object, int id)
     viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_REPRESENTATION, \
                                         pcl::visualization::PCL_VISUALIZER_REPRESENTATION_WIREFRAME, boxId.toStdString());
     viewer->setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 255, 0, 0, boxId.toStdString());
+}
+
+int PCLViewer::readPCDFile(const QString &filePath)
+{
+    int version;
+//    pcl::PointCloud<pcl::PointXYZI>::Ptr currentCloud(new pcl::PointCloud<pcl::PointXYZI>);
+//    if(pcl::io::loadPCDFile(pcdFilePath.toStdString(), *currentCloud) == -1)
+//    {
+//        return -1;
+//    }
+    srcCloud.reset(new pcl::PCLPointCloud2);
+    if(pcd.read(filePath.toStdString(), *srcCloud, origin, orientation, version) < 0)
+    {
+        return -1;
+    }
+    return 0;
+}
+
+int PCLViewer::readBinFile(const QString &filePath,
+                           pcl::PointCloud<pcl::PointXYZI>::Ptr &cloud)
+{
+    ifstream inFile(filePath.toStdString(), ios::in|ios::binary);
+    if(!inFile)
+    {
+        cout << filePath.toStdString() << " open error!" <<endl;
+        return -1;
+    }
+    cloud->clear();
+    if(PointCloudParamterConfig::getFieldsNumber() == 3)
+    {
+        float data[3];
+        while(inFile.read(reinterpret_cast<char*>(data), sizeof(data)))
+        {
+            pcl::PointXYZI point;
+            point.x = data[0];
+            point.y = data[1];
+            point.z = data[2];
+            point.intensity = 255;
+            cloud->push_back(point);
+        }
+    }
+    else if(PointCloudParamterConfig::getFieldsNumber() == 4)
+    {
+        float data[4];
+        while(inFile.read(reinterpret_cast<char*>(data), sizeof(data)))
+        {
+            pcl::PointXYZI point;
+            point.x = data[0];
+            point.y = data[1];
+            point.z = data[2];
+            point.intensity = data[3];
+            cloud->push_back(point);
+        }
+    }
+    inFile.close();
+    return 0;
 }
 
 void PCLViewer::initData()
@@ -272,6 +331,7 @@ void PCLViewer::initConnect()
 
 void PCLViewer::initCloud()
 {
-    srcCloud.reset (new pcl::PCLPointCloud2);
+    srcCloud.reset(new pcl::PCLPointCloud2);
+    rgbCloud.reset(new pcl::PointCloud<pcl::PointXYZRGB>);
     clickedPoints.reset(new pcl::PointCloud<pcl::PointXYZRGB>);
 }

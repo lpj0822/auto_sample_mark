@@ -2,6 +2,7 @@
 #include "imagesegmentcontrolwindow.h"
 #include <QMessageBox>
 #include <QDebug>
+#include "sampleMarkParam/segmentparamterconfig.h"
 
 ImageSegmentControlWindow::ImageSegmentControlWindow(QWidget *parent)
     : ControlWindow(parent)
@@ -171,6 +172,7 @@ void ImageSegmentControlWindow::initData()
 {
     initMarkData(".", MarkDataType::SEGMENT);
     initImageData();
+    SegmentParamterConfig::loadConfig();
 }
 
 void ImageSegmentControlWindow::initConnect()

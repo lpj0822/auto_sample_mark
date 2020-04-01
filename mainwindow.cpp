@@ -5,9 +5,12 @@
 #include <QMessageBox>
 #include <QDebug>
 #include "helpers/dirprocess.h"
-#include "manualparamterconfigwindow.h"
+#include "paramWindow/manualparamterconfigwindow.h"
+#include "paramWindow/videomarkparamterwindow.h"
+#include "paramWindow/segmentparamterconfigwindow.h"
 #include "autoSampleMark/autoparamterconfigwindow.h"
-#include "videomarkparamterwindow.h"
+#include "paramWindow/pointcloudmarkparamterwindow.h"
+#include "sampleMarkParam/pointcloudparamterconfig.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -99,7 +102,14 @@ void MainWindow::slotOpenPCDDir()
     else
     {
         initPointCloudMarkShape();
-        dirProcess.getDirAllFileName(this->openDataDir, "*.pcd", processDataList);
+        if(PointCloudParamterConfig::getFileType() == PointCloudFileType::PCD_FILE)
+        {
+            dirProcess.getDirAllFileName(this->openDataDir, "*.pcd", processDataList);
+        }
+        else if(PointCloudParamterConfig::getFileType() == PointCloudFileType::BIN_FILE)
+        {
+            dirProcess.getDirAllFileName(this->openDataDir, "*.bin", processDataList);
+        }
         markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::PCD;
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
@@ -134,6 +144,7 @@ void MainWindow::slotAutoMarkParamterConfig()
     delete window;
     window = NULL;
 }
+
 void MainWindow::slotVideoMarkParamterConfig()
 {
     int result = 0;
@@ -146,7 +157,34 @@ void MainWindow::slotVideoMarkParamterConfig()
     }
     delete window;
     window = NULL;
+}
 
+void MainWindow::slotSegmentMarkParamterConfig()
+{
+    int result = 0;
+    SegmentParamterConfigWindow *window = new SegmentParamterConfigWindow();
+    window->setModal(true);
+    result = window->exec();
+    if(result == QDialog::Accepted)
+    {
+        ;
+    }
+    delete window;
+    window = NULL;
+}
+
+void MainWindow::slotPointCloudParamterConfig()
+{
+    int result = 0;
+    PointCloudMarkParamterWindow *window = new PointCloudMarkParamterWindow();
+    window->setModal(true);
+    result = window->exec();
+    if(result == QDialog::Accepted)
+    {
+        ;
+    }
+    delete window;
+    window = NULL;
 }
 
 void MainWindow::slotAutoSampleMark()
@@ -220,6 +258,16 @@ void MainWindow::slotCamera()
     cameraWindow->show();
 }
 
+void MainWindow::slotPcdConverter()
+{
+    if(pcdConverterWindow == NULL)
+    {
+        pcdConverterWindow = new PCDConverterWindow();
+        connect(pcdConverterWindow, &PCDConverterWindow::signalClosePCDConverterWindow, this, &MainWindow::slotCloseOtherWindow);
+    }
+    pcdConverterWindow->show();
+}
+
 void MainWindow::slotAbout()
 {
     QMessageBox::about(this, "样本标注系统", "样本标注系统 版本："+ qApp->applicationVersion());
@@ -288,13 +336,19 @@ void MainWindow::slotCloseOtherWindow(QString flag)
     {
         disconnect(imageConverterWindow, &ImageConverterWindow::signalCloseImageConverterWindow, this, &MainWindow::slotCloseOtherWindow);
         delete imageConverterWindow;
-        imageConverterWindow =NULL;
+        imageConverterWindow = NULL;
     }
     else if(flag.contains("camera"))
     {
         disconnect(cameraWindow, &QCameraWindow::signalCloseCameraWindow, this, &MainWindow::slotCloseOtherWindow);
         delete cameraWindow;
         cameraWindow = NULL;
+    }
+    else if(flag.contains("pcdConverter"))
+    {
+        disconnect(pcdConverterWindow, &PCDConverterWindow::signalClosePCDConverterWindow, this, &MainWindow::slotCloseOtherWindow);
+        delete pcdConverterWindow;
+        pcdConverterWindow = NULL;
     }
 }
 
@@ -314,6 +368,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         imageConverterWindow->close();
     if(cameraWindow != NULL)
         cameraWindow->close();
+    if(pcdConverterWindow != NULL)
+        pcdConverterWindow->close();
     if(centerWidget != NULL)
     {
         centerWidget->currentWidget()->close();
@@ -331,6 +387,9 @@ void MainWindow::initData()
     videoCroppingWindow = NULL;
     imageConverterWindow = NULL;
     cameraWindow = NULL;
+
+    pcdConverterWindow = NULL;
+
     openDataDir = ".";
     loadDataType = MarkDataType::UNKNOWN;
 }
@@ -349,8 +408,10 @@ void MainWindow::initAction()
     exitAction = new QAction(tr("退出系统"), this);
     //setting
     manualParamterAction = new QAction(tr("手动标注参数设置"), this);
+    segmentParamterAction = new QAction(tr("分割标注参数设置"), this);
     autoParamterAction = new QAction(tr("自动标注参数设置"), this);
     videoMarkParamterAction = new QAction(tr("视频标注参数设置"), this);
+    pointcloudParamterAction = new QAction(tr("点云标注参数设置"));
     //autoMark
     autoMarkAction = new QAction(tr("自动化样本标注"), this);
     autoMarkAction->setIcon(QIcon(tr(":/images/images/mark.png")));
@@ -367,6 +428,10 @@ void MainWindow::initAction()
     imageConverterAction->setIcon(QIcon(tr(":/images/images/play.png")));
     cameraAction = new QAction(tr("视频采集"), this);
     cameraAction->setIcon(QIcon(tr(":/images/images/record.png")));
+
+    pcdConverterAction = new QAction(tr("PCD格式转换"), this);
+    pcdConverterAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
+
     //about
     aboutAction = new QAction(tr("关于"), this);
     userManualAction = new QAction(tr("系统说明"), this);
@@ -398,8 +463,11 @@ void MainWindow::initMenuBar()
     //setting
     settingMenu = new QMenu(tr("设置"), this);
     settingMenu->addAction(manualParamterAction);
+    settingMenu->addAction(segmentParamterAction);
     settingMenu->addAction(autoParamterAction);
     settingMenu->addAction(videoMarkParamterAction);
+    settingMenu->addSeparator();
+    settingMenu->addAction(pointcloudParamterAction);
     //autoMark
     autoMarkMenu = new QMenu(tr("自动化标注"), this);
     autoMarkMenu->addAction(autoMarkAction);
@@ -411,6 +479,8 @@ void MainWindow::initMenuBar()
     toolMenu->addAction(videoCroppingAction);
     toolMenu->addAction(imageConverterAction);
     toolMenu->addAction(cameraAction);
+    toolMenu->addSeparator();
+    toolMenu->addAction(pcdConverterAction);
     //about
     aboutMenu = new QMenu(tr("关于"), this);
     aboutMenu->addAction(aboutAction);
@@ -481,8 +551,10 @@ void MainWindow::initConnect()
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     //setting
     connect(manualParamterAction, &QAction::triggered, this, &MainWindow::slotManualMarkParamterConfig);
+    connect(segmentParamterAction, &QAction::triggered, this, &MainWindow::slotSegmentMarkParamterConfig);
     connect(autoParamterAction, &QAction::triggered, this, &MainWindow::slotAutoMarkParamterConfig);
     connect(videoMarkParamterAction, &QAction::triggered, this, &MainWindow::slotVideoMarkParamterConfig);
+    connect(pointcloudParamterAction, &QAction::triggered, this, &MainWindow::slotPointCloudParamterConfig);
     //autoMark
     connect(autoMarkAction, &QAction::triggered, this, &MainWindow::slotAutoSampleMark);
     //tool
@@ -492,6 +564,9 @@ void MainWindow::initConnect()
     connect(videoCroppingAction, &QAction::triggered, this, &MainWindow::slotVideoCropping);
     connect(imageConverterAction, &QAction::triggered, this, &MainWindow::slotImageConverter);
     connect(cameraAction, &QAction::triggered, this, &MainWindow::slotCamera);
+
+    connect(pcdConverterAction, &QAction::triggered, this, &MainWindow::slotPcdConverter);
+
     //about
     connect(aboutAction, &QAction::triggered, this, &MainWindow::slotAbout);
     connect(userManualAction, &QAction::triggered, this, &MainWindow::slotUserManual);

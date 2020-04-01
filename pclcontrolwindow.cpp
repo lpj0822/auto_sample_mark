@@ -3,6 +3,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QDebug>
+#include"sampleMarkParam/pointcloudparamterconfig.h"
 
 PCLControlWindow::PCLControlWindow(QWidget *parent)
     : ControlWindow(parent)
@@ -27,6 +28,7 @@ void PCLControlWindow::setMarkDataList(const QString markDataDir, const QList<QS
     if(markDataList.size() > 0)
     {
         this->processMarkDataList = markDataList;
+        readMarkHistory();
         updateListBox();
         isMarkButton->setEnabled(true);
     }
@@ -171,6 +173,7 @@ void PCLControlWindow::initData()
 {
     initMarkData(".", MarkDataType::PCD);
     currentPCDPath = "";
+    PointCloudParamterConfig::loadConfig();
 }
 
 void PCLControlWindow::initConnect()
