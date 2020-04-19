@@ -1,27 +1,26 @@
-#ifndef PCDCONVERTERWINDOW_H
-#define PCDCONVERTERWINDOW_H
+#ifndef PCDFILTERWINDOW_H
+#define PCDFILTERWINDOW_H
 
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QLabel>
 #include <QComboBox>
-#include <QSpinBox>
 #include <QLineEdit>
 #include <QList>
 #include <QCloseEvent>
-#include "pcdconverterthread.h"
+#include "pcdfilterterthread.h"
 
-class PCDConverterWindow : public QWidget
+class PCDFilterWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-    PCDConverterWindow(QWidget *parent = 0);
-    ~PCDConverterWindow();
+    PCDFilterWindow(QWidget *parent = 0);
+    ~PCDFilterWindow();
 
 signals:
-    void signalClosePCDConverterWindow(QString flag);
+    void signalClosePCDFilterWindow(QString flag);
 
 public slots:
     void slotOpen();
@@ -39,13 +38,11 @@ private:
     QPushButton *startButton;
     QPushButton *stopButton;
     QLineEdit *pathText;
-    QLabel *fieldsNumberLabel;
-    QSpinBox *fieldsNumberBox;
-    QLabel *formatLabel;
-    QComboBox *formatBox;
+    QLabel *filterTypeLabel;
+    QComboBox *filterTypeBox;
 
     QString pathDir;
-    PCDConverterThread *pcdConverterThread;
+    PCDFilterThread *pcdFilterThread;
 
     void init();
     void initUI();

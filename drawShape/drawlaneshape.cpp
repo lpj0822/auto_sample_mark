@@ -1,10 +1,13 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "drawlaneshape.h"
 #include <QMessageBox>
 #include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
-DrawLaneShape::DrawLaneShape(QObject *parent) : DrawShape(parent), maskImage(NULL)
+DrawLaneShape::DrawLaneShape(MarkDataType dataType, QObject *parent) :
+    DrawShape(dataType, parent), maskImage(NULL)
 {
     initDraw();
 }
@@ -36,6 +39,12 @@ void DrawLaneShape::initDraw()
         delete maskImage;
         maskImage = NULL;
     }
+    this->laneWidth = 10;
+}
+
+void DrawLaneShape::setLaneWidth(const int laneWidth)
+{
+    this->laneWidth = laneWidth;
 }
 
 int DrawLaneShape::drawMousePress(const QPoint point, bool &isDraw)
@@ -101,7 +110,7 @@ int DrawLaneShape::drawMouseRelease(QWidget *parent, const QPoint point, const Q
     {
         if(currentPolygon.count() >= 4)
         {
-            SelectMarkClassWindow *window = new SelectMarkClassWindow();
+            SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
             window->setModal(true);
             window->setObjectRect(sampleClass);
             int res = window->exec();
@@ -427,8 +436,8 @@ void DrawLaneShape::drawMaskImage(const QList<QPoint> &pointList, const QColor &
         for(int loop = 0; loop < pointList.count(); loop++)
         {
             int y = std::min(pointList[loop].y(), maskImage->height());
-            int minX = std::max(0, pointList[loop].x() - 10);
-            int maxX = std::min(pointList[loop].x() + 10, maskImage->width());
+            int minX = std::max(0, pointList[loop].x() - this->laneWidth);
+            int maxX = std::min(pointList[loop].x() + this->laneWidth, maskImage->width());
             for(int x = minX; x <= maxX; x++)
             {
                 maskImage->setPixel(x, y, qRgb(color.red(), color.green(), color.blue()));

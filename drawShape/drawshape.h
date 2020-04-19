@@ -4,13 +4,14 @@
 #include <QObject>
 #include <QPainter>
 #include "dataType/myobject.h"
+#include "dataType/mark_data_type.h"
 #include "baseAlgorithm/geometryalgorithm.h"
 
 class DrawShape : public QObject
 {
     Q_OBJECT
 public:
-    DrawShape(QObject *parent = nullptr);
+    DrawShape(MarkDataType dataType, QObject *parent = nullptr);
 
     virtual void initDraw() = 0;
     virtual int drawMousePress(const QPoint point, bool &isDraw) = 0;
@@ -34,6 +35,8 @@ protected:
     bool drawMousePressed;
     bool moveMousePressed;
     GeometryAlgorithm geometryAlgorithm;
+
+    MarkDataType markDataType;
 };
 
 #endif // DRAWSHAPE_H

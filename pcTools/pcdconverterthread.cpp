@@ -1,7 +1,9 @@
 ﻿#include "pcdconverterthread.h"
 #include <iostream>
 #include <QFileInfo>
+#include <QFile>
 #include <QDir>
+#include <QDebug>
 
 PCDConverterThread::PCDConverterThread()
 {
@@ -31,12 +33,17 @@ void PCDConverterThread::run()
             QString fileName = fileInfo.completeBaseName();
             QString saveFileName = saveDirName + fileName + format;
             pcl::PCLPointCloud2::Ptr srcCloud(new pcl::PCLPointCloud2);
-            if(pcdReader.read(pcdList[i].toStdString(), *srcCloud) < 0)
-            {
-                continue;
+            try {
+                if(pcdReader.read(pcdList[i].toStdString(), *srcCloud) < 0)
+                {
+                    qDebug() << "open " << pcdList[i] << " faild!";
+                    continue;
+                }
+                pcWriter.savePointCloudToBin(srcCloud, saveFileName.toStdString(),
+                                             this->fieldsNumber);
+            } catch (std::exception e) {
+               qDebug() << e.what() << "|open " << pcdList[i] << " faild!";
             }
-            pcWriter.savePointCloudToBin(srcCloud, saveFileName.toStdString(),
-                                         this->fieldsNumber);
         }
         emit signalFinish(saveDirName);
     }
@@ -52,13 +59,11 @@ int PCDConverterThread::initData(const QString &fileNameDir, const QString& file
     return 0;
 }
 
-//开始线程
 void PCDConverterThread::startThread()
 {
     isStart = true;
 }
 
-//结束线程
 void PCDConverterThread::stopThread()
 {
     isStart = false;

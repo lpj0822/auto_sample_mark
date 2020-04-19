@@ -2,6 +2,8 @@
 #define SEGMENTIMAGESAVE_H
 
 #include <QObject>
+#include <QImage>
+#include <QColor>
 #include "dataType/myobject.h"
 
 class SegmentImageSave : public QObject
@@ -13,6 +15,8 @@ public:
 
     int createSegmentImage();
     int readSegmentImage(const QString &imageFilePath, MyObject &object);
+
+    QImage generateMaskFromPolygon(const QList<MyObject> &obejcts, const int width, const int height);
 
 signals:
 

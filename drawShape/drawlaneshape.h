@@ -8,10 +8,12 @@ class DrawLaneShape : public DrawShape
 {
     Q_OBJECT
 public:
-    DrawLaneShape(QObject *parent = 0);
-    ~DrawLaneShape();
+    DrawLaneShape(MarkDataType dataType, QObject *parent = 0);
+    ~DrawLaneShape() override;
 
     void initDraw() override;
+
+    void setLaneWidth(const int laneWidth);
 
     //polygon
     int drawMousePress(const QPoint point, bool &isDraw) override;
@@ -58,6 +60,9 @@ private:
     QList<MyObject> listLane;
     QImage *maskImage;
     CurveAlgorithm curveFit;
+
+    int laneWidth;
 };
+
 
 #endif // DRAWLANESHAPE_H

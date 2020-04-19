@@ -277,8 +277,8 @@ int JSONProcess::readRect3Ddata(const QJsonArray &value, QList<MyObject>& object
         rect3d.center[0] = objectData.take("centerX").toVariant().toFloat();
         rect3d.center[1] = objectData.take("centerY").toVariant().toFloat();
         rect3d.center[2] = objectData.take("centerZ").toVariant().toFloat();
-        rect3d.size[0] = objectData.take("length").toVariant().toFloat();
-        rect3d.size[1] = objectData.take("width").toVariant().toFloat();
+        rect3d.size[0] = objectData.take("width").toVariant().toFloat();
+        rect3d.size[1] = objectData.take("length").toVariant().toFloat();
         rect3d.size[2] = objectData.take("height").toVariant().toFloat();
         rect3d.theta = objectData.take("yaw").toVariant().toFloat();
         className = objectData.take("class").toVariant().toString();

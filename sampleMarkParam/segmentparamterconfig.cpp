@@ -8,11 +8,11 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QVariant>
+#include <QColor>
 
-#include "drawmarkcolor.h"
+#include "manualparamterconfig.h"
 
-int SegmentParamterConfig::NEAR_POINT_LENGTH = 10;
-QMap<QString, QString> SegmentParamterConfig::markClass = QMap<QString, QString>();
+int SegmentParamterConfig::LINE_WIDTH = 10;
 
 SegmentParamterConfig::SegmentParamterConfig()
 {
@@ -24,51 +24,43 @@ SegmentParamterConfig::~SegmentParamterConfig()
 
 }
 
-void SegmentParamterConfig::setNearPointLength(int lenght)
+void SegmentParamterConfig::setLineWidth(const int width)
 {
-    NEAR_POINT_LENGTH = lenght;
+    LINE_WIDTH = width;
 }
 
-void SegmentParamterConfig::setMarkClass(QMap<QString, QString> classMark)
+int SegmentParamterConfig::getLineWidth()
 {
-    markClass.clear();
-    markClass = classMark;
-}
-
-void SegmentParamterConfig::addMarkClass(QString className, QString classColor)
-{
-    markClass.insert(className, classColor);
-}
-
-void SegmentParamterConfig::removeMarkClass(QString className)
-{
-    markClass.remove(className);
-}
-
-int SegmentParamterConfig::getNearPointLenght()
-{
-    return NEAR_POINT_LENGTH;
-}
-
-QMap<QString, QString> SegmentParamterConfig::getMarkClass()
-{
-    return markClass;
-}
-
-QString SegmentParamterConfig::getMarkClassColor(QString className)
-{
-    if(markClass.contains(className))
-    {
-        return markClass[className];
-    }
-    else
-    {
-        return "";
-    }
+    return LINE_WIDTH;
 }
 
 int SegmentParamterConfig::loadClassConfig(const QString &classPath)
 {
+    return 0;
+}
+
+int SegmentParamterConfig::saveClassConfig(const QString &saveClassPath)
+{
+    QMap<QString, QString>::const_iterator classIterator;
+    QMap<QString, QVariant> saveMarkClass;
+    QJsonDocument doc;
+    QByteArray data;
+    QJsonObject jsonData;
+    QFile file(saveClassPath);
+    QMap<QString, QString> markClass = ManualParamterConfig::getMarkClass();
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate |QIODevice::Text))
+    {
+        return -1;
+    }
+    for(classIterator = markClass.constBegin(); classIterator != markClass.constEnd(); ++classIterator)
+    {
+        QColor color(classIterator.value());
+        jsonData.insert(classIterator.key(), QString("%1,%2,%3").arg(color.red()).arg(color.green()).arg(color.blue()));
+    }
+    doc.setObject(jsonData);
+    data = doc.toJson();
+    file.write(data);
+    file.close();
     return 0;
 }
 
@@ -92,20 +84,9 @@ int SegmentParamterConfig::loadConfig()
             if (parseDoucment.isObject())
             {
                 QJsonObject jsonObject = parseDoucment.object();
-                if(jsonObject.contains("nearPointLength"))
+                if(jsonObject.contains("lineWidth"))
                 {
-                    NEAR_POINT_LENGTH = jsonObject.take("nearPointLength").toVariant().toInt();
-                }
-
-                if(jsonObject.contains("markClass"))
-                {
-                    markClass.clear();
-                    QMap<QString, QVariant> readMarkClass = jsonObject.take("markClass").toObject().toVariantMap();
-                    for(QMap<QString, QVariant>::const_iterator iter = readMarkClass.constBegin();
-                        iter != readMarkClass.constEnd(); ++iter)
-                    {
-                        markClass.insert(iter.key(), iter.value().toString());
-                    }
+                    LINE_WIDTH = jsonObject.take("lineWidth").toVariant().toInt();
                 }
             }
         }
@@ -119,8 +100,6 @@ int SegmentParamterConfig::loadConfig()
 
 int SegmentParamterConfig::saveConfig()
 {
-    QMap<QString, QString>::const_iterator classIterator;
-    QMap<QString, QVariant> saveMarkClass;
     QJsonDocument doc;
     QByteArray data;
     QJsonObject jsonData;
@@ -129,13 +108,7 @@ int SegmentParamterConfig::saveConfig()
     {
         return -1;
     }
-    for(classIterator = markClass.constBegin(); classIterator != markClass.constEnd(); ++classIterator)
-    {
-        saveMarkClass.insert(classIterator.key(), QVariant(classIterator.value()));
-    }
-    jsonData.insert("nearPointLength", QString::number(NEAR_POINT_LENGTH));
-    jsonData.insert("markClass", QJsonObject::fromVariantMap(saveMarkClass));
-
+    jsonData.insert("lineWidth", QString::number(LINE_WIDTH));
     doc.setObject(jsonData);
     data = doc.toJson();
     file.write(data);

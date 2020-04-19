@@ -19,6 +19,7 @@
 #include "videoTools/imageconverterwindow.h"
 #include "videoTools/qcamerawindow.h"
 #include "pcTools/pcdconverterwindow.h"
+#include "pcTools/pcdfilterwindow.h"
 #include "autoSampleMark/autosamplemarkwindow.h"
 #include "drawShape/myshape.h"
 #include "controlwindow.h"
@@ -48,6 +49,7 @@ public slots:
     void slotSegmentMarkParamterConfig();
     void slotAutoMarkParamterConfig();
     void slotVideoMarkParamterConfig();
+
     void slotPointCloudParamterConfig();
     //autoMark
     void slotAutoSampleMark();
@@ -60,6 +62,7 @@ public slots:
     void slotCamera();
 
     void slotPcdConverter();
+    void slotPcdFilter();
 
     //about
     void slotAbout();
@@ -98,6 +101,7 @@ private:
     QAction *imageConverterAction;
     QAction *cameraAction;
     QAction *pcdConverterAction;
+    QAction *pcdFilterAction;
     //about
     QAction *aboutAction;
     QAction *userManualAction;
@@ -133,9 +137,10 @@ private:
     QCameraWindow *cameraWindow;
 
     PCDConverterWindow *pcdConverterWindow;
+    PCDFilterWindow *pcdFilterWindow;
 
     MarkDataType loadDataType;
-    MyShape myShape;
+    MyShape imgShape;
 
     QString openDataDir;
 

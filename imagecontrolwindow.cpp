@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "imagecontrolwindow.h"
 #include <QMessageBox>
 #include <QDebug>
@@ -193,7 +195,6 @@ void ImageControlWindow::saveMarkDataResult()
     QString saveAnnotationsDir = this->markDataDir + "/../" + "Annotations";
     QString saveSegmentationDir = this->markDataDir + "/../" + "Segmentation";
     QList<MyObject> objects = drawLable->getObjects();
-    QList<MyObject> images = drawLable->getSegment();
     if(objects.size() > 0)
     {
         if(!makeDir.exists(saveAnnotationsDir))
@@ -213,7 +214,6 @@ void ImageControlWindow::saveMarkDataResult()
         if(this->markDataType == MarkDataType::IMAGE)
         {
             saveImageDataResult(saveAnnotationsDir, this->currentImagePath, objects);
-            saveImageSegmentResult(saveSegmentationDir, this->currentImagePath, images);
         }
     }
 }
@@ -341,27 +341,6 @@ void ImageControlWindow::saveImageDataResult(const QString &saveAnnotationsDir, 
             QFile tempFile(saveXmlPath);
             tempFile.remove();
         }
-    }
-}
-
-void ImageControlWindow::saveImageSegmentResult(const QString &saveAnnotationsDir, const QString &imagePath,
-                                                const QList<MyObject> &objects)
-{
-    QFileInfo imageFileInfo(imagePath);
-    QString saveImagePath = saveAnnotationsDir + "/" + imageFileInfo.fileName();
-    QFileInfo saveFileInfo(saveImagePath);
-    if(objects.size() > 0)
-    {
-        QImage result = objects[0].getSegmentImage();
-        if(!result.save(saveImagePath))
-        {
-            QMessageBox::information(this, tr("保存Segment图象"), tr("保存Segment图象%1失败！").arg(saveImagePath));
-        }
-    }
-    else if(saveFileInfo.exists())
-    {
-        QFile tempFile(saveImagePath);
-        tempFile.remove();
     }
 }
 

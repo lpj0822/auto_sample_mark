@@ -25,16 +25,7 @@
 #include "utilityGUI/customWindow/wexpand.h"
 #include "utilityGUI/customWindow/customanimation.h"
 #include "utilityGUI/customWindow/mystackedwidget.h"
-
-typedef enum MarkDataType{
-    UNKNOWN = 0,
-    IMAGE = 1,
-    VIDEO = 2,
-    SEGMENT = 3,
-    PCD = 4,
-    MAX_CONUT
-}MarkDataType;
-
+#include "dataType/mark_data_type.h"
 
 class ControlWindow : public QWidget
 {

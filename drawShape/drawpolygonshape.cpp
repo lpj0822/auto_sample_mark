@@ -1,10 +1,12 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "drawpolygonshape.h"
 #include <QMessageBox>
 #include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
-DrawPolygonShape::DrawPolygonShape(QObject *parent) : DrawShape(parent)
+DrawPolygonShape::DrawPolygonShape(MarkDataType dataType, QObject *parent) : DrawShape(dataType, parent)
 {
     initDraw();
 }
@@ -96,7 +98,7 @@ int DrawPolygonShape::drawMouseRelease(QWidget *parent, const QPoint point, cons
             int minArea = ManualParamterConfig::getMinWidth() * ManualParamterConfig::getMinHeight();
             if(area >= minArea)
             {
-                SelectMarkClassWindow *window = new SelectMarkClassWindow();
+                SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
                 window->setModal(true);
                 window->setObjectRect(sampleClass);
                 int res = window->exec();

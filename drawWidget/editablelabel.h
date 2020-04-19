@@ -8,27 +8,27 @@
 #include <QDateTime>
 #include <QToolButton>
 #include <QPoint>
-#include <QList>
 #include <QAction>
 #include <QWheelEvent>
 #include <QList>
+#include <QMap>
 
 #include "drawShape/drawrectshape.h"
 #include "drawShape/drawlineshape.h"
 #include "drawShape/drawpolygonshape.h"
-#include "drawShape/drawlaneshape.h"
+#include "dataType/mark_data_type.h"
 
 class EditableLabel : public QLabel
 {
 public:
     EditableLabel(QWidget *parent = 0);
+    ~EditableLabel();
 
     void clearObjects();
     void setNewQImage(QImage &image);
     void setDrawShape(int shapeID);
     void setOjects(QList<MyObject> obejcts, QString sampleClass);
     QList<MyObject> getObjects();
-    QList<MyObject> getSegment();
 
 public slots:
 
@@ -57,12 +57,11 @@ private:
 
     QString sampleClass;
 
-    ShapeType shapeType;
-
     QPixmap mp;
     QPixmap tempPixmap;
 
-    QList<DrawShape*> drawList;
+    ShapeType shapeType;
+    QMap<ShapeType, DrawShape*> drawList;
 };
 
 #endif // EDITABLELABEL_H

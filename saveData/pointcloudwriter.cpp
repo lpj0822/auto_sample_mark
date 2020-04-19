@@ -17,32 +17,38 @@ int PointCloudWriter::savePointCloudToBin(const pcl::PCLPointCloud2::Ptr& srcClo
     {
         pcl::PointCloud<pcl::PointXYZ> cloud;
         pcl::fromPCLPointCloud2(*srcCloud, cloud);
-        std::ofstream outF(fileNamePath, std::ios::binary);
-        for(const pcl::PointXYZ &point: cloud.points)
+        if(cloud.size() > 0)
         {
-            float data[3];
-            data[0] = point.x;
-            data[1] = point.y;
-            data[2] = point.z;
-            outF.write(reinterpret_cast<char*>(data), sizeof(data));
+            std::ofstream outF(fileNamePath, std::ios::binary);
+            for(const pcl::PointXYZ &point: cloud.points)
+            {
+                float data[3];
+                data[0] = point.x;
+                data[1] = point.y;
+                data[2] = point.z;
+                outF.write(reinterpret_cast<char*>(data), sizeof(data));
+            }
+            outF.close();
         }
-        outF.close();
     }
     else if(number == 4)
     {
         pcl::PointCloud<pcl::PointXYZI> cloud;
         pcl::fromPCLPointCloud2(*srcCloud, cloud);
-        std::ofstream outF(fileNamePath, std::ios::binary);
-        for(const pcl::PointXYZI &point: cloud.points)
+        if(cloud.size() > 0)
         {
-            float data[4];
-            data[0] = point.x;
-            data[1] = point.y;
-            data[2] = point.z;
-            data[3] = point.intensity;
-            outF.write(reinterpret_cast<char*>(data), sizeof(data));
+            std::ofstream outF(fileNamePath, std::ios::binary);
+            for(const pcl::PointXYZI &point: cloud.points)
+            {
+                float data[4];
+                data[0] = point.x;
+                data[1] = point.y;
+                data[2] = point.z;
+                data[3] = point.intensity;
+                outF.write(reinterpret_cast<char*>(data), sizeof(data));
+            }
+            outF.close();
         }
-        outF.close();
     }
     else
     {

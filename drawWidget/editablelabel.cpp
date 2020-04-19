@@ -12,6 +12,19 @@ EditableLabel::EditableLabel(QWidget *parent):
     initConnect();
 }
 
+EditableLabel::~EditableLabel()
+{
+    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
+    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
+    {
+        if(drawList[drawIterator.key()] != NULL)
+        {
+            delete drawList[drawIterator.key()];
+            drawList[drawIterator.key()] = NULL;
+        }
+    }
+}
+
 void EditableLabel::slotRemoveObject()
 {
     bool isDraw = false;
@@ -138,9 +151,10 @@ void EditableLabel::paintEvent(QPaintEvent *e)
 
 void EditableLabel::clearObjects()
 {
-    for(int loop = 0; loop < ShapeType::MAX_SHAPE_TYPE; loop++)
+    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
+    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
     {
-        drawList[loop]->initDraw();
+        drawList[drawIterator.key()]->initDraw();
     }
     drawPixmap();
 }
@@ -153,7 +167,7 @@ void EditableLabel::setNewQImage(QImage &image)
 
 void EditableLabel::setDrawShape(int shapeID)
 {
-    if(shapeID >= 0 && shapeID < ShapeType::MAX_SHAPE_TYPE)
+    if(shapeID >= 0 && shapeID < ShapeType::MAX_IMAGE_SHAPE_TYPE)
     {
         this->shapeType = static_cast<ShapeType>(shapeID);
         drawPixmap();
@@ -189,15 +203,10 @@ void EditableLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
         {
             polygonObejcts.append(object);
         }
-        else if(object.getShapeType() == ShapeType::LANE_SEGMENT)
-        {
-            laneObejcts.append(object);
-        }
     }
     drawList[ShapeType::RECT_SHAPE]->setObjectList(rectObejcts);
     drawList[ShapeType::LINE_SHAPE]->setObjectList(lineObejcts);
     drawList[ShapeType::POLYGON_SHAPE]->setObjectList(polygonObejcts);
-    drawList[ShapeType::LANE_SEGMENT]->setObjectList(laneObejcts);
     this->sampleClass = sampleClass;
     drawPixmap();
 }
@@ -207,26 +216,13 @@ QList<MyObject> EditableLabel::getObjects()
     QList<MyObject> allObject;
     allObject.clear();
 
-    for(int loop = 0; loop < ShapeType::MAX_SHAPE_TYPE; loop++)
+    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
+    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
     {
         QList<MyObject> tempObject;
         tempObject.clear();
-        drawList[loop]->getObjectList(tempObject);
+        drawList[drawIterator.key()]->getObjectList(tempObject);
         allObject.append(tempObject);
-    }
-    return allObject;
-}
-
-QList<MyObject> EditableLabel::getSegment()
-{
-    QList<MyObject> allObject;
-    allObject.clear();
-    for(int loop = 0; loop < ShapeType::MAX_SHAPE_TYPE; loop++)
-    {
-        if(loop == ShapeType::LANE_SEGMENT && drawList[loop]->getObjectSize() > 0)
-        {
-            allObject.append(drawList[loop]->getSegmentImage());
-        }
     }
     return allObject;
 }
@@ -238,11 +234,11 @@ void EditableLabel::drawPixmap()
     painter.begin(&tempPixmap);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    for(int loop = 0; loop < ShapeType::MAX_SHAPE_TYPE; loop++)
+    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
+    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
     {
-        drawList[loop]->drawPixmap(this->sampleClass, this->shapeType, painter);
+        drawList[drawIterator.key()]->drawPixmap(this->sampleClass, this->shapeType, painter);
     }
-
     painter.end();
     this->update();
 }
@@ -254,14 +250,14 @@ void EditableLabel::initData()
 
     this->sampleClass = "All";
 
-    this->shapeType = ShapeType::RECT_SHAPE;
-
     this->removeRectAction = new QAction(tr("删除标注"), this);
 
-    drawList.append(new DrawRectShape());
-    drawList.append(new DrawLineShape());
-    drawList.append(new DrawPolygonShape());
-    drawList.append(new DrawLaneShape());
+    this->shapeType = ShapeType::RECT_SHAPE;
+
+    drawList.clear();
+    drawList.insert(ShapeType::RECT_SHAPE, new DrawRectShape(MarkDataType::IMAGE));
+    drawList.insert(ShapeType::LINE_SHAPE, new DrawLineShape(MarkDataType::IMAGE));
+    drawList.insert(ShapeType::POLYGON_SHAPE, new DrawPolygonShape(MarkDataType::IMAGE));
 }
 
 void EditableLabel::initConnect()

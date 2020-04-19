@@ -9,7 +9,6 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
-#include "utilityGUI/customWindow/markclasstablewidget.h"
 #include "sampleMarkParam/segmentparamterconfig.h"
 
 class SegmentParamterConfigWindow : public QDialog
@@ -30,7 +29,8 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private:
-    MarkClassTableWidget *markClassTable;
+    QLabel *lineWidthLabel;
+    QSpinBox *lineWidthBox;
     QPushButton *loadDefaultButton;
     QPushButton *saveButton;
     QPushButton *cancelButton;

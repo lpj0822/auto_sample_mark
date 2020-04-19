@@ -1,4 +1,6 @@
+#ifdef WIN32
 #pragma execution_character_set("utf-8")
+#endif
 #include "segmentparamterconfigwindow.h"
 #include <QColorDialog>
 #include <QMessageBox>
@@ -29,7 +31,7 @@ void SegmentParamterConfigWindow::closeEvent(QCloseEvent *event)
 
 void SegmentParamterConfigWindow::slotOk()
 {
-    paramterConfig.setMarkClass(this->markClassTable->getMarkClass());
+    paramterConfig.setLineWidth(lineWidthBox->value());
     paramterConfig.saveConfig();
     this->accept();
 }
@@ -41,8 +43,17 @@ void SegmentParamterConfigWindow::init()
 
 void SegmentParamterConfigWindow::initUI()
 {
-    markClassTable = new MarkClassTableWidget();
-    initTable();
+    lineWidthLabel = new QLabel(tr("线条区域宽度"));
+    lineWidthBox = new QSpinBox();
+    lineWidthBox->setMinimum(1);
+    lineWidthBox->setMaximum(200);
+    lineWidthBox->setSingleStep(1);
+    lineWidthBox->setValue(paramterConfig.getLineWidth());
+
+    QHBoxLayout *topLayout = new QHBoxLayout();
+    topLayout->setSpacing(30);
+    topLayout->addWidget(lineWidthLabel);
+    topLayout->addWidget(lineWidthBox);
 
     loadDefaultButton = new QPushButton(tr("恢复默认值"));
     saveButton = new QPushButton(tr("保存"));
@@ -57,7 +68,7 @@ void SegmentParamterConfigWindow::initUI()
 
     QVBoxLayout *mainLayout = new QVBoxLayout();
     mainLayout->setSpacing(10);
-    mainLayout->addWidget(markClassTable);
+    mainLayout->addLayout(topLayout);
     mainLayout->addLayout(bottomLayout);
 
     this->setLayout(mainLayout);
@@ -73,65 +84,7 @@ void SegmentParamterConfigWindow::initConnect()
     connect(cancelButton, &QPushButton::clicked, this, &SegmentParamterConfigWindow::reject);
 }
 
-void SegmentParamterConfigWindow::initTable()
-{
-    int row = 0;
-    QMap<QString, QString>::const_iterator classIterator;
-    QStringList headerName;
-    QMap<QString, QString> markClassData = paramterConfig.getMarkClass();
-    int rows = markClassData.count();
-    markClassTable->clear();
-    markClassTable->setRowCount(rows);
-    markClassTable->setColumnCount(2);
-    headerName << QString(tr("类别")) << QString(tr("颜色"));
-    markClassTable->setHorizontalHeaderLabels(headerName);
-    markClassTable->horizontalHeader()->setEnabled(false);
-    markClassTable->verticalHeader()->setVisible(false);
-    markClassTable->horizontalHeader()->setStretchLastSection(true);
-    markClassTable->horizontalHeader()->resizeSection(0,150); //设置表头第一列的宽度为150
-    markClassTable->horizontalHeader()->setFixedHeight(25); //设置表头的高度
-    markClassTable->setSelectionBehavior(QTableWidget::SelectRows);
-    markClassTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    markClassTable->setFrameShape(QFrame::NoFrame); //设置无边框
-    markClassTable->setSelectionMode(QAbstractItemView::SingleSelection);
-    for(classIterator = markClassData.constBegin(); classIterator != markClassData.constEnd(); ++classIterator)
-    {
-        QTableWidgetItem* tableItem0 = new QTableWidgetItem(classIterator.key());
-        markClassTable->setItem(row, 0, tableItem0);
-        QTableWidgetItem* tableItem1 = new QTableWidgetItem(classIterator.value());
-        tableItem1->setBackgroundColor(QColor(classIterator.value()));
-        markClassTable->setItem(row, 1, tableItem1);
-        row++;
-    }
-}
-
 void SegmentParamterConfigWindow::loadDefaultValue()
 {
-    int row = 0;
-    QMap<QString, QString>::const_iterator classIterator;
-    QMap<QString, QString> markClassData;
-    QStringList headerName;
-    markClassData.clear();
-    markClassData.insert("person", "#FF0000");
-    markClassData.insert("car", "#00FF00");
-    markClassData.insert("bus", "#0000FF");
-    markClassData.insert("bicycle", "#FFFF00");
-    markClassData.insert("truck", "#FF00FF");
-    markClassData.insert("motorbike", "#00FFFF");
-    markClassData.insert("background", "#FFFFFF");
-    int rows = markClassData.count();
-    markClassTable->clear();
-    markClassTable->setRowCount(rows);
-    markClassTable->setColumnCount(2);
-    headerName << QString(tr("类别")) << QString(tr("颜色"));
-    markClassTable->setHorizontalHeaderLabels(headerName);
-    for(classIterator = markClassData.constBegin(); classIterator != markClassData.constEnd(); ++classIterator)
-    {
-        QTableWidgetItem* tableItem0 = new QTableWidgetItem(classIterator.key());
-        markClassTable->setItem(row, 0, tableItem0);
-        QTableWidgetItem* tableItem1 = new QTableWidgetItem(classIterator.value());
-        tableItem1->setBackgroundColor(QColor(classIterator.value()));
-        markClassTable->setItem(row, 1, tableItem1);
-        row++;
-    }
+    lineWidthBox->setValue(10);
 }

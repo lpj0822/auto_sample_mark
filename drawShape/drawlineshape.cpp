@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "drawlineshape.h"
 #include <QMessageBox>
 #include <iostream>
@@ -6,7 +8,7 @@
 #include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
-DrawLineShape::DrawLineShape(QObject *parent) : DrawShape(parent)
+DrawLineShape::DrawLineShape(MarkDataType dataType, QObject *parent) : DrawShape(dataType, parent)
 {
     initDraw();
 }
@@ -92,7 +94,7 @@ int DrawLineShape::drawMouseRelease(QWidget *parent, const QPoint point, const Q
 
         if(diffPoint.manhattanLength() >= ManualParamterConfig::getMinWidth())
         {
-            SelectMarkClassWindow *window = new SelectMarkClassWindow();
+            SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
             window->setModal(true);
             window->setObjectRect(sampleClass);
             int res = window->exec();

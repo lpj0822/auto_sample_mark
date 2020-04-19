@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "pcdconverterwindow.h"
 #include <QFileDialog>
 #include <QMessageBox>
@@ -38,7 +40,7 @@ void PCDConverterWindow::slotStart()
 {
     QString suffix = "*.pcd";
     QString format = formatBox->currentText();
-    int fieldsNumber = fieldsNumberBox->currentText().toInt();
+    int fieldsNumber = fieldsNumberBox->value();
     if(pcdConverterThread->initData(pathDir, suffix, format, fieldsNumber) == 0)
     {
         pcdConverterThread->startThread();
@@ -110,9 +112,11 @@ void PCDConverterWindow::initUI()
     formatBox->addItem(tr(".bin"));
 
     fieldsNumberLabel = new QLabel(tr("转换字段数:"));
-    fieldsNumberBox = new QComboBox();
-    fieldsNumberBox->addItem(tr("3"));
-    fieldsNumberBox->addItem(tr("4"));
+    fieldsNumberBox = new QSpinBox();
+    fieldsNumberBox->setMinimum(3);
+    fieldsNumberBox->setMaximum(4);
+    fieldsNumberBox->setSingleStep(1);
+    fieldsNumberBox->setValue(3);
 
     layout->addWidget(formatLabel);
     layout->addWidget(formatBox);

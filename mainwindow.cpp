@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "mainwindow.h"
 #include <QApplication>
 #include <QDesktopServices>
@@ -268,6 +270,16 @@ void MainWindow::slotPcdConverter()
     pcdConverterWindow->show();
 }
 
+void MainWindow::slotPcdFilter()
+{
+    if(pcdFilterWindow == NULL)
+    {
+        pcdFilterWindow = new PCDFilterWindow();
+        connect(pcdFilterWindow, &PCDFilterWindow::signalClosePCDFilterWindow, this, &MainWindow::slotCloseOtherWindow);
+    }
+    pcdFilterWindow->show();
+}
+
 void MainWindow::slotAbout()
 {
     QMessageBox::about(this, "样本标注系统", "样本标注系统 版本："+ qApp->applicationVersion());
@@ -290,6 +302,7 @@ void MainWindow::slotSelectMarkShape(const QString &text)
         markWindow[MarkDataType::VIDEO]->setDrawShape(index);
         break;
     case MarkDataType::SEGMENT:
+        markWindow[MarkDataType::SEGMENT]->setDrawShape(index);
         break;
     case MarkDataType::PCD:
         break;
@@ -350,6 +363,12 @@ void MainWindow::slotCloseOtherWindow(QString flag)
         delete pcdConverterWindow;
         pcdConverterWindow = NULL;
     }
+    else if(flag.contains("pcdFilter"))
+    {
+        disconnect(pcdFilterWindow, &PCDFilterWindow::signalClosePCDFilterWindow, this, &MainWindow::slotCloseOtherWindow);
+        delete pcdFilterWindow;
+        pcdFilterWindow = NULL;
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -370,6 +389,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         cameraWindow->close();
     if(pcdConverterWindow != NULL)
         pcdConverterWindow->close();
+    if(pcdFilterWindow != NULL)
+        pcdFilterWindow->close();
     if(centerWidget != NULL)
     {
         centerWidget->currentWidget()->close();
@@ -389,6 +410,7 @@ void MainWindow::initData()
     cameraWindow = NULL;
 
     pcdConverterWindow = NULL;
+    pcdFilterWindow = NULL;
 
     openDataDir = ".";
     loadDataType = MarkDataType::UNKNOWN;
@@ -432,6 +454,9 @@ void MainWindow::initAction()
     pcdConverterAction = new QAction(tr("PCD格式转换"), this);
     pcdConverterAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
 
+    pcdFilterAction = new QAction(tr("PCD文件过滤"), this);
+    pcdFilterAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
+
     //about
     aboutAction = new QAction(tr("关于"), this);
     userManualAction = new QAction(tr("系统说明"), this);
@@ -464,8 +489,9 @@ void MainWindow::initMenuBar()
     settingMenu = new QMenu(tr("设置"), this);
     settingMenu->addAction(manualParamterAction);
     settingMenu->addAction(segmentParamterAction);
-    settingMenu->addAction(autoParamterAction);
     settingMenu->addAction(videoMarkParamterAction);
+    settingMenu->addSeparator();
+    settingMenu->addAction(autoParamterAction);
     settingMenu->addSeparator();
     settingMenu->addAction(pointcloudParamterAction);
     //autoMark
@@ -481,6 +507,7 @@ void MainWindow::initMenuBar()
     toolMenu->addAction(cameraAction);
     toolMenu->addSeparator();
     toolMenu->addAction(pcdConverterAction);
+    toolMenu->addAction(pcdFilterAction);
     //about
     aboutMenu = new QMenu(tr("关于"), this);
     aboutMenu->addAction(aboutAction);
@@ -566,6 +593,7 @@ void MainWindow::initConnect()
     connect(cameraAction, &QAction::triggered, this, &MainWindow::slotCamera);
 
     connect(pcdConverterAction, &QAction::triggered, this, &MainWindow::slotPcdConverter);
+    connect(pcdFilterAction, &QAction::triggered, this, &MainWindow::slotPcdFilter);
 
     //about
     connect(aboutAction, &QAction::triggered, this, &MainWindow::slotAbout);
@@ -581,7 +609,7 @@ void MainWindow::initConnect()
 
 void MainWindow::initImageMarkShape()
 {
-    QMap<int, QString> shapeDatas = myShape.getAllShape();
+    QMap<int, QString> shapeDatas = imgShape.getImageShape();
     shapeBox->clear();
     for(QMap<int, QString>::const_iterator iter = shapeDatas.constBegin();
         iter != shapeDatas.constEnd(); ++iter)
@@ -592,7 +620,13 @@ void MainWindow::initImageMarkShape()
 
 void MainWindow::initSegmentMarkShape()
 {
+    QMap<int, QString> shapeDatas = imgShape.getSegmentShape();
     shapeBox->clear();
+    for(QMap<int, QString>::const_iterator iter = shapeDatas.constBegin();
+        iter != shapeDatas.constEnd(); ++iter)
+    {
+        shapeBox->addItem(iter.value(), iter.key());
+    }
 }
 
 void MainWindow::initPointCloudMarkShape()

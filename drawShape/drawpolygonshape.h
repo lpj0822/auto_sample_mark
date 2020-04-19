@@ -7,7 +7,7 @@ class DrawPolygonShape : public DrawShape
 {
     Q_OBJECT
 public:
-    DrawPolygonShape(QObject *parent = 0);
+    DrawPolygonShape(MarkDataType dataType, QObject *parent = 0);
     ~DrawPolygonShape();
 
     void initDraw();

@@ -10,12 +10,13 @@
 #include <QPushButton>
 #include <QListWidget>
 #include <QGroupBox>
+#include "dataType/mark_data_type.h"
 
 class SelectMarkClassWindow : public QDialog
 {
      Q_OBJECT
 public:
-    explicit SelectMarkClassWindow(QDialog *parent = 0);
+    explicit SelectMarkClassWindow(const MarkDataType dataType, QDialog *parent = 0);
 
     void setObjectRect(const QString sampleClass);
     QString getObjectClass();
@@ -44,6 +45,8 @@ private:
     QList<QString> classList;
 
     QString sampleCalss;
+
+    MarkDataType markDataType;
 
     void initData();
     void initUI();

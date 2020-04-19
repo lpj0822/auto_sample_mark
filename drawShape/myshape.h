@@ -11,8 +11,9 @@ typedef enum ShapeType{
     LINE_SHAPE = 1,
     POLYGON_SHAPE = 2,
     LANE_SEGMENT = 3,
-    MAX_SHAPE_TYPE = 4,
-    RECT3D_SHAPE = 5
+    MAX_IMAGE_SHAPE_TYPE = 4,
+    RECT3D_SHAPE = 5,
+    MAX_SHAPE_TYPE = 6
 }ShapeType;
 
 class MyShape
@@ -23,6 +24,8 @@ public:
 
     QString getShapeName(int shapeId);
     QMap<int, QString> getAllShape() const;
+    QMap<int, QString> getImageShape() const;
+    QMap<int, QString> getSegmentShape() const;
 
 private:
 

@@ -11,24 +11,18 @@ public:
     SegmentParamterConfig();
     ~SegmentParamterConfig();
 
-    void setNearPointLength(int lenght);
-    void setMarkClass(QMap<QString, QString> classMark);
-    void addMarkClass(QString className, QString classColor);
-    void removeMarkClass(QString className);
-
-    static int getNearPointLenght();
-    static QMap<QString, QString> getMarkClass();
-    static QString getMarkClassColor(QString className);
+    void setLineWidth(const int width);
+    static int getLineWidth();
 
     static int loadClassConfig(const QString &classPath);
+    static int saveClassConfig(const QString &saveClassPath);
+
     static int loadConfig();
     static int saveConfig();
 
 private:
 
-    static int NEAR_POINT_LENGTH;
-
-    static QMap<QString, QString> markClass;
+    static int LINE_WIDTH;
 
 private:
 

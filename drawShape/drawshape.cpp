@@ -1,6 +1,7 @@
 #include "drawshape.h"
 
-DrawShape::DrawShape(QObject *parent) : QObject(parent)
+DrawShape::DrawShape(MarkDataType dataType, QObject *parent) :
+    QObject(parent), markDataType(dataType)
 {
 
 }

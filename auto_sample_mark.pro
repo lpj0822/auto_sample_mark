@@ -62,7 +62,6 @@ SOURCES += main.cpp\
     saveMarkData/segmentimagesave.cpp \
     dataType/myobject.cpp \
     dataType/myrect3d.cpp \
-    drawShape/segmentshape.cpp \
     paramWindow/manualparamterconfigwindow.cpp \
     paramWindow/segmentparamterconfigwindow.cpp \
     paramWindow/videoparameterwindow.cpp \
@@ -70,7 +69,9 @@ SOURCES += main.cpp\
     pcTools/pcdconverterthread.cpp \
     pcTools/pcdconverterwindow.cpp \
     sampleMarkParam/pointcloudparamterconfig.cpp \
-    paramWindow/pointcloudmarkparamterwindow.cpp
+    paramWindow/pointcloudmarkparamterwindow.cpp \
+    pcTools/pcdfilterthread.cpp \
+    pcTools/pcdfilterwindow.cpp
 
 HEADERS  += controlwindow.h \
     markclasswindow.h \
@@ -113,7 +114,6 @@ HEADERS  += controlwindow.h \
     saveMarkData/segmentimagesave.h \
     dataType/myobject.h \
     dataType/myrect3d.h \
-    drawShape/segmentshape.h \
     paramWindow/manualparamterconfigwindow.h \
     paramWindow/segmentparamterconfigwindow.h \
     paramWindow/videoparameterwindow.h \
@@ -121,7 +121,10 @@ HEADERS  += controlwindow.h \
     pcTools/pcdconverterthread.h \
     pcTools/pcdconverterwindow.h \
     sampleMarkParam/pointcloudparamterconfig.h \
-    paramWindow/pointcloudmarkparamterwindow.h
+    paramWindow/pointcloudmarkparamterwindow.h \
+    dataType/mark_data_type.h \
+    pcTools/pcdfilterterthread.h \
+    pcTools/pcdfilterwindow.h
 
 RESOURCES += \
     style.qrc \

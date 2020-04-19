@@ -7,7 +7,7 @@ class DrawLineShape : public DrawShape
 {
     Q_OBJECT
 public:
-    DrawLineShape(QObject *parent = 0);
+    DrawLineShape(MarkDataType dataType, QObject *parent = 0);
     ~DrawLineShape();
 
     void initDraw();

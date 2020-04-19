@@ -52,9 +52,8 @@ protected:
 private:
     //imageData
     void loadImageData(const QString imagePath, const QString saveAnnotationsDir);
-    void saveImageDataResult(const QString &saveAnnotationsDir, const QString &imagePath, const QList<MyObject> &objects);
-    void saveImageSegmentResult(const QString &saveAnnotationsDir, const QString &imagePath, const QList<MyObject> &objects);
-
+    void saveImageDataResult(const QString &saveAnnotationsDir, const QString &imagePath,
+                             const QList<MyObject> &objects);
     void initData();
     void initImageData();
 
