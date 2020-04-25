@@ -1,7 +1,10 @@
 #ifndef MYRECT3D_H
 #define MYRECT3D_H
-
+#ifdef WIN32
+#include <Eigen/Core>
+#else
 #include <eigen3/Eigen/Core>
+#endif
 
 class MyRect3D
 {
