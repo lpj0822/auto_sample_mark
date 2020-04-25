@@ -8,7 +8,8 @@ class DrawLaneShape : public DrawShape
 {
     Q_OBJECT
 public:
-    DrawLaneShape(MarkDataType dataType, QObject *parent = 0);
+    DrawLaneShape(MarkDataType dataType, bool isSegment,
+                  bool isCurveFit, QObject *parent = 0);
     ~DrawLaneShape() override;
 
     void initDraw() override;
@@ -43,9 +44,11 @@ private:
 
     void getCurveFitPointList(const QList<QPoint> &inputKeyPoint, QList<QPoint> &result);
 
-    void drawMark(const QList<QPoint> &pointList, QPen &pen, QPainter &painter);
+    void drawMark(const QList<QPoint> &pointList, const int width,
+                  QPen &pen, QPainter &painter);
 
-    void drawMaskImage(const QList<QPoint> &pointList, const QColor &color);
+    void drawMaskImage(const QList<QPoint> &pointList, const int width, const QColor &color);
+    void drawMaskImage(const int width);
 
 private:
 
@@ -58,7 +61,12 @@ private:
     QPoint firstPoint;
     QPolygon currentPolygon;
     QList<MyObject> listLane;
+    QList<MyObject> drawPolygons;
+
+    bool isSegment;
     QImage *maskImage;
+
+    bool isCurveFit;
     CurveAlgorithm curveFit;
 
     int laneWidth;

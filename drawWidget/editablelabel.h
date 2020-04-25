@@ -16,6 +16,7 @@
 #include "drawShape/drawrectshape.h"
 #include "drawShape/drawlineshape.h"
 #include "drawShape/drawpolygonshape.h"
+#include "drawShape/drawlaneshape.h"
 #include "dataType/mark_data_type.h"
 
 class EditableLabel : public QLabel

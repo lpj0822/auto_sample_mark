@@ -82,6 +82,16 @@ QString MyObject::getObjectClass() const
     return this->obejctClass;
 }
 
+void MyObject::setLineWidth(const int width)
+{
+    this->lineWidth = width;
+}
+
+int MyObject::getLineWidth() const
+{
+    return this->lineWidth;
+}
+
 void MyObject::setIsDifficult(bool flag)
 {
     this->isDifficult = flag;
@@ -126,7 +136,9 @@ void MyObject::init()
 {
     this->shapeType = ShapeType::UNSHAPE;
     this->line.clear();
+    this->pointList.clear();
     this->polygon.clear();
+    this->lineWidth = 0;
     this->objectFlag = 0;
     this->isTrackingObject = false;
     this->isDifficult = false;

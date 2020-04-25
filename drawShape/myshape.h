@@ -10,7 +10,7 @@ typedef enum ShapeType{
     RECT_SHAPE = 0,
     LINE_SHAPE = 1,
     POLYGON_SHAPE = 2,
-    LANE_SEGMENT = 3,
+    LANE_SHAPE = 3,
     MAX_IMAGE_SHAPE_TYPE = 4,
     RECT3D_SHAPE = 5,
     MAX_SHAPE_TYPE = 6

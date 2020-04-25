@@ -89,7 +89,7 @@ void ImageControlWindow::slotChangeClass(QString classText)
 {
     if(this->isMark)
     {
-        saveMarkImageResult();
+        saveMarkDataResult();
     }
     loadMarkImage();
     this->setFocus();
@@ -150,9 +150,9 @@ void ImageControlWindow::showPrevious()
         if(currentIndex > 0)
         {
             if(this->isMark)
-                saveMarkImageResult();
+                saveMarkDataResult();
             currentIndex--;
-             loadMarkImage();
+            loadMarkImage();
         }
     }
 }
@@ -162,7 +162,7 @@ void ImageControlWindow::showNext()
     if(currentIndex < processMarkDataList.size() - 1)
     {
         if(this->isMark)
-            saveMarkImageResult();
+            saveMarkDataResult();
         currentIndex++;
         loadMarkImage();
     }
@@ -193,7 +193,6 @@ void ImageControlWindow::saveMarkDataResult()
 {
     QDir makeDir;
     QString saveAnnotationsDir = this->markDataDir + "/../" + "Annotations";
-    QString saveSegmentationDir = this->markDataDir + "/../" + "Segmentation";
     QList<MyObject> objects = drawLable->getObjects();
     if(objects.size() > 0)
     {
@@ -202,13 +201,6 @@ void ImageControlWindow::saveMarkDataResult()
             if(!makeDir.mkdir(saveAnnotationsDir))
             {
                 qDebug() << "make Annotations dir fail!" << endl;
-            }
-        }
-        if(!makeDir.exists(saveSegmentationDir))
-        {
-            if(!makeDir.mkdir(saveSegmentationDir))
-            {
-                qDebug() << "make Segmentation dir fail!" << endl;
             }
         }
         if(this->markDataType == MarkDataType::IMAGE)
@@ -228,27 +220,6 @@ void ImageControlWindow::loadMarkImage()
     }
     updateListBox();
     updateMarkProcessLable();
-}
-
-void ImageControlWindow::saveMarkImageResult()
-{
-    QDir makeDir;
-    QString saveAnnotationsDir = this->markDataDir + "/../" + "Annotations";
-    QList<MyObject> objects = drawLable->getObjects();
-    if(objects.size() > 0)
-    {
-        if(!makeDir.exists(saveAnnotationsDir))
-        {
-            if(!makeDir.mkdir(saveAnnotationsDir))
-            {
-                qDebug() << "make Annotations dir fail!" << endl;
-            }
-        }
-        if(this->markDataType == MarkDataType::IMAGE)
-        {
-            saveImageDataResult(saveAnnotationsDir, this->currentImagePath, objects);
-        }
-    }
 }
 
 void ImageControlWindow::initDrawWidget()

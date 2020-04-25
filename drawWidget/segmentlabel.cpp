@@ -51,7 +51,6 @@ void SegmentLabel::contextMenuEvent(QContextMenuEvent * event)
         popMenu->addAction(removeRectAction);
     }
 
-    //菜单出现的位置为当前鼠标的位置
     popMenu->exec(QCursor::pos());
     QLabel::contextMenuEvent(event);
 }
@@ -69,7 +68,7 @@ void SegmentLabel::mousePressEvent(QMouseEvent *e)
         int mouseChange = drawList[this->shapeType]->drawMousePress(e->pos(), isDraw);
         if(mouseChange == 1)
         {
-            this->setCursor(Qt::CrossCursor);
+            this->setCursor(myDrawCursor);
         }
         else if(mouseChange == 2)
         {
@@ -92,7 +91,7 @@ void SegmentLabel::mouseMoveEvent(QMouseEvent *e)
     int mouseChange = drawList[this->shapeType]->drawMouseMove(e->pos(), isDraw);
     if(mouseChange == 1)
     {
-        this->setCursor(Qt::CrossCursor);
+        this->setCursor(myDrawCursor);
     }
     else if(mouseChange == 2)
     {
@@ -199,13 +198,13 @@ void SegmentLabel::setOjects(const MyObject &mask, const QList<MyObject> &obejct
         {
             polygonObejcts.append(object);
         }
-        else if(object.getShapeType() == ShapeType::LANE_SEGMENT)
+        else if(object.getShapeType() == ShapeType::LANE_SHAPE)
         {
             laneObejcts.append(object);
         }
     }
     drawList[ShapeType::POLYGON_SHAPE]->setObjectList(polygonObejcts);
-    drawList[ShapeType::LANE_SEGMENT]->setObjectList(laneObejcts);
+    drawList[ShapeType::LANE_SHAPE]->setObjectList(laneObejcts);
     setMaskOject(mask);
     this->sampleClass = sampleClass;
     drawPixmap();
@@ -229,17 +228,19 @@ QList<MyObject> SegmentLabel::getObjects()
 MyObject SegmentLabel::getSegmentMask()
 {
     MyObject result;
-    if(shapeType == ShapeType::LANE_SEGMENT)
+    if(shapeType == ShapeType::LANE_SHAPE)
     {
-        if(drawList[ShapeType::LANE_SEGMENT]->getObjectSize() > 0)
+        if(drawList[ShapeType::LANE_SHAPE]->getObjectSize() > 0)
         {
-            result = drawList[ShapeType::LANE_SEGMENT]->getSegmentImage();
+            result = drawList[ShapeType::LANE_SHAPE]->getSegmentImage();
         }
     }
-    else
+    else if(shapeType == ShapeType::POLYGON_SHAPE)
     {
-        if(maskImage != NULL)
-            result.setSegmentImage(*maskImage);
+        if(drawList[ShapeType::POLYGON_SHAPE]->getObjectSize() > 0)
+        {
+            result = drawList[ShapeType::POLYGON_SHAPE]->getSegmentImage();
+        }
     }
     return result;
 }
@@ -255,31 +256,15 @@ void SegmentLabel::drawPixmap()
     {
         drawList[drawIterator.key()]->drawPixmap(this->sampleClass, this->shapeType, painter);
     }
-    if(shapeType != ShapeType::LANE_SEGMENT)
-        drawSegmentMask(painter);
+    drawSegmentMask(painter);
     painter.end();
     this->update();
 }
 
 void SegmentLabel::drawSegmentMask(QPainter &painter)
 {
-    if(shapeType == ShapeType::POLYGON_SHAPE)
-    {
-        const int height = painter.device()->height();
-        const int width = painter.device()->width();
-        QList<MyObject> allObject = getObjects();
-        if(allObject.count() > 0)
-        {
-            if(maskImage != NULL)
-            {
-                delete maskImage;
-                maskImage = NULL;
-            }
-            QImage result = segmentPorcess.generateMaskFromPolygon(allObject, width, height);
-            maskImage = new QImage(result);
-        }
-    }
-    if(maskImage != NULL)
+    QList<MyObject> result = getObjects();
+    if(maskImage != NULL && result.count() == 0)
     {
         painter.save();
         painter.setOpacity(0.5);
@@ -301,19 +286,21 @@ void SegmentLabel::setMaskOject(const MyObject &mask)
 
 void SegmentLabel::initData()
 {
+    myDrawCursor = QCursor(QPixmap(tr(":/images/images/cross.png")));
+
     this->setMouseTracking(true);
-    this->setCursor(Qt::CrossCursor);
+    this->setCursor(myDrawCursor);
 
     this->scale = 1.0f;
     this->maskImage = NULL;
     this->sampleClass = "All";
 
-     this->removeRectAction = new QAction(tr("删除标注"), this);
+    this->removeRectAction = new QAction(tr("删除标注"), this);
 
-    this->shapeType = ShapeType::UNSHAPE;
+    this->shapeType = ShapeType::POLYGON_SHAPE;
     drawList.clear();
-    drawList.insert(ShapeType::POLYGON_SHAPE, new DrawPolygonShape(MarkDataType::SEGMENT));
-    drawList.insert(ShapeType::LANE_SEGMENT, new DrawLaneShape(MarkDataType::SEGMENT));
+    drawList.insert(ShapeType::LANE_SHAPE, new DrawLaneShape(MarkDataType::SEGMENT, true, true));
+    drawList.insert(ShapeType::POLYGON_SHAPE, new DrawPolygonShape(MarkDataType::SEGMENT, true));
 }
 
 void SegmentLabel::initConnect()

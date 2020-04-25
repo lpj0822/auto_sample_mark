@@ -39,7 +39,6 @@ protected:
     virtual void loadMarkData(const QString dataPath);
     virtual void saveMarkDataResult();
     virtual void loadMarkImage();
-    virtual void saveMarkImageResult();
 
     void initDrawWidget();
     void initConnect();

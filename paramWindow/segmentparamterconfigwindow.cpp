@@ -72,8 +72,8 @@ void SegmentParamterConfigWindow::initUI()
     mainLayout->addLayout(bottomLayout);
 
     this->setLayout(mainLayout);
-    this->setMaximumSize(420, 500);
-    this->setMinimumSize(420, 500);
+    this->setMaximumSize(420, 200);
+    this->setMinimumSize(420, 200);
     this->setWindowTitle(tr("分割标注参数配置"));
 }
 

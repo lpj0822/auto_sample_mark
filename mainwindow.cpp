@@ -44,6 +44,7 @@ void MainWindow::slotOpenImageDir()
         dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
         markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::IMAGE;
+        markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
     }
@@ -65,6 +66,7 @@ void MainWindow::slotOpenVideoDir()
         dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
         markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::VIDEO;
+        markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
     }
@@ -86,6 +88,7 @@ void MainWindow::slotOpenImageSegmentDir()
         dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
         markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::SEGMENT;
+        markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
     }
@@ -466,6 +469,7 @@ void MainWindow::initAction()
     shapeWidget = new QWidget(this);
     shapeLabel = new QLabel(tr("选择标注形状"));
     shapeBox = new QComboBox();
+    shapeBox->clear();
     QHBoxLayout *shapLayout = new QHBoxLayout();
     shapLayout->setSpacing(10);
     shapLayout->addWidget(shapeLabel);
@@ -557,7 +561,6 @@ void MainWindow::initUI()
 
    for(int loop = 0; loop < markWindow.size(); loop++)
    {
-       markWindow[loop]->setDrawShape(this->shapeBox->currentData().toInt());
        centerWidget->addWidget(markWindow[loop]);
    }
    centerWidget->setCurrentIndex(loadDataType);

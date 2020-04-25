@@ -36,10 +36,9 @@ protected:
     void updateDrawLabel(bool isValue);
     void updateImage();
 
-    virtual void loadMarkData(const QString dataPath);
-    virtual void saveMarkDataResult();
-    virtual void loadMarkImage();
-    virtual void saveMarkImageResult();
+    void loadMarkData(const QString dataPath);
+    void saveMarkDataResult();
+    void loadMarkImage();
 
     void initDrawWidget();
     void initConnect();

@@ -70,7 +70,7 @@ int XMLProcess::createXML(const QString &xmlFilePath, const QString &imageFilePa
         {
             writePolygonData(object, xmlWriter);
         }
-        else if(object.getShapeType() == ShapeType::LANE_SEGMENT)
+        else if(object.getShapeType() == ShapeType::LANE_SHAPE)
         {
             writePointListData(object, xmlWriter);
         }
@@ -431,7 +431,7 @@ MyObject XMLProcess::readPointListData(const QDomNodeList &childList)
                 pointList.append(point);
             }
             object.setPointList(pointList);
-            object.setShapeType(ShapeType::LANE_SEGMENT);
+            object.setShapeType(ShapeType::LANE_SHAPE);
         }
     }
     return object;

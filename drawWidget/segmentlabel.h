@@ -12,6 +12,7 @@
 #include <QAction>
 #include <QWheelEvent>
 #include <QList>
+#include <QCursor>
 #include "drawShape/drawpolygonshape.h"
 #include "drawShape/drawlaneshape.h"
 #include "saveMarkData/segmentimagesave.h"
@@ -69,6 +70,8 @@ private:
     QMap<ShapeType, DrawShape*> drawList;
 
     SegmentImageSave segmentPorcess;
+
+    QCursor myDrawCursor;
 };
 
 #endif // SEGMENTLABEL_H

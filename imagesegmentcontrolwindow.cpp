@@ -45,6 +45,10 @@ void ImageSegmentControlWindow::setMarkDataList(const QString markDataDir, const
 
 void ImageSegmentControlWindow::saveMarkDataList()
 {
+    if(this->isMark)
+    {
+        saveMarkDataResult();
+    }
     writeMarkHistory();
 }
 
@@ -59,6 +63,7 @@ void ImageSegmentControlWindow::slotIsMark()
     {
         if(isMark)
         {
+            saveMarkDataResult();
             this->isMark = false;
         }
         else
@@ -72,6 +77,10 @@ void ImageSegmentControlWindow::slotIsMark()
 
 void ImageSegmentControlWindow::slotImageItem(QListWidgetItem *item)
 {
+    if(this->isMark)
+    {
+        saveMarkDataResult();
+    }
     this->currentIndex = markDataListWidget->row(item);
     loadMarkData(item->text());
     this->setFocus();
@@ -79,6 +88,10 @@ void ImageSegmentControlWindow::slotImageItem(QListWidgetItem *item)
 
 void ImageSegmentControlWindow::slotChangeClass(QString classText)
 {
+    if(this->isMark)
+    {
+        saveMarkDataResult();
+    }
     loadMarkImage();
     this->setFocus();
 }
@@ -94,6 +107,10 @@ void ImageSegmentControlWindow::slotScrollArea(int keyValue)
         else if(keyValue == int(Qt::Key_D))
         {
             showNext();
+        }
+        else if(keyValue == int(Qt::Key_E))
+        {
+            slotIsMark();
         }
     }
     if(keyValue == int(Qt::Key_Escape))
@@ -120,6 +137,10 @@ void ImageSegmentControlWindow::keyPressEvent(QKeyEvent *e)
         {
             showNext();
         }
+        else if(e->key() == Qt::Key_E)
+        {
+            slotIsMark();
+        }
     }
 }
 
@@ -129,8 +150,10 @@ void ImageSegmentControlWindow::showPrevious()
     {
         if(currentIndex > 0)
         {
+            if(this->isMark)
+                saveMarkDataResult();
             currentIndex--;
-            loadMarkImage();
+             loadMarkImage();
         }
     }
 }
@@ -139,6 +162,8 @@ void ImageSegmentControlWindow::showNext()
 {
     if(currentIndex < processMarkDataList.size() - 1)
     {
+        if(this->isMark)
+            saveMarkDataResult();
         currentIndex++;
         loadMarkImage();
     }
@@ -156,8 +181,9 @@ void ImageSegmentControlWindow::updateImage()
 }
 
 void ImageSegmentControlWindow::loadMarkData(const QString dataPath)
-{   QString saveSegmentLabelDir = this->markDataDir + "/../" + "Segmentation";
+{
     QString saveAnnotationsDir = this->markDataDir + "/../" + "Annotations";
+    QString saveSegmentLabelDir = this->markDataDir + "/../" + "SegmentLabel";
     if(this->markDataType == MarkDataType::SEGMENT)
     {
         loadImageData(dataPath, saveSegmentLabelDir, saveAnnotationsDir);
@@ -170,7 +196,7 @@ void ImageSegmentControlWindow::saveMarkDataResult()
 {
     QDir makeDir;
     QString saveAnnotationsDir = this->markDataDir + "/../" + "Annotations";
-    QString saveSegmentationDir = this->markDataDir + "/../" + "Segmentation";
+    QString saveSegmentationDir = this->markDataDir + "/../" + "SegmentLabel";
     QList<MyObject> objects = drawLable->getObjects();
     MyObject maskImage = drawLable->getSegmentMask();
     if(objects.size() > 0)
@@ -186,7 +212,7 @@ void ImageSegmentControlWindow::saveMarkDataResult()
         {
             if(!makeDir.mkdir(saveSegmentationDir))
             {
-                qDebug() << "make Segmentation dir fail!" << endl;
+                qDebug() << "make SegmentLabel dir fail!" << endl;
             }
         }
         if(this->markDataType == MarkDataType::SEGMENT)
@@ -199,7 +225,7 @@ void ImageSegmentControlWindow::saveMarkDataResult()
 
 void ImageSegmentControlWindow::loadMarkImage()
 {
-    QString saveSegmentLabelDir = this->markDataDir + "/../" + "Segmentation";
+    QString saveSegmentLabelDir = this->markDataDir + "/../" + "SegmentLabel";
     QString saveAnnotationsDir = this->markDataDir + "/../" + "Annotations";
     if(this->markDataType == MarkDataType::SEGMENT && processMarkDataList.size() > 0)
     {
@@ -208,27 +234,6 @@ void ImageSegmentControlWindow::loadMarkImage()
     }
     updateListBox();
     updateMarkProcessLable();
-}
-
-void ImageSegmentControlWindow::saveMarkImageResult()
-{
-    QDir makeDir;
-    QString saveAnnotationsDir = this->markDataDir + "/../" + "Annotations";
-    QList<MyObject> objects = drawLable->getObjects();
-    if(objects.size() > 0)
-    {
-        if(!makeDir.exists(saveAnnotationsDir))
-        {
-            if(!makeDir.mkdir(saveAnnotationsDir))
-            {
-                qDebug() << "make Annotations dir fail!" << endl;
-            }
-        }
-        if(this->markDataType == MarkDataType::SEGMENT)
-        {
-            saveImageDataResult(saveAnnotationsDir, this->currentImagePath, objects);
-        }
-    }
 }
 
 void ImageSegmentControlWindow::initDrawWidget()
@@ -245,7 +250,7 @@ void ImageSegmentControlWindow::initDrawWidget()
 
     drawLable->clearObjects();
     drawLable->setNewQImage(currentImage);
-    drawLable->setEnabled(true);
+    drawLable->setEnabled(false);
     drawMarkDataWidget->setCurrentIndex(1);
 }
 
@@ -304,8 +309,8 @@ void ImageSegmentControlWindow::saveImageDataResult(const QString &saveAnnotatio
                                              const QList<MyObject> &objects)
 {
     QFileInfo imageFileInfo(imagePath);
-    QString saveXmlPath = saveAnnotationsDir + "/" + imageFileInfo.completeBaseName() + ".xml";
-    QFileInfo xmlFileInfo(saveXmlPath);
+    QString saveJsonPath = saveAnnotationsDir + "/" + imageFileInfo.completeBaseName() + ".json";
+    QFileInfo jsonFileInfo(saveJsonPath);
 
     QMessageBox::StandardButton result = QMessageBox::question(this, tr("保存标注信息"), tr("是否保存标注信息?"),
                                                            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
@@ -313,8 +318,8 @@ void ImageSegmentControlWindow::saveImageDataResult(const QString &saveAnnotatio
     {
         if(objects.size() > 0)
         {
-            if(xmlProcess.createXML(saveXmlPath, currentImagePath, currentImage.width(),
-                                    currentImage.height(), objects) == 0)
+            if(jsonProcess.createJSON(saveJsonPath, currentImagePath, currentImage.width(),
+                                      currentImage.height(), objects) == 0)
             {
                 if(currentIndex >= 0)
                 {
@@ -323,12 +328,12 @@ void ImageSegmentControlWindow::saveImageDataResult(const QString &saveAnnotatio
             }
             else
             {
-                QMessageBox::information(this, tr("保存XML"), tr("保存XML文件失败！"));
+                QMessageBox::information(this, tr("保存Json"), tr("保存Json文件失败！"));
             }
         }
-        else if(xmlFileInfo.exists())
+        else if(jsonFileInfo.exists())
         {
-            QFile tempFile(saveXmlPath);
+            QFile tempFile(saveJsonPath);
             tempFile.remove();
         }
     }

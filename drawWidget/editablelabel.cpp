@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "editablelabel.h"
 #include <QDebug>
 #include <QMenu>
@@ -203,10 +205,15 @@ void EditableLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
         {
             polygonObejcts.append(object);
         }
+        else if(object.getShapeType() == ShapeType::LANE_SHAPE)
+        {
+            laneObejcts.append(object);
+        }
     }
     drawList[ShapeType::RECT_SHAPE]->setObjectList(rectObejcts);
     drawList[ShapeType::LINE_SHAPE]->setObjectList(lineObejcts);
     drawList[ShapeType::POLYGON_SHAPE]->setObjectList(polygonObejcts);
+    drawList[ShapeType::LANE_SHAPE]->setObjectList(laneObejcts);
     this->sampleClass = sampleClass;
     drawPixmap();
 }
@@ -257,7 +264,8 @@ void EditableLabel::initData()
     drawList.clear();
     drawList.insert(ShapeType::RECT_SHAPE, new DrawRectShape(MarkDataType::IMAGE));
     drawList.insert(ShapeType::LINE_SHAPE, new DrawLineShape(MarkDataType::IMAGE));
-    drawList.insert(ShapeType::POLYGON_SHAPE, new DrawPolygonShape(MarkDataType::IMAGE));
+    drawList.insert(ShapeType::POLYGON_SHAPE, new DrawPolygonShape(MarkDataType::IMAGE, false));
+    drawList.insert(ShapeType::LANE_SHAPE, new DrawLaneShape(MarkDataType::IMAGE, false, false));
 }
 
 void EditableLabel::initConnect()

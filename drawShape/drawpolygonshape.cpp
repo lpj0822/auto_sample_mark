@@ -6,14 +6,19 @@
 #include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
-DrawPolygonShape::DrawPolygonShape(MarkDataType dataType, QObject *parent) : DrawShape(dataType, parent)
+DrawPolygonShape::DrawPolygonShape(MarkDataType dataType, bool isSegment, QObject *parent) :
+    DrawShape(dataType, parent), isSegment(isSegment), maskImage(NULL)
 {
     initDraw();
 }
 
 DrawPolygonShape::~DrawPolygonShape()
 {
-
+    if(maskImage != NULL)
+    {
+        delete maskImage;
+        maskImage = NULL;
+    }
 }
 
 void DrawPolygonShape::initDraw()
@@ -29,6 +34,11 @@ void DrawPolygonShape::initDraw()
     polygonPointIndex = 0;
     removePolygonIndex = -1;
     listPolygon.clear();
+    if(maskImage != NULL)
+    {
+        delete maskImage;
+        maskImage = NULL;
+    }
 }
 
 int DrawPolygonShape::drawMousePress(const QPoint point, bool &isDraw)
@@ -189,7 +199,14 @@ bool DrawPolygonShape::isInShape(const QPoint &point)
 
 void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter)
 {
-    QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
+    const int height = painter.device()->height();
+    const int width = painter.device()->width();
+    int drawLineWidth = 2;
+    if(isSegment)
+    {
+        drawLineWidth = 1;
+    }
+    QPen pen(QColor("#3CFF55"), drawLineWidth ,Qt::DashLine);
     QFont font("Decorative", 15);
     painter.setPen(pen);
     painter.setFont(font);
@@ -247,6 +264,17 @@ void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType sh
             }
         }
     }
+    if(isSegment)
+    {
+        drawMaskImage(width, height);
+        if(this->listPolygon.count() > 0 && maskImage != NULL)
+        {
+            painter.save();
+            painter.setOpacity(0.5);
+            painter.drawImage(QPoint(0, 0), *maskImage);
+            painter.restore();
+        }
+    }
     if(isDraw)
     {
         if(!currentPolygon.isEmpty())
@@ -257,7 +285,7 @@ void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType sh
                 painter.drawEllipse(var, 2, 2);
             }
 
-            QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
+            QPen pen(QColor("#3CFF55"), drawLineWidth ,Qt::DashLine);
             painter.setPen(pen);
             painter.drawPolyline(QPolygonF(currentPolygon));
         }
@@ -273,6 +301,29 @@ void DrawPolygonShape::setObjectList(QList<MyObject> list)
 void DrawPolygonShape::getObjectList(QList<MyObject> &list)
 {
     list = this->listPolygon;
+}
+
+int DrawPolygonShape::getObjectSize()
+{
+    return this->listPolygon.count();
+}
+
+void DrawPolygonShape::setSegmentImage(const MyObject &object)
+{
+    if(maskImage != NULL)
+    {
+        delete maskImage;
+        maskImage = NULL;
+    }
+    maskImage = new QImage(object.getSegmentImage());
+}
+
+MyObject DrawPolygonShape::getSegmentImage()
+{
+    MyObject result;
+    if(maskImage != NULL)
+        result.setSegmentImage(*maskImage);
+    return result;
 }
 
 QPolygon DrawPolygonShape::getCurrentPolygon(bool &isDraw)
@@ -323,4 +374,30 @@ void DrawPolygonShape::updatePolygon(const QPoint point)
     QPolygon polygon = listPolygon[nearPolygonIndex].getPolygon();
     polygon[polygonPointIndex - 1] = point;
     listPolygon[nearPolygonIndex].setPolygon(polygon);
+}
+
+void DrawPolygonShape::drawMaskImage(const QPolygon &drawPolygon, const QColor &color)
+{
+    if(maskImage != NULL)
+    {
+        QPainter painter;
+        QPen pen(color, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+        QBrush brush(color, Qt::SolidPattern);
+        painter.begin(maskImage);
+        painter.setPen(pen);
+        painter.setBrush(brush);
+        painter.drawPolygon(drawPolygon);
+        painter.end();
+    }
+}
+
+void DrawPolygonShape::drawMaskImage(const int width, const int height)
+{
+    if(maskImage != NULL)
+    {
+        delete maskImage;
+        maskImage = NULL;
+    }
+    QImage result = segmentPorcess.generateMaskFromPolygon(this->listPolygon, width, height);
+    maskImage = new QImage(result);
 }

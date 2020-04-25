@@ -36,6 +36,9 @@ protected:
     int writePolygonData(const QList<MyObject>& objects, QJsonObject &jsonData);
     int readPolygonData(const QJsonArray &value, QList<MyObject>& objects);
 
+    int writeLaneData(const QList<MyObject>& objects, QJsonObject &jsonData);
+    int readLaneData(const QJsonArray &value, QList<MyObject>& objects);
+
     int readRect3Ddata(const QJsonArray &value, QList<MyObject>& objects);
 
 };

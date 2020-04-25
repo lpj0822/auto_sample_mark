@@ -36,6 +36,9 @@ public:
     void setObjectClass(QString objectClass);
     QString getObjectClass() const;
 
+    void setLineWidth(const int width);
+    int getLineWidth() const;
+
     void setIsDifficult(bool flag);
     bool getIsDifficult() const;
 
@@ -52,6 +55,7 @@ private:
     int objectFlag;
     bool isDifficult;
     bool isTrackingObject;
+    int lineWidth;
     MyRect3D box3D;
     QRect box;
     QList<QPoint> line;

@@ -1,8 +1,11 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "markclasstablewidget.h"
 #include <QMenu>
 #include <QContextMenuEvent>
 #include "markclasswindow.h"
+#include <iostream>
 
 MarkClassTableWidget::MarkClassTableWidget(QWidget *parent): QTableWidget(parent)
 {
@@ -35,13 +38,26 @@ void MarkClassTableWidget::slotAdd()
     int res = window->exec();
     if (res == QDialog::Accepted)
     {
-        this->insertRow(row);
-        QTableWidgetItem* tableItem0 = new QTableWidgetItem(window->getClassName());
-        this->setItem(row, 0, tableItem0);
-        QTableWidgetItem* tableItem1 = new QTableWidgetItem(window->getClassColor());
-        tableItem1->setBackgroundColor(QColor(window->getClassColor()));
-        this->setItem(row, 1, tableItem1);
-        this->setCurrentItem(tableItem1);
+        if(row < 0)
+        {
+            this->insertRow(0);
+            QTableWidgetItem* tableItem0 = new QTableWidgetItem(window->getClassName());
+            this->setItem(0, 0, tableItem0);
+            QTableWidgetItem* tableItem1 = new QTableWidgetItem(window->getClassColor());
+            tableItem1->setBackgroundColor(QColor(window->getClassColor()));
+            this->setItem(0, 1, tableItem1);
+            this->setCurrentItem(tableItem1);
+        }
+        else
+        {
+            this->insertRow(row);
+            QTableWidgetItem* tableItem0 = new QTableWidgetItem(window->getClassName());
+            this->setItem(row, 0, tableItem0);
+            QTableWidgetItem* tableItem1 = new QTableWidgetItem(window->getClassColor());
+            tableItem1->setBackgroundColor(QColor(window->getClassColor()));
+            this->setItem(row, 1, tableItem1);
+            this->setCurrentItem(tableItem1);
+        }
     }
     window->deleteLater();
 }
@@ -86,6 +102,12 @@ void MarkClassTableWidget::contextMenuEvent(QContextMenuEvent *event)
         popMenu->addAction(deleteAction);
         popMenu->addAction(refreshAction);
 
+        popMenu->exec(QCursor::pos());
+    }
+    else
+    {
+        popMenu->addAction(addAction);
+        popMenu->addAction(refreshAction);
         popMenu->exec(QCursor::pos());
     }
 }
