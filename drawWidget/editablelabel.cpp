@@ -205,7 +205,7 @@ void EditableLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
         {
             polygonObejcts.append(object);
         }
-        else if(object.getShapeType() == ShapeType::LANE_SHAPE)
+        else if(object.getShapeType() == ShapeType::POLYLINE_SHAPE)
         {
             laneObejcts.append(object);
         }
@@ -213,7 +213,7 @@ void EditableLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
     drawList[ShapeType::RECT_SHAPE]->setObjectList(rectObejcts);
     drawList[ShapeType::LINE_SHAPE]->setObjectList(lineObejcts);
     drawList[ShapeType::POLYGON_SHAPE]->setObjectList(polygonObejcts);
-    drawList[ShapeType::LANE_SHAPE]->setObjectList(laneObejcts);
+    drawList[ShapeType::POLYLINE_SHAPE]->setObjectList(laneObejcts);
     this->sampleClass = sampleClass;
     drawPixmap();
 }
@@ -265,7 +265,7 @@ void EditableLabel::initData()
     drawList.insert(ShapeType::RECT_SHAPE, new DrawRectShape(MarkDataType::IMAGE));
     drawList.insert(ShapeType::LINE_SHAPE, new DrawLineShape(MarkDataType::IMAGE));
     drawList.insert(ShapeType::POLYGON_SHAPE, new DrawPolygonShape(MarkDataType::IMAGE, false));
-    drawList.insert(ShapeType::LANE_SHAPE, new DrawLaneShape(MarkDataType::IMAGE, false, false));
+    drawList.insert(ShapeType::POLYLINE_SHAPE, new DrawLaneShape(MarkDataType::IMAGE, false, false));
 }
 
 void EditableLabel::initConnect()

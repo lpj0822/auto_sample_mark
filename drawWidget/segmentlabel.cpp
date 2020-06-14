@@ -194,7 +194,7 @@ void SegmentLabel::setOjects(const MyObject &mask, const QList<MyObject> &obejct
     for(int loop = 0; loop < obejcts.count(); loop++)
     {
         const MyObject object = obejcts[loop];
-        if(object.getShapeType() == ShapeType::POLYGON_SHAPE)
+        if(object.getShapeType() == ShapeType::SEGMENT_POLYGON_SHAPE)
         {
             polygonObejcts.append(object);
         }
@@ -203,7 +203,7 @@ void SegmentLabel::setOjects(const MyObject &mask, const QList<MyObject> &obejct
             laneObejcts.append(object);
         }
     }
-    drawList[ShapeType::POLYGON_SHAPE]->setObjectList(polygonObejcts);
+    drawList[ShapeType::SEGMENT_POLYGON_SHAPE]->setObjectList(polygonObejcts);
     drawList[ShapeType::LANE_SHAPE]->setObjectList(laneObejcts);
     setMaskOject(mask);
     this->sampleClass = sampleClass;
@@ -235,11 +235,11 @@ MyObject SegmentLabel::getSegmentMask()
             result = drawList[ShapeType::LANE_SHAPE]->getSegmentImage();
         }
     }
-    else if(shapeType == ShapeType::POLYGON_SHAPE)
+    else if(shapeType == ShapeType::SEGMENT_POLYGON_SHAPE)
     {
-        if(drawList[ShapeType::POLYGON_SHAPE]->getObjectSize() > 0)
+        if(drawList[ShapeType::SEGMENT_POLYGON_SHAPE]->getObjectSize() > 0)
         {
-            result = drawList[ShapeType::POLYGON_SHAPE]->getSegmentImage();
+            result = drawList[ShapeType::SEGMENT_POLYGON_SHAPE]->getSegmentImage();
         }
     }
     return result;
@@ -297,10 +297,12 @@ void SegmentLabel::initData()
 
     this->removeRectAction = new QAction(tr("删除标注"), this);
 
-    this->shapeType = ShapeType::POLYGON_SHAPE;
+    this->shapeType = ShapeType::SEGMENT_POLYGON_SHAPE;
     drawList.clear();
-    drawList.insert(ShapeType::LANE_SHAPE, new DrawLaneShape(MarkDataType::SEGMENT, true, true));
-    drawList.insert(ShapeType::POLYGON_SHAPE, new DrawPolygonShape(MarkDataType::SEGMENT, true));
+    drawList.insert(ShapeType::LANE_SHAPE,
+                    new DrawLaneShape(MarkDataType::SEGMENT, true, true));
+    drawList.insert(ShapeType::SEGMENT_POLYGON_SHAPE,
+                    new DrawPolygonShape(MarkDataType::SEGMENT, true));
 }
 
 void SegmentLabel::initConnect()

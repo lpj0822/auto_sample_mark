@@ -119,7 +119,14 @@ int DrawLaneShape::drawMouseRelease(QWidget *parent, const QPoint point, const Q
             if (res == QDialog::Accepted)
             {
                 MyObject object;
-                object.setShapeType(ShapeType::LANE_SHAPE);
+                if(this->markDataType == MarkDataType::SEGMENT)
+                {
+                    object.setShapeType(ShapeType::LANE_SHAPE);
+                }
+                else
+                {
+                    object.setShapeType(ShapeType::POLYLINE_SHAPE);
+                }
                 object.setLineWidth(this->laneWidth);
                 QList<QPoint> temp = currentPolygon.toList();
                 object.setPointList(temp);

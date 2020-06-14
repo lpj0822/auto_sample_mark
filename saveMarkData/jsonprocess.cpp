@@ -28,7 +28,7 @@ int JSONProcess::createJSON(const QString &jsonFilePath, const QString &imageFil
     QFileInfo fileInfo(imageFilePath);
     QFile file(jsonFilePath);
     QStringList pathNameList = fileInfo.absolutePath().split("/");
-    QString folder = "MultipleTarget";
+    QString folder = "JPEGImages";
     if(pathNameList.size() > 0)
     {
         folder = pathNameList[pathNameList.size() - 1];
@@ -54,7 +54,9 @@ int JSONProcess::createJSON(const QString &jsonFilePath, const QString &imageFil
     writeRectData(objects, allData);
     writeLineData(objects, allData);
     writePolygonData(objects, allData);
+    writePolylineData(objects, allData);
     writeLaneData(objects, allData);
+    writeSegmentData(objects, allData);
 
     jsonData.insert("objects", allData);
     doc.setObject(jsonData);
@@ -105,10 +107,20 @@ int JSONProcess::readJSON(const QString &jsonFilePath, QList<MyObject> &objects)
                         QJsonArray polygonValue = allData.take("polygonObject").toArray();
                         readPolygonData(polygonValue, objects);
                     }
+                    if(allData.contains("polylineObject"))
+                    {
+                        QJsonArray polylineValue = allData.take("polylineObject").toArray();
+                        readPolylineData(polylineValue, objects);
+                    }
                     if(allData.contains("laneObject"))
                     {
                         QJsonArray laneValue = allData.take("laneObject").toArray();
                         readLaneData(laneValue, objects);
+                    }
+                    if(allData.contains("segmentObject"))
+                    {
+                        QJsonArray segmentValue = allData.take("segmentObject").toArray();
+                        readSegmentData(segmentValue, objects);
                     }
                     if(allData.contains("rect3DObject"))
                     {
@@ -274,6 +286,63 @@ int JSONProcess::readPolygonData(const QJsonArray &value, QList<MyObject>& objec
     return 0;
 }
 
+int JSONProcess::writePolylineData(const QList<MyObject>& objects, QJsonObject &jsonData)
+{
+    QJsonArray objectArrays;
+    int dataIndex = 0;
+    for(int loop = 0; loop < objects.size(); loop++)
+    {
+        if(objects[loop].getShapeType() == ShapeType::POLYLINE_SHAPE)
+        {
+            const QList<QPoint> pointList = objects[loop].getPointList();
+            QJsonObject objectData;
+            QJsonArray pointListData;
+            int tempIndex = 0;
+            objectData.insert("class", objects[loop].getObjectClass());
+            objectData.insert("pointCount", pointList.count());
+            for(int index = 0; index < pointList.count(); index++)
+            {
+                pointListData.insert(tempIndex++, pointList[index].x());
+                pointListData.insert(tempIndex++, pointList[index].y());
+            }
+            objectData.insert("polyline", pointListData);
+            objectArrays.insert(dataIndex, objectData);
+            dataIndex++;
+        }
+    }
+    if(objectArrays.count() > 0)
+    {
+        jsonData.insert("polylineObject", objectArrays);
+    }
+    return 0;
+}
+
+int JSONProcess::readPolylineData(const QJsonArray &value, QList<MyObject>& objects)
+{
+    for(int loop = 0; loop < value.size(); loop++)
+    {
+        QJsonObject objectData = value.at(loop).toObject();
+        MyObject object;
+        QList<QPoint> pointList;
+        QJsonArray dataList = objectData.take("polyline").toArray();
+        pointList.clear();
+        for(int index = 0; index < dataList.size(); index++)
+        {
+            QPoint point;
+            point.setX(dataList.at(index).toInt());
+            index++;
+            point.setY(dataList.at(index).toInt());
+            pointList.append(point);
+        }
+        object.setObjectClass(objectData.take("class").toVariant().toString());
+        object.setPointList(pointList);
+        object.setShapeType(ShapeType::POLYLINE_SHAPE);
+        objects.append(object);
+    }
+
+    return 0;
+}
+
 int JSONProcess::writeLaneData(const QList<MyObject>& objects, QJsonObject &jsonData)
 {
     QJsonArray objectArrays;
@@ -282,18 +351,19 @@ int JSONProcess::writeLaneData(const QList<MyObject>& objects, QJsonObject &json
     {
         if(objects[loop].getShapeType() == ShapeType::LANE_SHAPE)
         {
-            const QPolygon polygon = objects[loop].getPolygon();
+            const QList<QPoint> pointList = objects[loop].getPointList();
             QJsonObject objectData;
-            QJsonArray polygonData;
+            QJsonArray pointListData;
             int tempIndex = 0;
             objectData.insert("class", objects[loop].getObjectClass());
-            objectData.insert("pointCount", polygon.count());
-            for(int index = 0; index < polygon.count(); index++)
+            objectData.insert("pointCount", pointList.count());
+            objectData.insert("lineWidth", objects[loop].getLineWidth());
+            for(int index = 0; index < pointList.count(); index++)
             {
-                polygonData.insert(tempIndex++, polygon[index].x());
-                polygonData.insert(tempIndex++, polygon[index].y());
+                pointListData.insert(tempIndex++, pointList[index].x());
+                pointListData.insert(tempIndex++, pointList[index].y());
             }
-            objectData.insert("lane", polygonData);
+            objectData.insert("lane", pointListData);
             objectArrays.insert(dataIndex, objectData);
             dataIndex++;
         }
@@ -323,8 +393,66 @@ int JSONProcess::readLaneData(const QJsonArray &value, QList<MyObject>& objects)
             pointList.append(point);
         }
         object.setObjectClass(objectData.take("class").toVariant().toString());
+        object.setLineWidth(objectData.take("lineWidth").toVariant().toInt());
         object.setPointList(pointList);
         object.setShapeType(ShapeType::LANE_SHAPE);
+        objects.append(object);
+    }
+
+    return 0;
+}
+
+int JSONProcess::writeSegmentData(const QList<MyObject>& objects, QJsonObject &jsonData)
+{
+    QJsonArray objectArrays;
+    int dataIndex = 0;
+    for(int loop = 0; loop < objects.size(); loop++)
+    {
+        if(objects[loop].getShapeType() == ShapeType::SEGMENT_POLYGON_SHAPE)
+        {
+            const QPolygon polygon = objects[loop].getPolygon();
+            QJsonObject objectData;
+            QJsonArray polygonData;
+            int tempIndex = 0;
+            objectData.insert("class", objects[loop].getObjectClass());
+            objectData.insert("pointCount", polygon.count());
+            for(int index = 0; index < polygon.count(); index++)
+            {
+                polygonData.insert(tempIndex++, polygon[index].x());
+                polygonData.insert(tempIndex++, polygon[index].y());
+            }
+            objectData.insert("mask", polygonData);
+            objectArrays.insert(dataIndex, objectData);
+            dataIndex++;
+        }
+    }
+    if(objectArrays.count() > 0)
+    {
+        jsonData.insert("segmentObject", objectArrays);
+    }
+    return 0;
+}
+
+int JSONProcess::readSegmentData(const QJsonArray &value, QList<MyObject>& objects)
+{
+    for(int loop = 0; loop < value.size(); loop++)
+    {
+        QJsonObject objectData = value.at(loop).toObject();
+        MyObject object;
+        QPolygon polygon;
+        QJsonArray dataList = objectData.take("mask").toArray();
+        polygon.clear();
+        for(int index = 0; index < dataList.size(); index++)
+        {
+            QPoint point;
+            point.setX(dataList.at(index).toInt());
+            index++;
+            point.setY(dataList.at(index).toInt());
+            polygon.append(point);
+        }
+        object.setObjectClass(objectData.take("class").toVariant().toString());
+        object.setPolygon(polygon);
+        object.setShapeType(ShapeType::SEGMENT_POLYGON_SHAPE);
         objects.append(object);
     }
 

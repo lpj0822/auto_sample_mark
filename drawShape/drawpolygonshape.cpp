@@ -115,7 +115,14 @@ int DrawPolygonShape::drawMouseRelease(QWidget *parent, const QPoint point, cons
                 if (res == QDialog::Accepted)
                 {
                     MyObject object;
-                    object.setShapeType(ShapeType::POLYGON_SHAPE);
+                    if(this->markDataType == MarkDataType::SEGMENT)
+                    {
+                        object.setShapeType(ShapeType::SEGMENT_POLYGON_SHAPE);
+                    }
+                    else
+                    {
+                        object.setShapeType(ShapeType::POLYGON_SHAPE);
+                    }
                     object.setPolygon(currentPolygon);
                     object.setObjectClass(window->getObjectClass());
                     object.setIsDifficult(window->getIsDifficult());

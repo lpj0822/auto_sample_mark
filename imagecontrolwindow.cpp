@@ -267,13 +267,23 @@ void ImageControlWindow::loadImageData(const QString imagePath, const QString sa
         currentImagePath = imagePath;
         updateImage();
         QFileInfo imageFileInfo(currentImagePath);
-        QString readXmlPath= saveAnnotationsDir + "/" + imageFileInfo.completeBaseName() + ".xml";
-        QFileInfo xmlFileInfo(readXmlPath);
+        QString readJsonPath= saveAnnotationsDir + "/" + imageFileInfo.completeBaseName() + ".json";
+        QFileInfo jsonFileInfo(readJsonPath);
         QList<MyObject> objects;
-        if(xmlFileInfo.exists() && xmlProcess.readXML(readXmlPath, objects) == 0)
+        if(jsonFileInfo.exists() && jsonProcess.readJSON(readJsonPath, objects) == 0)
         {
             drawLable->setOjects(objects, classBox->currentText());
         }
+//        currentImagePath = imagePath;
+//        updateImage();
+//        QFileInfo imageFileInfo(currentImagePath);
+//        QString readXmlPath= saveAnnotationsDir + "/" + imageFileInfo.completeBaseName() + ".xml";
+//        QFileInfo xmlFileInfo(readXmlPath);
+//        QList<MyObject> objects;
+//        if(xmlFileInfo.exists() && xmlProcess.readXML(readXmlPath, objects) == 0)
+//        {
+//            drawLable->setOjects(objects, classBox->currentText());
+//        }
     }
     else
     {
@@ -285,8 +295,8 @@ void ImageControlWindow::saveImageDataResult(const QString &saveAnnotationsDir, 
                                              const QList<MyObject> &objects)
 {
     QFileInfo imageFileInfo(imagePath);
-    QString saveXmlPath = saveAnnotationsDir + "/" + imageFileInfo.completeBaseName() + ".xml";
-    QFileInfo xmlFileInfo(saveXmlPath);
+    QString saveJsonPath = saveAnnotationsDir + "/" + imageFileInfo.completeBaseName() + ".json";
+    QFileInfo jsonFileInfo(saveJsonPath);
 
     QMessageBox::StandardButton result = QMessageBox::question(this, tr("保存标注信息"), tr("是否保存标注信息?"),
                                                            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
@@ -294,8 +304,8 @@ void ImageControlWindow::saveImageDataResult(const QString &saveAnnotationsDir, 
     {
         if(objects.size() > 0)
         {
-            if(xmlProcess.createXML(saveXmlPath, currentImagePath, currentImage.width(),
-                                    currentImage.height(), objects) == 0)
+            if(jsonProcess.createJSON(saveJsonPath, currentImagePath, currentImage.width(),
+                                      currentImage.height(), objects) == 0)
             {
                 if(currentIndex >= 0)
                 {
@@ -304,15 +314,44 @@ void ImageControlWindow::saveImageDataResult(const QString &saveAnnotationsDir, 
             }
             else
             {
-                QMessageBox::information(this, tr("保存XML"), tr("保存XML文件失败！"));
+                QMessageBox::information(this, tr("保存Json"), tr("保存Json文件失败！"));
             }
         }
-        else if(xmlFileInfo.exists())
+        else if(jsonFileInfo.exists())
         {
-            QFile tempFile(saveXmlPath);
+            QFile tempFile(saveJsonPath);
             tempFile.remove();
         }
     }
+//    QFileInfo imageFileInfo(imagePath);
+//    QString saveXmlPath = saveAnnotationsDir + "/" + imageFileInfo.completeBaseName() + ".xml";
+//    QFileInfo xmlFileInfo(saveXmlPath);
+
+//    QMessageBox::StandardButton result = QMessageBox::question(this, tr("保存标注信息"), tr("是否保存标注信息?"),
+//                                                           QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+//    if(result == QMessageBox::Yes)
+//    {
+//        if(objects.size() > 0)
+//        {
+//            if(xmlProcess.createXML(saveXmlPath, currentImagePath, currentImage.width(),
+//                                    currentImage.height(), objects) == 0)
+//            {
+//                if(currentIndex >= 0)
+//                {
+//                    processDataFlagList[currentIndex] = 0;
+//                }
+//            }
+//            else
+//            {
+//                QMessageBox::information(this, tr("保存XML"), tr("保存XML文件失败！"));
+//            }
+//        }
+//        else if(xmlFileInfo.exists())
+//        {
+//            QFile tempFile(saveXmlPath);
+//            tempFile.remove();
+//        }
+//    }
 }
 
 void ImageControlWindow::initImageData()
