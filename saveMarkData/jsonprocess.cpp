@@ -47,6 +47,7 @@ int JSONProcess::createJSON(const QString &jsonFilePath, const QString &imageFil
     //size
     sizeData.insert("width", imageWidth);
     sizeData.insert("height", inageHeight);
+    sizeData.insert("depth", 3);
     jsonData.insert("size", sizeData);
 
     jsonData.insert("objectCount", count);
