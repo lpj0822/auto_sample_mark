@@ -16,7 +16,7 @@ public:
     virtual void initDraw() = 0;
     virtual int drawMousePress(const QPoint point, bool &isDraw) = 0;
     virtual int drawMouseMove(const QPoint point, bool &isDraw) = 0;
-    virtual int drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw) = 0;
+    virtual int drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw) = 0;
     virtual void removeShape(bool &isDraw) = 0;
     virtual bool isInShape(const QPoint &point) = 0;
 
@@ -27,16 +27,21 @@ public:
 
     virtual int getObjectSize();
 
+    virtual int drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &isDraw);
+
     virtual void setSegmentImage(const MyObject &object);
     virtual MyObject getSegmentImage();
+
+    void setVisibleSampleClass(const QString &sampleClass);
 
 protected:
 
     bool drawMousePressed;
     bool moveMousePressed;
     GeometryAlgorithm geometryAlgorithm;
-
     MarkDataType markDataType;
+
+    QString visibleSampleClass;
 };
 
 #endif // DRAWSHAPE_H

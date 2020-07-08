@@ -40,13 +40,12 @@ void EditableLabel::slotRemoveObject()
 void EditableLabel::contextMenuEvent(QContextMenuEvent * event)
 {
     QMenu* popMenu = new QMenu(this);
-    bool isFind = drawList[this->shapeType]->isInShape(this->mapFromGlobal(QCursor::pos()));
+    QPoint point = this->mapFromGlobal(QCursor::pos());
+    bool isFind = drawList[this->shapeType]->isInShape(scalePoint(point));
     if(isFind)
     {
         popMenu->addAction(removeRectAction);
     }
-
-    //菜单出现的位置为当前鼠标的位置
     popMenu->exec(QCursor::pos());
     QLabel::contextMenuEvent(event);
 }
@@ -61,7 +60,8 @@ void EditableLabel::mousePressEvent(QMouseEvent *e)
     if(e->button() == Qt::LeftButton)
     {
         bool isDraw = false;
-        int mouseChange = drawList[this->shapeType]->drawMousePress(e->pos(), isDraw);
+        QPoint point = e->pos();
+        int mouseChange = drawList[this->shapeType]->drawMousePress(scalePoint(point), isDraw);
         if(mouseChange == 1)
         {
             this->setCursor(Qt::CrossCursor);
@@ -75,6 +75,7 @@ void EditableLabel::mousePressEvent(QMouseEvent *e)
             drawPixmap();
         }
     }
+    QLabel::mousePressEvent(e);
 }
 
 void EditableLabel::mouseMoveEvent(QMouseEvent *e)
@@ -84,7 +85,8 @@ void EditableLabel::mouseMoveEvent(QMouseEvent *e)
         return;
     }
     bool isDraw = false;
-    int mouseChange = drawList[this->shapeType]->drawMouseMove(e->pos(), isDraw);
+    QPoint point = e->pos();
+    int mouseChange = drawList[this->shapeType]->drawMouseMove(scalePoint(point), isDraw);
     if(mouseChange == 1)
     {
         this->setCursor(Qt::CrossCursor);
@@ -97,6 +99,7 @@ void EditableLabel::mouseMoveEvent(QMouseEvent *e)
     {
         drawPixmap();
     }
+    QLabel::mouseMoveEvent(e);
 }
 
 void EditableLabel::mouseReleaseEvent(QMouseEvent *e)
@@ -109,33 +112,52 @@ void EditableLabel::mouseReleaseEvent(QMouseEvent *e)
     if(e->button() == Qt::LeftButton)
     {
         bool isDraw = false;
-        drawList[this->shapeType]->drawMouseRelease(this, e->pos(), this->sampleClass, isDraw);
+        QPoint point = e->pos();
+        drawList[this->shapeType]->setVisibleSampleClass(this->sampleClass);
+        drawList[this->shapeType]->drawMouseRelease(this, scalePoint(point), isDraw);
         if(isDraw)
         {
             drawPixmap();
         }
     }
+    QLabel::mouseReleaseEvent(e);
+}
+
+void EditableLabel::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton)
+    {
+        bool isDraw = false;
+        QPoint point = event->pos();
+        drawList[this->shapeType]->setVisibleSampleClass(this->sampleClass);
+        drawList[this->shapeType]->drawMouseDoubleClick(this, scalePoint(point), isDraw);
+        if(isDraw)
+        {
+            drawPixmap();
+        }
+    }
+    //QLabel::mouseDoubleClickEvent(event);
 }
 
 void EditableLabel::wheelEvent(QWheelEvent * event)
 {
-//    if(event->delta() > 0)
-//    {
-//        scale++;//放大
-//        if(scale > MAX_SCALE)
-//        {
-//            scale = MAX_SCALE;
-//        }
-//    }
-//    else
-//    {
-//        scale--;//缩小
-//        if(scale < MIN_SCALE)
-//        {
-//            scale = MIN_SCALE;
-//        }
-//    }
-//    drawPixmap();
+    if(event->delta() > 0)
+    {
+        this->zoomValue++;
+        if(this->zoomValue > ManualParamterConfig::getMaxScale())
+        {
+            this->zoomValue = ManualParamterConfig::getMaxScale();
+        }
+    }
+    else
+    {
+        this->zoomValue--;
+        if(this->zoomValue < ManualParamterConfig::getMinSacle())
+        {
+            this->zoomValue = ManualParamterConfig::getMinSacle();
+        }
+    }
+    drawPixmap();
     QWidget::wheelEvent(event);
 }
 
@@ -143,12 +165,17 @@ void EditableLabel::paintEvent(QPaintEvent *e)
 {
     QLabel::paintEvent(e);
     QPainter painter(this);
-    //painter.save(); //保存坐标系状态
-    //painter.scale(scale / 100.0, scale / 100.0);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::HighQualityAntialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+    float scale = this->zoomValue / 100.0f;
+    painter.scale(scale, scale);
+    painter.translate(this->offsetToCenter());
     painter.drawPixmap(QPoint(0,0), tempPixmap);
-    //painter.restore(); //恢复以前的坐标系状态
     painter.end();
-    this->resize(tempPixmap.width(), tempPixmap.height());
+    this->resize(tempPixmap.width() * scale, tempPixmap.height() * scale);
+    this->setAutoFillBackground(true);
+    QLabel::paintEvent(e);
 }
 
 void EditableLabel::clearObjects()
@@ -164,6 +191,7 @@ void EditableLabel::clearObjects()
 void EditableLabel::setNewQImage(QImage &image)
 {
     mp = QPixmap::fromImage(image);
+    this->zoomValue = 100;
     drawPixmap();
 }
 
@@ -239,7 +267,9 @@ void EditableLabel::drawPixmap()
     QPainter painter;
     tempPixmap = mp.copy();
     painter.begin(&tempPixmap);
-    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::HighQualityAntialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
     QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
     for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
@@ -248,6 +278,35 @@ void EditableLabel::drawPixmap()
     }
     painter.end();
     this->update();
+}
+
+QPointF EditableLabel::offsetToCenter()
+{
+    QSize area = this->size();
+    float scale = this->zoomValue / 100.0f;
+    float w = this->mp.width() * scale;
+    float h = this->mp.height() * scale;
+    float aw = area.width();
+    float ah = area.height();
+    float x = 0;
+    float y = 0;
+    if(aw > w)
+    {
+        x = (aw - w) / (2 * scale);
+    }
+    if(ah > h)
+    {
+        y = (ah - h) / (2 * scale);
+    }
+    return QPointF(x, y);
+}
+
+QPoint EditableLabel::scalePoint(const QPoint point)
+{
+    float scale = this->zoomValue / 100.0f;
+    QPoint resultPoint(static_cast<int>(point.x() / scale),
+                       static_cast<int>(point.y() / scale));
+    return resultPoint;
 }
 
 void EditableLabel::initData()
@@ -261,11 +320,18 @@ void EditableLabel::initData()
 
     this->shapeType = ShapeType::RECT_SHAPE;
 
+    this->zoomValue = 100;
+
     drawList.clear();
     drawList.insert(ShapeType::RECT_SHAPE, new DrawRectShape(MarkDataType::IMAGE));
     drawList.insert(ShapeType::LINE_SHAPE, new DrawLineShape(MarkDataType::IMAGE));
     drawList.insert(ShapeType::POLYGON_SHAPE, new DrawPolygonShape(MarkDataType::IMAGE, false));
     drawList.insert(ShapeType::POLYLINE_SHAPE, new DrawLaneShape(MarkDataType::IMAGE, false, false));
+    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
+    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
+    {
+        drawList[drawIterator.key()]->setVisibleSampleClass(this->sampleClass);
+    }
 }
 
 void EditableLabel::initConnect()

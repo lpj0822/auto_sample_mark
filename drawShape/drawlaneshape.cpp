@@ -28,7 +28,6 @@ void DrawLaneShape::initDraw()
     drawMousePressed = false;
     moveMousePressed = false;
 
-    finishDrawPolygon = false;
     nearFirstPoint = false;
     firstPoint = QPoint(-1, -1);
 
@@ -69,10 +68,6 @@ int DrawLaneShape::drawMousePress(const QPoint point, bool &isDraw)
         {
             currentPolygon.append(point);
         }
-        else
-        {
-            finishDrawPolygon = true;
-        }
         mouseChange = 1;
         moveMousePressed = false;
         drawMousePressed = true;
@@ -106,47 +101,9 @@ int DrawLaneShape::drawMouseMove(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawLaneShape::drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
+int DrawLaneShape::drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw)
 {
-    if(finishDrawPolygon)
-    {
-        if(currentPolygon.count() >= 4)
-        {
-            SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
-            window->setModal(true);
-            window->setObjectRect(sampleClass);
-            int res = window->exec();
-            if (res == QDialog::Accepted)
-            {
-                MyObject object;
-                if(this->markDataType == MarkDataType::SEGMENT)
-                {
-                    object.setShapeType(ShapeType::LANE_SHAPE);
-                }
-                else
-                {
-                    object.setShapeType(ShapeType::POLYLINE_SHAPE);
-                }
-                object.setLineWidth(this->laneWidth);
-                QList<QPoint> temp = currentPolygon.toList();
-                object.setPointList(temp);
-                object.setObjectClass(window->getObjectClass());
-                object.setIsDifficult(window->getIsDifficult());
-                object.setObjectFlag(window->getObjectFlag());
-                listLane.append(object);
-            }
-            window->deleteLater();
-
-        }
-        else
-        {
-            QMessageBox::information(parent, tr("标注"), tr("标注目标点数需要大于4!"));
-        }
-        currentPolygon.clear();
-        firstPoint = QPoint(-1, -1);
-        finishDrawPolygon = false;
-    }
-    else if(moveMousePressed)
+    if(moveMousePressed)
     {
         QList<QPoint> polygon = listLane[nearPolygonIndex].getPointList();
         int pointCount = polygon.count();
@@ -161,7 +118,7 @@ int DrawLaneShape::drawMouseRelease(QWidget *parent, const QPoint point, const Q
                 point2.manhattanLength() <= ManualParamterConfig::getNearPointLenght())
         {
             polygon.removeAt(polygonPointIndex-1);
-            if(polygon.count() < 4)
+            if(polygon.count() < 3)
             {
                 this->listLane.removeAt(nearPolygonIndex);
                 QMessageBox::information(parent, tr("标注"), tr("标注目标有误!"));
@@ -172,6 +129,47 @@ int DrawLaneShape::drawMouseRelease(QWidget *parent, const QPoint point, const Q
             }
         }
     }
+    drawMousePressed = false;
+    moveMousePressed = false;
+    isDraw = true;
+    return 0;
+}
+
+int DrawLaneShape::drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &isDraw)
+{
+    if(currentPolygon.count() >= 3)
+    {
+        SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
+        window->setModal(true);
+        window->setObjectRect(this->visibleSampleClass);
+        int res = window->exec();
+        if (res == QDialog::Accepted)
+        {
+            MyObject object;
+            if(this->markDataType == MarkDataType::SEGMENT)
+            {
+                object.setShapeType(ShapeType::LANE_SHAPE);
+            }
+            else
+            {
+                object.setShapeType(ShapeType::POLYLINE_SHAPE);
+            }
+            object.setLineWidth(this->laneWidth);
+            QList<QPoint> temp = currentPolygon.toList();
+            object.setPointList(temp);
+            object.setObjectClass(window->getObjectClass());
+            object.setIsDifficult(window->getIsDifficult());
+            object.setObjectFlag(window->getObjectFlag());
+            listLane.append(object);
+        }
+        window->deleteLater();
+    }
+    else
+    {
+        QMessageBox::information(parent, tr("标注"), tr("标注目标点数需要大于3!"));
+    }
+    currentPolygon.clear();
+    firstPoint = QPoint(-1, -1);
     drawMousePressed = false;
     moveMousePressed = false;
     isDraw = true;
@@ -489,9 +487,4 @@ void DrawLaneShape::drawMaskImage(const QList<QPoint> &pointList, const int widt
         }
         painter.end();
     }
-}
-
-void DrawLaneShape::drawMaskImage(const int width)
-{
-
 }

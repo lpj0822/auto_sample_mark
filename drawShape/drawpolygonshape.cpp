@@ -98,7 +98,7 @@ int DrawPolygonShape::drawMouseMove(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawPolygonShape::drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
+int DrawPolygonShape::drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw)
 {
     if(finishDrawPolygon)
     {
@@ -110,7 +110,7 @@ int DrawPolygonShape::drawMouseRelease(QWidget *parent, const QPoint point, cons
             {
                 SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
                 window->setModal(true);
-                window->setObjectRect(sampleClass);
+                window->setObjectRect(this->visibleSampleClass);
                 int res = window->exec();
                 if (res == QDialog::Accepted)
                 {

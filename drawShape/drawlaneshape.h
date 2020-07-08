@@ -19,7 +19,10 @@ public:
     //polygon
     int drawMousePress(const QPoint point, bool &isDraw) override;
     int drawMouseMove(const QPoint point, bool &isDraw) override;
-    int drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw) override;
+    int drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw) override;
+
+    int drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &isDraw) override;
+
     void removeShape(bool &isDraw) override;
     bool isInShape(const QPoint &point) override;
 
@@ -48,12 +51,10 @@ private:
                   QPen &pen, QPainter &painter);
 
     void drawMaskImage(const QList<QPoint> &pointList, const int width, const QColor &color);
-    void drawMaskImage(const int width);
 
 private:
 
     bool nearFirstPoint;
-    bool finishDrawPolygon;
 
     int nearPolygonIndex;
     int polygonPointIndex;

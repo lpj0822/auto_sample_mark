@@ -15,7 +15,7 @@ public:
     //rect
     int drawMousePress(const QPoint point, bool &isDraw);
     int drawMouseMove(const QPoint point, bool &isDraw);
-    int drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw);
+    int drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw);
     void removeShape(bool &isDraw);
     bool isInShape(const QPoint &point);
 

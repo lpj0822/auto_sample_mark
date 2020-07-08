@@ -45,7 +45,8 @@ void SegmentLabel::slotRemoveObject()
 void SegmentLabel::contextMenuEvent(QContextMenuEvent * event)
 {
     QMenu* popMenu = new QMenu(this);
-    bool isFind = drawList[this->shapeType]->isInShape(this->mapFromGlobal(QCursor::pos()));
+    QPoint point = this->mapFromGlobal(QCursor::pos());
+    bool isFind = drawList[this->shapeType]->isInShape(scalePoint(point));
     if(isFind)
     {
         popMenu->addAction(removeRectAction);
@@ -65,7 +66,8 @@ void SegmentLabel::mousePressEvent(QMouseEvent *e)
     if(e->button() == Qt::LeftButton)
     {
         bool isDraw = false;
-        int mouseChange = drawList[this->shapeType]->drawMousePress(e->pos(), isDraw);
+        QPoint point = e->pos();
+        int mouseChange = drawList[this->shapeType]->drawMousePress(scalePoint(point), isDraw);
         if(mouseChange == 1)
         {
             this->setCursor(myDrawCursor);
@@ -88,7 +90,8 @@ void SegmentLabel::mouseMoveEvent(QMouseEvent *e)
         return;
     }
     bool isDraw = false;
-    int mouseChange = drawList[this->shapeType]->drawMouseMove(e->pos(), isDraw);
+    QPoint point = e->pos();
+    int mouseChange = drawList[this->shapeType]->drawMouseMove(scalePoint(point), isDraw);
     if(mouseChange == 1)
     {
         this->setCursor(myDrawCursor);
@@ -113,7 +116,9 @@ void SegmentLabel::mouseReleaseEvent(QMouseEvent *e)
     if(e->button() == Qt::LeftButton)
     {
         bool isDraw = false;
-        drawList[this->shapeType]->drawMouseRelease(this, e->pos(), this->sampleClass, isDraw);
+        QPoint point = e->pos();
+        drawList[this->shapeType]->setVisibleSampleClass(this->sampleClass);
+        drawList[this->shapeType]->drawMouseRelease(this, scalePoint(point), isDraw);
         if(isDraw)
         {
             drawPixmap();
@@ -121,20 +126,36 @@ void SegmentLabel::mouseReleaseEvent(QMouseEvent *e)
     }
 }
 
+void SegmentLabel::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton)
+    {
+        bool isDraw = false;
+        QPoint point = event->pos();
+        drawList[this->shapeType]->setVisibleSampleClass(this->sampleClass);
+        drawList[this->shapeType]->drawMouseDoubleClick(this, scalePoint(point), isDraw);
+        if(isDraw)
+        {
+            drawPixmap();
+        }
+    }
+    //QLabel::mouseDoubleClickEvent(event);
+}
+
 void SegmentLabel::wheelEvent(QWheelEvent * event)
 {
-//    int value = event->delta();
-//    float scaleRatio = value / (8 * 360.0f);
-//    scale += scaleRatio;
-//    if(scale > 2.0f)
-//    {
-//        scale = 2.0f;
-//    }
-//    else if(scale < 0.5f)
-//    {
-//        scale = 0.5f;
-//    }
-//    drawPixmap();
+    int value = event->delta();
+    float scaleRatio = value / (8 * 360.0f);
+    scale += scaleRatio;
+    if(scale > 2.0f)
+    {
+        scale = 2.0f;
+    }
+    else if(scale < 0.5f)
+    {
+        scale = 0.5f;
+    }
+    drawPixmap();
     QLabel::wheelEvent(event);
 }
 
@@ -142,12 +163,16 @@ void SegmentLabel::paintEvent(QPaintEvent *e)
 {
     QLabel::paintEvent(e);
     QPainter painter(this);
-    int width = static_cast<int>(tempPixmap.width() * scale);
-    int height = static_cast<int>(tempPixmap.height() * scale);
-    QPixmap temp = tempPixmap.scaled(width, height, Qt::KeepAspectRatio);
-    painter.drawPixmap(QPoint(0,0), temp);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::HighQualityAntialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
+    painter.scale(this->scale, this->scale);
+    painter.translate(this->offsetToCenter());
+    painter.drawPixmap(QPoint(0,0), tempPixmap);
     painter.end();
-    this->resize(temp.width(), temp.height());
+    this->resize(tempPixmap.width() * this->scale, tempPixmap.height() * this->scale);
+    this->setAutoFillBackground(true);
+    QLabel::paintEvent(e);
 }
 
 void SegmentLabel::clearObjects()
@@ -157,7 +182,6 @@ void SegmentLabel::clearObjects()
         delete maskImage;
         maskImage = NULL;
     }
-    this->scale = 1.0f;
     QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
     for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
     {
@@ -169,6 +193,7 @@ void SegmentLabel::clearObjects()
 void SegmentLabel::setNewQImage(QImage &image)
 {
     mp = QPixmap::fromImage(image);
+    this->scale = 1.0f;
     drawPixmap();
 }
 
@@ -250,7 +275,9 @@ void SegmentLabel::drawPixmap()
     QPainter painter;
     tempPixmap = mp.copy();
     painter.begin(&tempPixmap);
-    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setRenderHint(QPainter::HighQualityAntialiasing);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform);
     QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
     for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
     {
@@ -284,6 +311,33 @@ void SegmentLabel::setMaskOject(const MyObject &mask)
         maskImage = new QImage(mask.getSegmentImage());
 }
 
+QPointF SegmentLabel::offsetToCenter()
+{
+    QSize area = this->size();
+    float w = this->mp.width() * scale;
+    float h = this->mp.height() * scale;
+    float aw = area.width();
+    float ah = area.height();
+    float x = 0;
+    float y = 0;
+    if(aw > w)
+    {
+        x = (aw - w) / (2 * scale);
+    }
+    if(ah > h)
+    {
+        y = (ah - h) / (2 * scale);
+    }
+    return QPointF(x, y);
+}
+
+QPoint SegmentLabel::scalePoint(const QPoint point)
+{
+    QPoint resultPoint(static_cast<int>(point.x() / scale),
+                       static_cast<int>(point.y() / scale));
+    return resultPoint;
+}
+
 void SegmentLabel::initData()
 {
     myDrawCursor = QCursor(QPixmap(tr(":/images/images/cross.png")));
@@ -303,6 +357,11 @@ void SegmentLabel::initData()
                     new DrawLaneShape(MarkDataType::SEGMENT, true, true));
     drawList.insert(ShapeType::SEGMENT_POLYGON_SHAPE,
                     new DrawPolygonShape(MarkDataType::SEGMENT, true));
+    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
+    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
+    {
+        drawList[drawIterator.key()]->setVisibleSampleClass(this->sampleClass);
+    }
 }
 
 void SegmentLabel::initConnect()

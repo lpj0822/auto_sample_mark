@@ -14,7 +14,7 @@
 int ManualParamterConfig::MIN_WIDTH = 1;
 int ManualParamterConfig::MIN_HEIGHT = 1;
 int ManualParamterConfig::NEAR_POINT_LENGTH = 5;
-int ManualParamterConfig::MAX_SCALE = 200;
+int ManualParamterConfig::MAX_SCALE = 300;
 int ManualParamterConfig::MIN_SCALE = 50;
 QMap<QString, QString> ManualParamterConfig::markClass = QMap<QString, QString>();
 

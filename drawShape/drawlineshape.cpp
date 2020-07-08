@@ -86,7 +86,7 @@ int DrawLineShape::drawMouseMove(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawLineShape::drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
+int DrawLineShape::drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw)
 {
     if(drawMousePressed)
     {
@@ -96,7 +96,7 @@ int DrawLineShape::drawMouseRelease(QWidget *parent, const QPoint point, const Q
         {
             SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
             window->setModal(true);
-            window->setObjectRect(sampleClass);
+            window->setObjectRect(this->visibleSampleClass);
             int res = window->exec();
             if (res == QDialog::Accepted)
             {

@@ -6,6 +6,12 @@ DrawShape::DrawShape(MarkDataType dataType, QObject *parent) :
 
 }
 
+int DrawShape::drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &isDraw)
+{
+    isDraw = false;
+    return 0;
+}
+
 int DrawShape::getObjectSize()
 {
     return 0;
@@ -19,4 +25,9 @@ void DrawShape::setSegmentImage(const MyObject &object)
 MyObject DrawShape::getSegmentImage()
 {
     return MyObject();
+}
+
+void DrawShape::setVisibleSampleClass(const QString &sampleClass)
+{
+    this->visibleSampleClass = sampleClass;
 }

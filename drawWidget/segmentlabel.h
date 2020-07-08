@@ -38,6 +38,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *e);
+    void mouseDoubleClickEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent * event);
 
     void paintEvent(QPaintEvent *e);
@@ -51,6 +52,9 @@ private:
     void drawSegmentMask(QPainter &painter);
 
     void setMaskOject(const MyObject &mask);
+
+    QPointF offsetToCenter();
+    QPoint scalePoint(const QPoint point);
 
     void initData();
     void initConnect();

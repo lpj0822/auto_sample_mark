@@ -16,8 +16,7 @@ public:
     //polygon
     int drawMousePress(const QPoint point, bool &isDraw) override;
     int drawMouseMove(const QPoint point, bool &isDraw) override;
-    int drawMouseRelease(QWidget *parent, const QPoint point,
-                         const QString sampleClass, bool &isDraw) override;
+    int drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw) override;
     void removeShape(bool &isDraw) override;
     bool isInShape(const QPoint &point) override;
 
