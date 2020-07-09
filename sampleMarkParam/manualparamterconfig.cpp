@@ -252,6 +252,7 @@ int ManualParamterConfig::saveClassConfig(const QString &classPath)
     for(classIterator = markClass.constBegin(); classIterator != markClass.constEnd(); ++classIterator)
     {
         jsonData.insert(QString::number(index), classIterator.key());
+        index++;
     }
     doc.setObject(jsonData);
     data = doc.toJson();
