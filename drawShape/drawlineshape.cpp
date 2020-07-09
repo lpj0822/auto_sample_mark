@@ -175,7 +175,7 @@ bool DrawLineShape::isInShape(const QPoint &point)
     return isFind;
 }
 
-void DrawLineShape::drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter)
+void DrawLineShape::drawPixmap(const ShapeType shapeID, QPainter &painter)
 {
     QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
     QFont font("Decorative", 15);
@@ -202,7 +202,7 @@ void DrawLineShape::drawPixmap(const QString &sampleClass, const ShapeType shape
             pen.setColor(drawColor);
             painter.setPen(pen);
         }
-        if(sampleClass == "All")
+        if(this->visibleSampleClass == "All")
         {
             painter.drawLine(line[0], line[1]);
             painter.drawText(line[0], this->listLine[i].getObjectClass());
@@ -217,7 +217,7 @@ void DrawLineShape::drawPixmap(const QString &sampleClass, const ShapeType shape
         }
         else
         {
-            if(this->listLine[i].getObjectClass().contains(sampleClass))
+            if(this->listLine[i].getObjectClass().contains(this->visibleSampleClass))
             {
                 painter.drawLine(line[0], line[1]);
                 painter.drawText(line[0], this->listLine[i].getObjectClass());

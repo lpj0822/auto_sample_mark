@@ -29,6 +29,7 @@ public:
     void setOjects(const MyObject &mask, const QList<MyObject> &obejcts, const QString &sampleClass);
     QList<MyObject> getObjects();
     MyObject getSegmentMask();
+    void resetDraw();
 
 public slots:
 
@@ -67,8 +68,9 @@ private:
     QPixmap tempPixmap;
 
     float scale;
-    QImage *maskImage;
     QString sampleClass;
+
+    QImage *maskImage;
 
     ShapeType shapeType;
     QMap<ShapeType, DrawShape*> drawList;

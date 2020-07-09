@@ -17,14 +17,9 @@ int DrawShape::getObjectSize()
     return 0;
 }
 
-void DrawShape::setSegmentImage(const MyObject &object)
+void DrawShape::createImageMask(QImage &maskImage)
 {
 
-}
-
-MyObject DrawShape::getSegmentImage()
-{
-    return MyObject();
 }
 
 void DrawShape::setVisibleSampleClass(const QString &sampleClass)

@@ -30,6 +30,7 @@ public:
     void setDrawShape(int shapeID);
     void setOjects(QList<MyObject> obejcts, QString sampleClass);
     QList<MyObject> getObjects();
+    void resetDraw();
 
 public slots:
 

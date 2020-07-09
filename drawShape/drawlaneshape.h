@@ -14,8 +14,6 @@ public:
 
     void initDraw() override;
 
-    void setLaneWidth(const int laneWidth);
-
     //polygon
     int drawMousePress(const QPoint point, bool &isDraw) override;
     int drawMouseMove(const QPoint point, bool &isDraw) override;
@@ -26,15 +24,14 @@ public:
     void removeShape(bool &isDraw) override;
     bool isInShape(const QPoint &point) override;
 
-    void drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter) override;
+    void drawPixmap(const ShapeType shapeID, QPainter &painter) override;
 
     void setObjectList(QList<MyObject> list) override;
     void getObjectList(QList<MyObject> &list) override;
 
     int getObjectSize() override;
 
-    void setSegmentImage(const MyObject &object) override;
-    MyObject getSegmentImage() override;
+    void createImageMask(QImage &maskImage) override;
 
 signals:
 
@@ -47,10 +44,10 @@ private:
 
     void getCurveFitPointList(const QList<QPoint> &inputKeyPoint, QList<QPoint> &result);
 
-    void drawMark(const QList<QPoint> &pointList, const int width,
-                  QPen &pen, QPainter &painter);
+    void drawMark(const QList<QPoint> &pointList, QPainter &painter);
 
-    void drawMaskImage(const QList<QPoint> &pointList, const int width, const QColor &color);
+    void drawMaskImage(const QList<QPoint> &pointList, const int width,
+                       const QColor &color, QImage &maskImage);
 
 private:
 
@@ -62,15 +59,10 @@ private:
     QPoint firstPoint;
     QPolygon currentPolygon;
     QList<MyObject> listLane;
-    QList<MyObject> drawPolygons;
 
     bool isSegment;
-    QImage *maskImage;
-
     bool isCurveFit;
     CurveAlgorithm curveFit;
-
-    int laneWidth;
 };
 
 

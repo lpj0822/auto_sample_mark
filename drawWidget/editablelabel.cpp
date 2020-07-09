@@ -262,6 +262,12 @@ QList<MyObject> EditableLabel::getObjects()
     return allObject;
 }
 
+void EditableLabel::resetDraw()
+{
+    this->zoomValue = 100;
+    drawPixmap();
+}
+
 void EditableLabel::drawPixmap()
 {
     QPainter painter;
@@ -274,7 +280,8 @@ void EditableLabel::drawPixmap()
     QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
     for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
     {
-        drawList[drawIterator.key()]->drawPixmap(this->sampleClass, this->shapeType, painter);
+        drawList[drawIterator.key()]->setVisibleSampleClass(this->sampleClass);
+        drawList[drawIterator.key()]->drawPixmap(this->shapeType, painter);
     }
     painter.end();
     this->update();

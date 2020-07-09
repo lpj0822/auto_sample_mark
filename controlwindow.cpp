@@ -23,11 +23,13 @@ ControlWindow::ControlWindow(QWidget *parent)
     init();
     initUI();
     connect(showFullButton, &QPushButton::clicked, this, &ControlWindow::slotShowFull);
+    connect(isMarkButton, &QPushButton::clicked, this, &ControlWindow::slotIsMark);
+    connect(resetButton, &QPushButton::clicked, this, &ControlWindow::slotReset);
 }
 
 ControlWindow::~ControlWindow()
 {
-
+    saveClassConfig(markDataDir);
 }
 
 void ControlWindow::setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType)
@@ -80,6 +82,27 @@ void ControlWindow::slotShowFull()
             showFullButton->setText(tr("全屏显示"));
         }
     }
+}
+
+void ControlWindow::slotIsMark()
+{
+    isMarkData();
+}
+
+void ControlWindow::slotReset()
+{
+    resetDraw();
+}
+
+
+void ControlWindow::resetDraw()
+{
+
+}
+
+void ControlWindow::isMarkData()
+{
+
 }
 
 void ControlWindow::updateIsMarkButton(bool isValue)
@@ -162,6 +185,7 @@ void ControlWindow::initUI()
 
     showFullButton = new QPushButton(tr("全屏显示"));
     isMarkButton = new QPushButton(tr("启用标注"));
+    resetButton = new QPushButton(tr("恢复原位"));
     isMarkButton->setStyleSheet("background-color:#302F2F");
     markProcessLabel = new QLabel(tr(""));
 
@@ -171,6 +195,7 @@ void ControlWindow::initUI()
     centerTopLayout->addLayout(showClassLayout);
     centerTopLayout->addWidget(showFullButton);
     centerTopLayout->addWidget(isMarkButton);
+    centerTopLayout->addWidget(resetButton);
     centerTopLayout->addWidget(markProcessLabel);
 
     drawMarkDataWidget = new MyStackedWidget(this);
@@ -314,9 +339,54 @@ void ControlWindow::updateExpandRight()
 void ControlWindow::readClassConfig(const QString &markDataDir)
 {
     QString saveClassPath = markDataDir + "/../" + "class.json";
-    if(ManualParamterConfig::loadClassConfig(saveClassPath) == 0)
+    switch(markDataType)
     {
-        ManualParamterConfig::saveConfig();
+    case MarkDataType::IMAGE:
+    case MarkDataType::VIDEO:
+    {
+        if(ManualParamterConfig::loadClassConfig(saveClassPath) == 0)
+        {
+            initMarkClassBox();
+        }
+        break;
+    }
+    case MarkDataType::SEGMENT:
+    {
+        if(ManualParamterConfig::loadSegClassConfig(saveClassPath) == 0)
+        {
+            initMarkClassBox();
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void ControlWindow::saveClassConfig(const QString &markDataDir)
+{
+    QString saveClassPath = markDataDir + "/../" + "class.json";
+    switch(markDataType)
+    {
+    case MarkDataType::IMAGE:
+    case MarkDataType::VIDEO:
+    {
+        if(ManualParamterConfig::saveClassConfig(saveClassPath) == 0)
+        {
+            ManualParamterConfig::saveConfig();
+        }
+        break;
+    }
+    case MarkDataType::SEGMENT:
+    {
+        if(ManualParamterConfig::saveSegClassConfig(saveClassPath) == 0)
+        {
+            ManualParamterConfig::saveConfig();
+        }
+        break;
+    }
+    default:
+        break;
     }
 }
 

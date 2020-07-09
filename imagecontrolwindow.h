@@ -19,7 +19,6 @@ public:
 
 public slots:
 
-    void slotIsMark();
     void slotImageItem(QListWidgetItem *item);
     void slotChangeClass(QString classText);
     virtual void slotScrollArea(int keyValue);
@@ -29,6 +28,9 @@ protected:
     virtual void keyPressEvent(QKeyEvent *e) override;
 
 protected:
+
+    void isMarkData() override;
+    void resetDraw() override;
 
     virtual void showPrevious();
     virtual void showNext();

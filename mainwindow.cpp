@@ -41,7 +41,7 @@ void MainWindow::slotOpenImageDir()
     else
     {
         initImageMarkShape();
-        dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
+        processDataList = dirProcess.getDirFileName(this->openDataDir);
         markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::IMAGE;
         markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
@@ -63,7 +63,7 @@ void MainWindow::slotOpenVideoDir()
     else
     {
         initImageMarkShape();
-        dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
+        processDataList = dirProcess.getDirFileName(this->openDataDir);
         markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::VIDEO;
         markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
@@ -85,7 +85,7 @@ void MainWindow::slotOpenImageSegmentDir()
     else
     {
         initSegmentMarkShape();
-        dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
+        processDataList = dirProcess.getDirFileName(this->openDataDir);
         markWindow[loadDataType]->saveMarkDataList();
         loadDataType = MarkDataType::SEGMENT;
         markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());

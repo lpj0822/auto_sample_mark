@@ -18,7 +18,7 @@ public:
     void removeShape(bool &isDraw);
     bool isInShape(const QPoint &point);
 
-    void drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter);
+    void drawPixmap(const ShapeType shapeID, QPainter &painter);
 
     void setObjectList(QList<MyObject> list);
     void getObjectList(QList<MyObject> &list);

@@ -7,18 +7,14 @@
 #include "selectmarkclasswindow.h"
 
 DrawPolygonShape::DrawPolygonShape(MarkDataType dataType, bool isSegment, QObject *parent) :
-    DrawShape(dataType, parent), isSegment(isSegment), maskImage(NULL)
+    DrawShape(dataType, parent), isSegment(isSegment)
 {
     initDraw();
 }
 
 DrawPolygonShape::~DrawPolygonShape()
 {
-    if(maskImage != NULL)
-    {
-        delete maskImage;
-        maskImage = NULL;
-    }
+
 }
 
 void DrawPolygonShape::initDraw()
@@ -34,11 +30,6 @@ void DrawPolygonShape::initDraw()
     polygonPointIndex = 0;
     removePolygonIndex = -1;
     listPolygon.clear();
-    if(maskImage != NULL)
-    {
-        delete maskImage;
-        maskImage = NULL;
-    }
 }
 
 int DrawPolygonShape::drawMousePress(const QPoint point, bool &isDraw)
@@ -204,10 +195,8 @@ bool DrawPolygonShape::isInShape(const QPoint &point)
     return isFind;
 }
 
-void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter)
+void DrawPolygonShape::drawPixmap(const ShapeType shapeID, QPainter &painter)
 {
-    const int height = painter.device()->height();
-    const int width = painter.device()->width();
     int drawLineWidth = 2;
     if(isSegment)
     {
@@ -237,7 +226,7 @@ void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType sh
             pen.setColor(drawColor);
             painter.setPen(pen);
         }
-        if(sampleClass == "All")
+        if(this->visibleSampleClass == "All")
         {
             QPolygon drawpoints = this->listPolygon[i].getPolygon();
             drawpoints.append(drawpoints.at(0));
@@ -254,7 +243,7 @@ void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType sh
         }
         else
         {
-            if(this->listPolygon[i].getObjectClass().contains(sampleClass))
+            if(this->listPolygon[i].getObjectClass().contains(this->visibleSampleClass))
             {
                 QPolygon drawpoints = this->listPolygon[i].getPolygon();
                 drawpoints.append(drawpoints.at(0));
@@ -269,17 +258,6 @@ void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType sh
                 painter.drawPolyline(QPolygon(drawpoints));
                 painter.drawText(drawpoints.at(0), this->listPolygon[i].getObjectClass());
             }
-        }
-    }
-    if(isSegment)
-    {
-        drawMaskImage(width, height);
-        if(this->listPolygon.count() > 0 && maskImage != NULL)
-        {
-            painter.save();
-            painter.setOpacity(0.5);
-            painter.drawImage(QPoint(0, 0), *maskImage);
-            painter.restore();
         }
     }
     if(isDraw)
@@ -315,22 +293,28 @@ int DrawPolygonShape::getObjectSize()
     return this->listPolygon.count();
 }
 
-void DrawPolygonShape::setSegmentImage(const MyObject &object)
+void DrawPolygonShape::createImageMask(QImage &maskImage)
 {
-    if(maskImage != NULL)
+    for(int i=0; i< this->listPolygon.count(); i++)
     {
-        delete maskImage;
-        maskImage = NULL;
+        QString color = ManualParamterConfig::getMarkClassColor(this->listPolygon[i].getObjectClass());
+        QColor drawColor(color);
+        if(!drawColor.isValid())
+        {
+            drawColor = QColor("#000000");
+        }
+        if(this->visibleSampleClass == "All")
+        {
+            drawMaskImage(this->listPolygon[i].getPolygon(), drawColor, maskImage);
+        }
+        else
+        {
+            if(this->listPolygon[i].getObjectClass().contains(this->visibleSampleClass))
+            {
+                drawMaskImage(this->listPolygon[i].getPolygon(), drawColor, maskImage);
+            }
+        }
     }
-    maskImage = new QImage(object.getSegmentImage());
-}
-
-MyObject DrawPolygonShape::getSegmentImage()
-{
-    MyObject result;
-    if(maskImage != NULL)
-        result.setSegmentImage(*maskImage);
-    return result;
 }
 
 QPolygon DrawPolygonShape::getCurrentPolygon(bool &isDraw)
@@ -383,14 +367,17 @@ void DrawPolygonShape::updatePolygon(const QPoint point)
     listPolygon[nearPolygonIndex].setPolygon(polygon);
 }
 
-void DrawPolygonShape::drawMaskImage(const QPolygon &drawPolygon, const QColor &color)
+void DrawPolygonShape::drawMaskImage(const QPolygon &drawPolygon, const QColor &color, QImage &maskImage)
 {
-    if(maskImage != NULL)
+    if(!maskImage.isNull())
     {
         QPainter painter;
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
         QPen pen(color, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
         QBrush brush(color, Qt::SolidPattern);
-        painter.begin(maskImage);
+        painter.begin(&maskImage);
         painter.setPen(pen);
         painter.setBrush(brush);
         painter.drawPolygon(drawPolygon);
@@ -398,13 +385,8 @@ void DrawPolygonShape::drawMaskImage(const QPolygon &drawPolygon, const QColor &
     }
 }
 
-void DrawPolygonShape::drawMaskImage(const int width, const int height)
+void DrawPolygonShape::drawMaskImage(const int width, const int height, QImage &maskImage)
 {
-    if(maskImage != NULL)
-    {
-        delete maskImage;
-        maskImage = NULL;
-    }
     QImage result = segmentPorcess.generateMaskFromPolygon(this->listPolygon, width, height);
-    maskImage = new QImage(result);
+    maskImage = result.copy();
 }

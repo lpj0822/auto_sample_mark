@@ -9,18 +9,13 @@
 
 DrawLaneShape::DrawLaneShape(MarkDataType dataType, bool isSegment,
                              bool isCurveFit, QObject *parent) :
-    DrawShape(dataType, parent), isSegment(isSegment), maskImage(NULL), isCurveFit(isCurveFit)
+    DrawShape(dataType, parent), isSegment(isSegment), isCurveFit(isCurveFit)
 {
     initDraw();
 }
 
 DrawLaneShape::~DrawLaneShape()
 {
-    if(maskImage != NULL)
-    {
-        delete maskImage;
-        maskImage = NULL;
-    }
 }
 
 void DrawLaneShape::initDraw()
@@ -35,17 +30,6 @@ void DrawLaneShape::initDraw()
     polygonPointIndex = 0;
     removePolygonIndex = -1;
     listLane.clear();
-    if(maskImage != NULL)
-    {
-        delete maskImage;
-        maskImage = NULL;
-    }
-    this->laneWidth = 10;
-}
-
-void DrawLaneShape::setLaneWidth(const int laneWidth)
-{
-    this->laneWidth = laneWidth;
 }
 
 int DrawLaneShape::drawMousePress(const QPoint point, bool &isDraw)
@@ -118,10 +102,10 @@ int DrawLaneShape::drawMouseRelease(QWidget *parent, const QPoint point, bool &i
                 point2.manhattanLength() <= ManualParamterConfig::getNearPointLenght())
         {
             polygon.removeAt(polygonPointIndex-1);
-            if(polygon.count() < 3)
+            if(polygon.count() < 4)
             {
                 this->listLane.removeAt(nearPolygonIndex);
-                QMessageBox::information(parent, tr("标注"), tr("标注目标有误!"));
+                QMessageBox::information(parent, tr("标注"), tr("标注目标点数需要大于3!"));
             }
             else
             {
@@ -137,9 +121,10 @@ int DrawLaneShape::drawMouseRelease(QWidget *parent, const QPoint point, bool &i
 
 int DrawLaneShape::drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &isDraw)
 {
-    if(currentPolygon.count() >= 3)
+    if(currentPolygon.count() >= 4)
     {
         SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
+        int laneWidth = SegmentParamterConfig::getLineWidth();
         window->setModal(true);
         window->setObjectRect(this->visibleSampleClass);
         int res = window->exec();
@@ -154,7 +139,7 @@ int DrawLaneShape::drawMouseDoubleClick(QWidget *parent, const QPoint point, boo
             {
                 object.setShapeType(ShapeType::POLYLINE_SHAPE);
             }
-            object.setLineWidth(this->laneWidth);
+            object.setLineWidth(laneWidth);
             QList<QPoint> temp = currentPolygon.toList();
             object.setPointList(temp);
             object.setObjectClass(window->getObjectClass());
@@ -213,7 +198,7 @@ bool DrawLaneShape::isInShape(const QPoint &point)
     return isFind;
 }
 
-void DrawLaneShape::drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter)
+void DrawLaneShape::drawPixmap(const ShapeType shapeID, QPainter &painter)
 {
     const int height = painter.device()->height();
     const int width = painter.device()->width();
@@ -230,18 +215,6 @@ void DrawLaneShape::drawPixmap(const QString &sampleClass, const ShapeType shape
 
     bool isDraw = false;
     QPolygon currentPolygon = getCurrentPolygon(isDraw);
-
-    if(isSegment)
-    {
-        this->laneWidth = SegmentParamterConfig::getLineWidth();
-        if(maskImage != NULL)
-        {
-            delete maskImage;
-            maskImage = NULL;
-        }
-        maskImage = new QImage(width, height, QImage::Format_ARGB32);
-        maskImage->fill(0);
-    }
 
     if(shapeID == ShapeType::LANE_SHAPE)
     {
@@ -271,38 +244,21 @@ void DrawLaneShape::drawPixmap(const QString &sampleClass, const ShapeType shape
             pen.setColor(drawColor);
             painter.setPen(pen);
         }
-        if(sampleClass == "All")
+        if(this->visibleSampleClass == "All")
         {
-            if(this->listLane[i].getLineWidth() > 0)
-            {
-                this->laneWidth = this->listLane[i].getLineWidth();
-            }
-            drawMark(this->listLane[i].getPointList(), this->laneWidth, pen, painter);
+            drawMark(this->listLane[i].getPointList(), painter);
             painter.drawText(this->listLane[i].getPointList().at(0), this->listLane[i].getObjectClass());
         }
         else
         {
-            if(this->listLane[i].getObjectClass().contains(sampleClass))
+            if(this->listLane[i].getObjectClass().contains(this->visibleSampleClass))
             {
-                if(this->listLane[i].getLineWidth() > 0)
-                {
-                    this->laneWidth = this->listLane[i].getLineWidth();
-                }
-                drawMark(this->listLane[i].getPointList(), this->laneWidth, pen, painter);
+                drawMark(this->listLane[i].getPointList(), painter);
                 painter.drawText(this->listLane[i].getPointList().at(0), this->listLane[i].getObjectClass());
             }
         }
     }
-    if(isSegment)
-    {
-        if(this->listLane.count() > 0 && maskImage != NULL)
-        {
-            painter.save();
-            painter.setOpacity(0.5);
-            painter.drawImage(QPoint(0, 0), *maskImage);
-            painter.restore();
-        }
-    }
+
     if(isDraw)
     {
         if(!currentPolygon.isEmpty())
@@ -336,51 +292,80 @@ int DrawLaneShape::getObjectSize()
     return this->listLane.count();
 }
 
-void DrawLaneShape::setSegmentImage(const MyObject &object)
+void DrawLaneShape::createImageMask(QImage &maskImage)
 {
-    if(maskImage != NULL)
+    int laneWidth = SegmentParamterConfig::getLineWidth();
+    for(int i=0; i< this->listLane.count(); i++)
     {
-        delete maskImage;
-        maskImage = NULL;
+        QList<QPoint> resultPoints;
+        QString color = ManualParamterConfig::getMarkClassColor(this->listLane[i].getObjectClass());
+        QColor drawColor(color);
+        if(!drawColor.isValid())
+        {
+            drawColor = QColor("#000000");
+        }
+        if(this->visibleSampleClass == "All")
+        {
+            if(this->listLane[i].getLineWidth() > 0)
+            {
+                laneWidth = this->listLane[i].getLineWidth();
+            }
+            if(isCurveFit)
+            {
+                getCurveFitPointList(this->listLane[i].getPointList(), resultPoints);
+            }
+            else
+            {
+                resultPoints = this->listLane[i].getPointList();
+            }
+            drawMaskImage(resultPoints, laneWidth, drawColor, maskImage);
+        }
+        else
+        {
+            if(this->listLane[i].getObjectClass().contains(this->visibleSampleClass))
+            {
+                if(this->listLane[i].getLineWidth() > 0)
+                {
+                    laneWidth = this->listLane[i].getLineWidth();
+                }
+                if(isCurveFit)
+                {
+                    getCurveFitPointList(this->listLane[i].getPointList(), resultPoints);
+                }
+                else
+                {
+                    resultPoints = this->listLane[i].getPointList();
+                }
+                drawMaskImage(resultPoints, laneWidth, drawColor, maskImage);
+            }
+        }
     }
-    maskImage = new QImage(object.getSegmentImage());
-}
-
-MyObject DrawLaneShape::getSegmentImage()
-{
-    MyObject result;
-    if(maskImage != NULL)
-        result.setSegmentImage(*maskImage);
-    return result;
 }
 
 void DrawLaneShape::getCurveFitPointList(const QList<QPoint> &inputKeyPoint, QList<QPoint> &result)
 {
     cv::Mat A;
-    int minX = 0;
+    int minX = 1e7;
     int maxX = 0;
     result.clear();
     if(inputKeyPoint.size() > 0)
     {
         curveFit.polynomialCurveFit(inputKeyPoint, 3, A);
-        if(inputKeyPoint[0].x() > inputKeyPoint[inputKeyPoint.size() - 1].x())
+        for(int loop = 0; loop < inputKeyPoint.count(); loop++)
         {
-            minX = inputKeyPoint[inputKeyPoint.size() - 1].x();
-            maxX = inputKeyPoint[0].x();
+            if(inputKeyPoint[loop].x() > maxX)
+                maxX = inputKeyPoint[loop].x();
+            if(inputKeyPoint[loop].x() < minX)
+                minX = inputKeyPoint[loop].x();
         }
-        else
+        for (double x = minX; x <= maxX; x += 0.05)
         {
-            minX = inputKeyPoint[0].x();
-            maxX = inputKeyPoint[inputKeyPoint.size() - 1].x();
+            double y = A.at<double>(0, 0) + A.at<double>(1, 0) * x +
+                    A.at<double>(2, 0)*std::pow(x, 2) + A.at<double>(3, 0)*std::pow(x, 3);
+            int tempX = static_cast<int>(std::round(x));
+            int tempY = static_cast<int>(std::round(y));
+            result.append(QPoint(tempX, tempY));
         }
-    }
-    for (double x = minX; x < maxX; x += 0.2)
-    {
-        double y = A.at<double>(0, 0) + A.at<double>(1, 0) * x +
-                A.at<double>(2, 0)*std::pow(x, 2) + A.at<double>(3, 0)*std::pow(x, 3);
-        int tempX = static_cast<int>(std::round(x));
-        int tempY = static_cast<int>(std::round(y));
-        result.append(QPoint(tempX, tempY));
     }
 }
 
@@ -434,55 +419,38 @@ void DrawLaneShape::updatePolygon(const QPoint point)
     listLane[nearPolygonIndex].setPointList(polygon);
 }
 
-void DrawLaneShape::drawMark(const QList<QPoint> &pointList, const int width,
-                             QPen &pen, QPainter &painter)
+void DrawLaneShape::drawMark(const QList<QPoint> &pointList, QPainter &painter)
 {
     QPolygon drawpoints;
-    QList<QPoint> resultPoints;
     for(int loop = 0; loop < pointList.size(); loop++)
     {
         drawpoints.append(pointList[loop]);
         painter.drawEllipse(pointList[loop], 2, 2);
     }
     painter.drawPolyline(QPolygon(drawpoints));
-    if(isCurveFit)
-    {
-        getCurveFitPointList(pointList, resultPoints);
-        painter.save();
-        painter.setPen(QPen(QColor(0, 0, 0)));
-        for(int loop = 0; loop < resultPoints.size(); loop++)
-        {
-            painter.drawEllipse(resultPoints[loop], 1, 1);
-        }
-        painter.restore();
-    }
-    else
-    {
-        resultPoints = pointList;
-    }
-    if(isSegment)
-    {
-        drawMaskImage(resultPoints, width, pen.color());
-    }
+
 }
 
 void DrawLaneShape::drawMaskImage(const QList<QPoint> &pointList, const int width,
-                                  const QColor &color)
+                                  const QColor &color, QImage &maskImage)
 {
     int harf_width = width / 2;
-    if(maskImage != NULL)
+    if(!maskImage.isNull())
     {
         QPainter painter;
-        QPen pen(color, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setRenderHint(QPainter::HighQualityAntialiasing);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
+        QPen pen(color, 2, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
         QBrush brush(color, Qt::SolidPattern);
-        painter.begin(maskImage);
+        painter.begin(&maskImage);
         painter.setPen(pen);
         painter.setBrush(brush);
         for(int loop = 0; loop < pointList.count(); loop++)
         {
-            int y = std::min(pointList[loop].y(), maskImage->height());
+            int y = std::min(pointList[loop].y(), maskImage.height());
             int minX = std::max(0, pointList[loop].x() - harf_width);
-            int maxX = std::min(pointList[loop].x() + harf_width, maskImage->width());
+            int maxX = std::min(pointList[loop].x() + harf_width, maskImage.width());
             painter.drawLine(QPoint(minX, y), QPoint(maxX, y));
         }
         painter.end();

@@ -20,7 +20,7 @@ public:
     virtual void removeShape(bool &isDraw) = 0;
     virtual bool isInShape(const QPoint &point) = 0;
 
-    virtual void drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter) = 0;
+    virtual void drawPixmap(const ShapeType shapeID, QPainter &painter) = 0;
 
     virtual void setObjectList(QList<MyObject> list) = 0;
     virtual void getObjectList(QList<MyObject> &list) = 0;
@@ -29,8 +29,7 @@ public:
 
     virtual int drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &isDraw);
 
-    virtual void setSegmentImage(const MyObject &object);
-    virtual MyObject getSegmentImage();
+    virtual void createImageMask(QImage &maskImage);
 
     void setVisibleSampleClass(const QString &sampleClass);
 

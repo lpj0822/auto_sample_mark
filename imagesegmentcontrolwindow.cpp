@@ -21,7 +21,6 @@ ImageSegmentControlWindow::~ImageSegmentControlWindow()
 
 void ImageSegmentControlWindow::setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType)
 {
-    readClassConfig(markDataDir);
     initMarkData(markDataDir, dataType);
     initImageData();
 
@@ -30,6 +29,8 @@ void ImageSegmentControlWindow::setMarkDataList(const QString markDataDir, const
 
     if(markDataList.size() > 0)
     {
+        readClassConfig(markDataDir);
+        saveClassConfig(markDataDir);
         this->processMarkDataList = markDataList;
         initImageList();
         updateListBox();
@@ -55,24 +56,6 @@ void ImageSegmentControlWindow::saveMarkDataList()
 void ImageSegmentControlWindow::setDrawShape(int shapeId)
 {
     this->drawLable->setDrawShape(shapeId);
-}
-
-void ImageSegmentControlWindow::slotIsMark()
-{
-    if(currentIndex >= 0)
-    {
-        if(isMark)
-        {
-            saveMarkDataResult();
-            this->isMark = false;
-        }
-        else
-        {
-            this->isMark = true;
-        }
-        updateIsMarkButton(this->isMark);
-        updateDrawLabel(this->isMark);
-    }
 }
 
 void ImageSegmentControlWindow::slotImageItem(QListWidgetItem *item)
@@ -142,6 +125,29 @@ void ImageSegmentControlWindow::keyPressEvent(QKeyEvent *e)
             slotIsMark();
         }
     }
+}
+
+void ImageSegmentControlWindow::isMarkData()
+{
+    if(currentIndex >= 0)
+    {
+        if(isMark)
+        {
+            saveMarkDataResult();
+            this->isMark = false;
+        }
+        else
+        {
+            this->isMark = true;
+        }
+        updateIsMarkButton(this->isMark);
+        updateDrawLabel(this->isMark);
+    }
+}
+
+void ImageSegmentControlWindow::resetDraw()
+{
+    drawLable->resetDraw();
 }
 
 void ImageSegmentControlWindow::showPrevious()
@@ -265,7 +271,6 @@ void ImageSegmentControlWindow::initConnect()
 {
     connect(markDataListWidget, &QListWidget::itemClicked, this, &ImageSegmentControlWindow::slotImageItem);
     connect(drawMarkDataWidget, &MyStackedWidget::signalsKey, this, &ImageSegmentControlWindow::slotScrollArea);
-    connect(isMarkButton, &QPushButton::clicked, this, &ImageSegmentControlWindow::slotIsMark);
     connect(classBox, &QComboBox::currentTextChanged, this, &ImageSegmentControlWindow::slotChangeClass);
 }
 

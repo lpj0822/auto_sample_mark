@@ -42,12 +42,17 @@ public:
 public slots:
     void slotManualMarkParamterChanged();
     void slotShowFull();
+    void slotIsMark();
+    void slotReset();
 
 protected:
     void resizeEvent(QResizeEvent *e);
     void contextMenuEvent (QContextMenuEvent * event);
 
 protected:
+
+    virtual void resetDraw();
+    virtual void isMarkData();
 
     void updateIsMarkButton(bool isValue);
     void updateListBox();
@@ -65,6 +70,7 @@ protected:
     void updateExpandRight();
 
     void readClassConfig(const QString &markDataDir);
+    void saveClassConfig(const QString &markDataDir);
     void readMarkHistory();
     void writeMarkHistory();
 
@@ -77,6 +83,7 @@ protected:
     QComboBox *classBox;
     QPushButton *showFullButton;
     QPushButton *isMarkButton;
+    QPushButton *resetButton;
     QLabel *markProcessLabel;
 
     MyStackedWidget *drawMarkDataWidget;

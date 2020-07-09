@@ -20,7 +20,6 @@ ImageControlWindow::~ImageControlWindow()
 
 void ImageControlWindow::setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType)
 {
-    readClassConfig(markDataDir);
     initMarkData(markDataDir, dataType);
     initImageData();
 
@@ -29,6 +28,8 @@ void ImageControlWindow::setMarkDataList(const QString markDataDir, const QList<
 
     if(markDataList.size() > 0)
     {
+        readClassConfig(markDataDir);
+        saveClassConfig(markDataDir);
         this->processMarkDataList = markDataList;
         initImageList();
         updateListBox();
@@ -56,23 +57,6 @@ void ImageControlWindow::setDrawShape(int shapeId)
     this->drawLable->setDrawShape(shapeId);
 }
 
-void ImageControlWindow::slotIsMark()
-{
-    if(currentIndex >= 0)
-    {
-        if(isMark)
-        {
-            saveMarkDataResult();
-            this->isMark = false;
-        }
-        else
-        {
-            this->isMark = true;
-        }
-        updateIsMarkButton(this->isMark);
-        updateDrawLabel(this->isMark);
-    }
-}
 
 void ImageControlWindow::slotImageItem(QListWidgetItem *item)
 {
@@ -141,6 +125,29 @@ void ImageControlWindow::keyPressEvent(QKeyEvent *e)
             slotIsMark();
         }
     }
+}
+
+void ImageControlWindow::isMarkData()
+{
+    if(currentIndex >= 0)
+    {
+        if(isMark)
+        {
+            saveMarkDataResult();
+            this->isMark = false;
+        }
+        else
+        {
+            this->isMark = true;
+        }
+        updateIsMarkButton(this->isMark);
+        updateDrawLabel(this->isMark);
+    }
+}
+
+void ImageControlWindow::resetDraw()
+{
+    drawLable->resetDraw();
 }
 
 void ImageControlWindow::showPrevious()
@@ -250,7 +257,6 @@ void ImageControlWindow::initConnect()
 {
     connect(markDataListWidget, &QListWidget::itemClicked, this, &ImageControlWindow::slotImageItem);
     connect(drawMarkDataWidget, &MyStackedWidget::signalsKey, this, &ImageControlWindow::slotScrollArea);
-    connect(isMarkButton, &QPushButton::clicked, this, &ImageControlWindow::slotIsMark);
     connect(classBox, &QComboBox::currentTextChanged, this, &ImageControlWindow::slotChangeClass);
 }
 

@@ -20,18 +20,14 @@ public:
     void removeShape(bool &isDraw) override;
     bool isInShape(const QPoint &point) override;
 
-    void drawPixmap(const QString &sampleClass,
-                    const ShapeType shapeID, QPainter &painter) override;
+    void drawPixmap(const ShapeType shapeID, QPainter &painter) override;
 
     void setObjectList(QList<MyObject> list) override;
     void getObjectList(QList<MyObject> &list) override;
 
     int getObjectSize() override;
 
-    void setSegmentImage(const MyObject &object) override;
-    MyObject getSegmentImage() override;
-
-    QPolygon getCurrentPolygon(bool &isDraw);
+    void createImageMask(QImage &maskImage) override;
 
 signals:
 
@@ -39,11 +35,13 @@ public slots:
 
 private:
 
+    QPolygon getCurrentPolygon(bool &isDraw);
+
     int nearPolygonPoint(const QPoint point);
     void updatePolygon(const QPoint point);
 
-    void drawMaskImage(const QPolygon &drawPolygon, const QColor &color);
-    void drawMaskImage(const int width, const int height);
+    void drawMaskImage(const QPolygon &drawPolygon, const QColor &color, QImage &maskImage);
+    void drawMaskImage(const int width, const int height, QImage &maskImage);
 
 private:
 
@@ -58,7 +56,6 @@ private:
     QList<MyObject> listPolygon;
 
     bool isSegment;
-    QImage *maskImage;
     SegmentImageSave segmentPorcess;
 };
 

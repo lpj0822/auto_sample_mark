@@ -24,7 +24,6 @@ VideoControlWindow::~VideoControlWindow()
 
 void VideoControlWindow::setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType)
 {
-    readClassConfig(markDataDir);
     initMarkData(markDataDir, dataType);
     initVideoData();
     updateIsMarkButton(this->isMark);
@@ -32,6 +31,8 @@ void VideoControlWindow::setMarkDataList(const QString markDataDir, const QList<
 
     if(markDataList.size() > 0)
     {
+        readClassConfig(markDataDir);
+        saveClassConfig(markDataDir);
         this->processMarkDataList = markDataList;
         initImageList();
         updateListBox();
