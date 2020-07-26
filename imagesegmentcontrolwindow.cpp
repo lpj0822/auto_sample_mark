@@ -227,6 +227,13 @@ void ImageSegmentControlWindow::saveMarkDataResult()
             saveImageSegmentResult(saveSegmentationDir, this->currentImagePath, maskImage);
         }
     }
+    else
+    {
+        if(this->markDataType == MarkDataType::SEGMENT)
+        {
+            saveImageDataResult(saveAnnotationsDir, this->currentImagePath, objects);
+        }
+    }
 }
 
 void ImageSegmentControlWindow::loadMarkImage()
