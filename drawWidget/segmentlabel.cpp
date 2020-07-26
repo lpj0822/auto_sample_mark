@@ -288,7 +288,7 @@ void SegmentLabel::drawSegmentMask(QPainter &painter)
     const int height = painter.device()->height();
     const int width = painter.device()->width();
     QList<MyObject> result = getObjects();
-    if(this->isEnabled() && maskImage != NULL && result.count() == 0)
+    if(!this->isEnabled() && maskImage != NULL && result.count() == 0)
     {
         painter.save();
         painter.setOpacity(0.35);

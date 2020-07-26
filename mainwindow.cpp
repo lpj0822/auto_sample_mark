@@ -469,6 +469,7 @@ void MainWindow::initAction()
     shapeWidget = new QWidget(this);
     shapeLabel = new QLabel(tr("选择标注形状"));
     shapeBox = new QComboBox();
+    shapeBox->setEnabled(false);
     shapeBox->clear();
     QHBoxLayout *shapLayout = new QHBoxLayout();
     shapLayout->setSpacing(10);
@@ -486,7 +487,7 @@ void MainWindow::initMenuBar()
     fileMenu->addAction(openImageDirAction);
     fileMenu->addAction(openVideoDirAction);
     fileMenu->addAction(openSegmentImageDirAction);
-    fileMenu->addAction(openPCDDirAction);
+    //fileMenu->addAction(openPCDDirAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
     //setting
@@ -495,12 +496,12 @@ void MainWindow::initMenuBar()
     settingMenu->addAction(segmentParamterAction);
     settingMenu->addAction(videoMarkParamterAction);
     settingMenu->addSeparator();
-    settingMenu->addAction(autoParamterAction);
-    settingMenu->addSeparator();
-    settingMenu->addAction(pointcloudParamterAction);
+    //settingMenu->addAction(autoParamterAction);
+    //settingMenu->addSeparator();
+    //settingMenu->addAction(pointcloudParamterAction);
     //autoMark
     autoMarkMenu = new QMenu(tr("自动化标注"), this);
-    autoMarkMenu->addAction(autoMarkAction);
+    //autoMarkMenu->addAction(autoMarkAction);
     //tool
     toolMenu = new QMenu(tr("工具"), this);
     toolMenu->addAction(videoToPictureAction);
@@ -534,11 +535,11 @@ void MainWindow::initToolBar()
     fileTool->addAction(openImageDirAction);
     fileTool->addAction(openVideoDirAction);
     fileTool->addAction(openSegmentImageDirAction);
-    fileTool->addAction(openPCDDirAction);
+    //fileTool->addAction(openPCDDirAction);
     //autoMark
     autoMarkTool = new QToolBar(tr("自动化标注"));
     autoMarkTool->setIconSize(QSize(30, 30));
-    autoMarkTool->addAction(autoMarkAction);
+    //autoMarkTool->addAction(autoMarkAction);
     //shapeTool
     shapeTool = new QToolBar(tr("标注形状"));
     shapeTool->addWidget(shapeWidget);
@@ -577,16 +578,16 @@ void MainWindow::initConnect()
     connect(openImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageDir);
     connect(openVideoDirAction, &QAction::triggered, this, &MainWindow::slotOpenVideoDir);
     connect(openSegmentImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageSegmentDir);
-    connect(openPCDDirAction, &QAction::triggered, this, &MainWindow::slotOpenPCDDir);
+    //connect(openPCDDirAction, &QAction::triggered, this, &MainWindow::slotOpenPCDDir);
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     //setting
     connect(manualParamterAction, &QAction::triggered, this, &MainWindow::slotManualMarkParamterConfig);
     connect(segmentParamterAction, &QAction::triggered, this, &MainWindow::slotSegmentMarkParamterConfig);
-    connect(autoParamterAction, &QAction::triggered, this, &MainWindow::slotAutoMarkParamterConfig);
+    //connect(autoParamterAction, &QAction::triggered, this, &MainWindow::slotAutoMarkParamterConfig);
     connect(videoMarkParamterAction, &QAction::triggered, this, &MainWindow::slotVideoMarkParamterConfig);
-    connect(pointcloudParamterAction, &QAction::triggered, this, &MainWindow::slotPointCloudParamterConfig);
+    //connect(pointcloudParamterAction, &QAction::triggered, this, &MainWindow::slotPointCloudParamterConfig);
     //autoMark
-    connect(autoMarkAction, &QAction::triggered, this, &MainWindow::slotAutoSampleMark);
+    //connect(autoMarkAction, &QAction::triggered, this, &MainWindow::slotAutoSampleMark);
     //tool
     connect(videoToPictureAction, &QAction::triggered, this, &MainWindow::slotVideoToPicture);
     connect(videoFromPictureAction, &QAction::triggered, this, &MainWindow::slotVideoFromPicture);

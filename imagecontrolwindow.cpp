@@ -293,7 +293,7 @@ void ImageControlWindow::loadImageData(const QString imagePath, const QString sa
     }
     else
     {
-        QMessageBox::information(this, tr("加载图片"), tr("加载图片失败！"));
+        QMessageBox::information(this, tr("加载图片"), tr("该图片加载失败,请点击下一张图片！"));
     }
 }
 
