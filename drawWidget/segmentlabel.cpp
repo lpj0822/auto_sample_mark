@@ -254,7 +254,15 @@ MyObject SegmentLabel::getSegmentMask()
 {
     MyObject result;
     if(maskImage != NULL)
+    {
+//        QList<MyObject> tempObject;
+//        tempObject.clear();
+//        drawList[ShapeType::SEGMENT_POLYGON_SHAPE]->getObjectList(tempObject);
+//        QImage tempMask = segmentPorcess.generateMaskFromPolygon(tempObject, maskImage->width(), maskImage->height());
+//        if(!tempMask.isNull())
+//            result.setSegmentImage(tempMask);
         result.setSegmentImage(*maskImage);
+    }
     return result;
 }
 

@@ -14,5 +14,6 @@
         <file>images/imageTovideo.png</file>
         <file>images/pcl.png</file>
         <file>images/seg.png</file>
+        <file>images/logo.png</file>
     </qresource>
 </RCC>

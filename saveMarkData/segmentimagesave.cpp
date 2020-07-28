@@ -35,7 +35,7 @@ int SegmentImageSave::readSegmentImage(const QString &imageFilePath, MyObject &o
 QImage SegmentImageSave::generateMaskFromPolygon(const QList<MyObject> &obejcts, const int width, const int height)
 {
     QImage result;
-    cv::Mat src = cv::Mat::zeros(height, width, CV_8UC3);
+    cv::Mat src = cv::Mat(height, width, CV_8UC3, cv::Scalar(255, 255, 255));
     for(int loop = 0; loop < obejcts.count(); loop++)
     {
         const MyObject object = obejcts[loop];
