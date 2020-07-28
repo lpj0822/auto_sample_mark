@@ -1,4 +1,4 @@
-T#-------------------------------------------------
+#-------------------------------------------------
 #
 # Project created by QtCreator 2017-05-08T12:15:54
 #
@@ -11,7 +11,7 @@ CONFIG   += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = SampleMark
+TARGET = EasyAiSampleMark
 TEMPLATE = app
 
 include(helpers/helpers.pri)
@@ -133,7 +133,7 @@ RESOURCES += \
     document.qrc \
     qm.qrc
 
-RC_ICONS = appico.ico
+RC_ICONS = logo.ico
 
 TRANSLATIONS = zh.ts en.ts ja.ts
 

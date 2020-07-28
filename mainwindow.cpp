@@ -485,7 +485,7 @@ void MainWindow::initMenuBar()
     //file
     fileMenu = new QMenu(tr("文件"), this);
     fileMenu->addAction(openImageDirAction);
-    fileMenu->addAction(openVideoDirAction);
+    //fileMenu->addAction(openVideoDirAction);
     fileMenu->addAction(openSegmentImageDirAction);
     //fileMenu->addAction(openPCDDirAction);
     fileMenu->addSeparator();
@@ -493,9 +493,9 @@ void MainWindow::initMenuBar()
     //setting
     settingMenu = new QMenu(tr("设置"), this);
     settingMenu->addAction(manualParamterAction);
-    settingMenu->addAction(segmentParamterAction);
-    settingMenu->addAction(videoMarkParamterAction);
-    settingMenu->addSeparator();
+    //settingMenu->addAction(segmentParamterAction);
+    //settingMenu->addAction(videoMarkParamterAction);
+    //settingMenu->addSeparator();
     //settingMenu->addAction(autoParamterAction);
     //settingMenu->addSeparator();
     //settingMenu->addAction(pointcloudParamterAction);
@@ -509,10 +509,10 @@ void MainWindow::initMenuBar()
     toolMenu->addAction(videoCuttingAction);
     toolMenu->addAction(videoCroppingAction);
     toolMenu->addAction(imageConverterAction);
-    toolMenu->addAction(cameraAction);
-    toolMenu->addSeparator();
-    toolMenu->addAction(pcdConverterAction);
-    toolMenu->addAction(pcdFilterAction);
+    //toolMenu->addAction(cameraAction);
+    //toolMenu->addSeparator();
+    //toolMenu->addAction(pcdConverterAction);
+    //toolMenu->addAction(pcdFilterAction);
     //about
     aboutMenu = new QMenu(tr("关于"), this);
     aboutMenu->addAction(aboutAction);
@@ -533,7 +533,7 @@ void MainWindow::initToolBar()
     fileTool = new QToolBar(tr("文件"));
     fileTool->setIconSize(QSize(30, 30));
     fileTool->addAction(openImageDirAction);
-    fileTool->addAction(openVideoDirAction);
+    //fileTool->addAction(openVideoDirAction);
     fileTool->addAction(openSegmentImageDirAction);
     //fileTool->addAction(openPCDDirAction);
     //autoMark
@@ -545,7 +545,7 @@ void MainWindow::initToolBar()
     shapeTool->addWidget(shapeWidget);
 
     this->addToolBar(fileTool);
-    this->addToolBar(autoMarkTool);
+    //this->addToolBar(autoMarkTool);
     this->addToolBar(shapeTool);
 }
 
@@ -576,15 +576,15 @@ void MainWindow::initConnect()
 {
     //file
     connect(openImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageDir);
-    connect(openVideoDirAction, &QAction::triggered, this, &MainWindow::slotOpenVideoDir);
+    //connect(openVideoDirAction, &QAction::triggered, this, &MainWindow::slotOpenVideoDir);
     connect(openSegmentImageDirAction, &QAction::triggered, this, &MainWindow::slotOpenImageSegmentDir);
     //connect(openPCDDirAction, &QAction::triggered, this, &MainWindow::slotOpenPCDDir);
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     //setting
     connect(manualParamterAction, &QAction::triggered, this, &MainWindow::slotManualMarkParamterConfig);
-    connect(segmentParamterAction, &QAction::triggered, this, &MainWindow::slotSegmentMarkParamterConfig);
+    //connect(segmentParamterAction, &QAction::triggered, this, &MainWindow::slotSegmentMarkParamterConfig);
     //connect(autoParamterAction, &QAction::triggered, this, &MainWindow::slotAutoMarkParamterConfig);
-    connect(videoMarkParamterAction, &QAction::triggered, this, &MainWindow::slotVideoMarkParamterConfig);
+    //connect(videoMarkParamterAction, &QAction::triggered, this, &MainWindow::slotVideoMarkParamterConfig);
     //connect(pointcloudParamterAction, &QAction::triggered, this, &MainWindow::slotPointCloudParamterConfig);
     //autoMark
     //connect(autoMarkAction, &QAction::triggered, this, &MainWindow::slotAutoSampleMark);
@@ -594,10 +594,10 @@ void MainWindow::initConnect()
     connect(videoCuttingAction, &QAction::triggered, this, &MainWindow::slotVideoCutting);
     connect(videoCroppingAction, &QAction::triggered, this, &MainWindow::slotVideoCropping);
     connect(imageConverterAction, &QAction::triggered, this, &MainWindow::slotImageConverter);
-    connect(cameraAction, &QAction::triggered, this, &MainWindow::slotCamera);
+    //connect(cameraAction, &QAction::triggered, this, &MainWindow::slotCamera);
 
-    connect(pcdConverterAction, &QAction::triggered, this, &MainWindow::slotPcdConverter);
-    connect(pcdFilterAction, &QAction::triggered, this, &MainWindow::slotPcdFilter);
+    //connect(pcdConverterAction, &QAction::triggered, this, &MainWindow::slotPcdConverter);
+    //connect(pcdFilterAction, &QAction::triggered, this, &MainWindow::slotPcdFilter);
 
     //about
     connect(aboutAction, &QAction::triggered, this, &MainWindow::slotAbout);

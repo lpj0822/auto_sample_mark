@@ -1,7 +1,7 @@
 ﻿Sample Mark
 ===============================
 
-![logo](./appico.ico)
+![logo](./logo.ico)
 
 ## Source description
     This supports all kinds of annotations needed in a driving database. It supports bounding box,and video tracking.
