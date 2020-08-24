@@ -21,7 +21,6 @@
 #include "helpers/recordhistorydata.h"
 #include "saveMarkData/xmlprocess.h"
 #include "saveMarkData/jsonprocessvideo.h"
-#include "saveMarkData/segmentimagesave.h"
 #include "utilityGUI/customWindow/wexpand.h"
 #include "utilityGUI/customWindow/customanimation.h"
 #include "utilityGUI/customWindow/mystackedwidget.h"
@@ -38,6 +37,9 @@ public:
     virtual void setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType);
     virtual void saveMarkDataList();
     virtual void setDrawShape(int shapeId);
+
+    virtual void readClassConfig();
+    virtual void saveClassConfig();
 
 public slots:
     void slotManualMarkParamterChanged();
@@ -69,8 +71,6 @@ protected:
     void updateExpandLeft();
     void updateExpandRight();
 
-    void readClassConfig(const QString &markDataDir);
-    void saveClassConfig(const QString &markDataDir);
     void readMarkHistory();
     void writeMarkHistory();
 
@@ -115,7 +115,6 @@ protected:
     JSONProcessVideo jsonProcessVideo;
     JSONProcess jsonProcess;
     XMLProcess xmlProcess;
-    SegmentImageSave segmentImageProcess;
 
     RecordHistoryData historyProcess;
 };

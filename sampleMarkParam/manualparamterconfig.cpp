@@ -195,7 +195,7 @@ int ManualParamterConfig::saveConfig()
     return 0;
 }
 
-int ManualParamterConfig::loadClassConfig(const QString &classPath)
+int ManualParamterConfig::loadDetClassConfig(const QString &classPath)
 {
     QByteArray data;
     QFile file;
@@ -214,16 +214,20 @@ int ManualParamterConfig::loadClassConfig(const QString &classPath)
         {
             if (parseDoucment.isObject())
             {
-                QMap<QString, QVariant> readMarkClass = parseDoucment.object().toVariantMap();
-                int index = 0;
-                QString color = "#000000";
-                markClass.clear();
-                for(QMap<QString, QVariant>::const_iterator iter = readMarkClass.constBegin();
-                    iter != readMarkClass.constEnd(); ++iter)
+                QJsonObject jsonObject = parseDoucment.object();
+                if(jsonObject.contains("DetectionClass"))
                 {
-                    index = iter.key().toInt();
-                    color = drawMarkColor[index % DRAW_MARK_COLOR_COUNT];
-                    markClass.insert(iter.value().toString(), color);
+                    QMap<QString, QVariant> readMarkClass = jsonObject.take("DetectionClass").toObject().toVariantMap();
+                    int index = 0;
+                    QString color = "#000000";
+                    markClass.clear();
+                    for(QMap<QString, QVariant>::const_iterator iter = readMarkClass.constBegin();
+                        iter != readMarkClass.constEnd(); ++iter)
+                    {
+                        index = iter.key().toInt();
+                        color = drawMarkColor[index % DRAW_MARK_COLOR_COUNT];
+                        markClass.insert(iter.value().toString(), color);
+                    }
                 }
             }
         }
@@ -235,7 +239,7 @@ int ManualParamterConfig::loadClassConfig(const QString &classPath)
     return 0;
 }
 
-int ManualParamterConfig::saveClassConfig(const QString &classPath)
+int ManualParamterConfig::saveDetClassConfig(const QString &classPath)
 {
     if(markClass.count() == 0)
         return -2;
@@ -243,6 +247,7 @@ int ManualParamterConfig::saveClassConfig(const QString &classPath)
     QJsonDocument doc;
     QByteArray data;
     QJsonObject jsonData;
+    QJsonObject classData;
     QFile file(classPath);
     int index = 0;
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate |QIODevice::Text))
@@ -251,9 +256,10 @@ int ManualParamterConfig::saveClassConfig(const QString &classPath)
     }
     for(classIterator = markClass.constBegin(); classIterator != markClass.constEnd(); ++classIterator)
     {
-        jsonData.insert(QString::number(index), classIterator.key());
+        classData.insert(QString::number(index), classIterator.key());
         index++;
     }
+    jsonData.insert("DetectionClass", classData);
     doc.setObject(jsonData);
     data = doc.toJson();
     file.write(data);
@@ -280,23 +286,27 @@ int ManualParamterConfig::loadSegClassConfig(const QString &classPath)
         {
             if (parseDoucment.isObject())
             {
-                QMap<QString, QVariant> readMarkClass = parseDoucment.object().toVariantMap();
-                QString className;
-                QStringList color;
-                int red = 0;
-                int green = 0;
-                int blue = 0;
-                markClass.clear();
-                for(QMap<QString, QVariant>::const_iterator iter = readMarkClass.constBegin();
-                    iter != readMarkClass.constEnd(); ++iter)
+                QJsonObject jsonObject = parseDoucment.object();
+                if(jsonObject.contains("SegmentationClass"))
                 {
-                    className = iter.key();
-                    color = iter.value().toString().split(',');
-                    red = color[0].toInt();
-                    green = color[1].toInt();
-                    blue = color[2].toInt();
-                    QColor tempColor(red, green, blue);
-                    markClass.insert(className, tempColor.name());
+                    QMap<QString, QVariant> readMarkClass = jsonObject.take("SegmentationClass").toObject().toVariantMap();
+                    QString className;
+                    QStringList color;
+                    int red = 0;
+                    int green = 0;
+                    int blue = 0;
+                    markClass.clear();
+                    for(QMap<QString, QVariant>::const_iterator iter = readMarkClass.constBegin();
+                        iter != readMarkClass.constEnd(); ++iter)
+                    {
+                        className = iter.key();
+                        color = iter.value().toString().split(',');
+                        red = color[0].toInt();
+                        green = color[1].toInt();
+                        blue = color[2].toInt();
+                        QColor tempColor(red, green, blue);
+                        markClass.insert(className, tempColor.name());
+                    }
                 }
             }
         }
@@ -316,6 +326,7 @@ int ManualParamterConfig::saveSegClassConfig(const QString &classPath)
     QJsonDocument doc;
     QByteArray data;
     QJsonObject jsonData;
+    QJsonObject classData;
     QFile file(classPath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate |QIODevice::Text))
     {
@@ -324,9 +335,10 @@ int ManualParamterConfig::saveSegClassConfig(const QString &classPath)
     for(classIterator = markClass.constBegin(); classIterator != markClass.constEnd(); ++classIterator)
     {
         QColor tempColor(classIterator.value());
-        jsonData.insert(classIterator.key(), QString("%1,%2,%3").arg(tempColor.red())
+        classData.insert(classIterator.key(), QString("%1,%2,%3").arg(tempColor.red())
                         .arg(tempColor.green()).arg(tempColor.blue()));
     }
+    jsonData.insert("SegmentationClass", classData);
     doc.setObject(jsonData);
     data = doc.toJson();
     file.write(data);

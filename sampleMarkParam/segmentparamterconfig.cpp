@@ -34,36 +34,6 @@ int SegmentParamterConfig::getLineWidth()
     return LINE_WIDTH;
 }
 
-int SegmentParamterConfig::loadClassConfig(const QString &classPath)
-{
-    return 0;
-}
-
-int SegmentParamterConfig::saveClassConfig(const QString &saveClassPath)
-{
-    QMap<QString, QString>::const_iterator classIterator;
-    QMap<QString, QVariant> saveMarkClass;
-    QJsonDocument doc;
-    QByteArray data;
-    QJsonObject jsonData;
-    QFile file(saveClassPath);
-    QMap<QString, QString> markClass = ManualParamterConfig::getMarkClass();
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate |QIODevice::Text))
-    {
-        return -1;
-    }
-    for(classIterator = markClass.constBegin(); classIterator != markClass.constEnd(); ++classIterator)
-    {
-        QColor color(classIterator.value());
-        jsonData.insert(classIterator.key(), QString("%1,%2,%3").arg(color.red()).arg(color.green()).arg(color.blue()));
-    }
-    doc.setObject(jsonData);
-    data = doc.toJson();
-    file.write(data);
-    file.close();
-    return 0;
-}
-
 int SegmentParamterConfig::loadConfig()
 {
     QByteArray data;

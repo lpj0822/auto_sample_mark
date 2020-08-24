@@ -31,8 +31,7 @@ void VideoControlWindow::setMarkDataList(const QString markDataDir, const QList<
 
     if(markDataList.size() > 0)
     {
-        readClassConfig(markDataDir);
-        saveClassConfig(markDataDir);
+        readClassConfig();
         this->processMarkDataList = markDataList;
         initImageList();
         updateListBox();

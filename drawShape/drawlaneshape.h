@@ -1,15 +1,15 @@
 ﻿#ifndef DRAWLANESHAPE_H
 #define DRAWLANESHAPE_H
 
-#include "drawshape.h"
-#include "baseAlgorithm/curvealgorithm.h"
+#include "drawShape/drawshape.h"
+#include "drawShape/drawimagemask.h"
 
 class DrawLaneShape : public DrawShape
 {
     Q_OBJECT
 public:
     DrawLaneShape(MarkDataType dataType, bool isSegment,
-                  bool isCurveFit, QObject *parent = 0);
+                  QObject *parent = 0);
     ~DrawLaneShape() override;
 
     void initDraw() override;
@@ -42,12 +42,7 @@ private:
     int nearPolygonPoint(const QPoint point);
     void updatePolygon(const QPoint point);
 
-    void getCurveFitPointList(const QList<QPoint> &inputKeyPoint, QList<QPoint> &result);
-
     void drawMark(const QList<QPoint> &pointList, QPainter &painter);
-
-    void drawMaskImage(const QList<QPoint> &pointList, const int width,
-                       const QColor &color, QImage &maskImage);
 
 private:
 
@@ -61,8 +56,7 @@ private:
     QList<MyObject> listLane;
 
     bool isSegment;
-    bool isCurveFit;
-    CurveAlgorithm curveFit;
+    DrawImageMask drawImageMask;
 };
 
 

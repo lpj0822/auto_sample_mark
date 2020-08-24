@@ -8,10 +8,9 @@
 #include "sampleMarkParam/manualparamterconfig.h"
 
 EditableLabel::EditableLabel(QWidget *parent):
-    QLabel(parent)
+    ImageDrawLabel(parent)
 {
     initData();
-    initConnect();
 }
 
 EditableLabel::~EditableLabel()
@@ -27,14 +26,40 @@ EditableLabel::~EditableLabel()
     }
 }
 
-void EditableLabel::slotRemoveObject()
+void EditableLabel::clearDraw()
 {
-    bool isDraw = false;
-    drawList[this->shapeType]->removeShape(isDraw);
-    if(isDraw)
+    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
+    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
     {
+        drawList[drawIterator.key()]->initDraw();
+    }
+    drawPixmap();
+}
+
+void EditableLabel::setNewQImage(QImage &image)
+{
+    mp = QPixmap::fromImage(image);
+    this->zoomValue = 100;
+    drawPixmap();
+}
+
+void EditableLabel::setDrawShape(int shapeID)
+{
+    if(shapeID >= 0 && shapeID < ShapeType::MAX_IMAGE_SHAPE_TYPE)
+    {
+        this->shapeType = static_cast<ShapeType>(shapeID);
         drawPixmap();
     }
+    else
+    {
+        QMessageBox::information(this, tr("标注形状"), tr("选择的标注形状有误！"));
+    }
+}
+
+void EditableLabel::resetDraw()
+{
+    this->zoomValue = 100;
+    drawPixmap();
 }
 
 void EditableLabel::contextMenuEvent(QContextMenuEvent * event)
@@ -178,93 +203,12 @@ void EditableLabel::paintEvent(QPaintEvent *e)
     QLabel::paintEvent(e);
 }
 
-void EditableLabel::clearObjects()
+void EditableLabel::setDrawShapeObjects()
 {
-    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
-    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
-    {
-        drawList[drawIterator.key()]->initDraw();
-    }
-    drawPixmap();
-}
-
-void EditableLabel::setNewQImage(QImage &image)
-{
-    mp = QPixmap::fromImage(image);
-    this->zoomValue = 100;
-    drawPixmap();
-}
-
-void EditableLabel::setDrawShape(int shapeID)
-{
-    if(shapeID >= 0 && shapeID < ShapeType::MAX_IMAGE_SHAPE_TYPE)
-    {
-        this->shapeType = static_cast<ShapeType>(shapeID);
-        drawPixmap();
-    }
-    else
-    {
-        QMessageBox::information(this, tr("标注形状"), tr("选择的标注形状有误！"));
-    }
-}
-
-void EditableLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
-{
-    QList<MyObject> rectObejcts;
-    QList<MyObject> lineObejcts;
-    QList<MyObject> polygonObejcts;
-    QList<MyObject> laneObejcts;
-    rectObejcts.clear();
-    lineObejcts.clear();
-    polygonObejcts.clear();
-    laneObejcts.clear();
-    for(int loop = 0; loop < obejcts.count(); loop++)
-    {
-        const MyObject object = obejcts[loop];
-        if(object.getShapeType() == ShapeType::RECT_SHAPE)
-        {
-            rectObejcts.append(object);
-        }
-        else if(object.getShapeType() == ShapeType::LINE_SHAPE)
-        {
-            lineObejcts.append(object);
-        }
-        else if(object.getShapeType() == ShapeType::POLYGON_SHAPE)
-        {
-            polygonObejcts.append(object);
-        }
-        else if(object.getShapeType() == ShapeType::POLYLINE_SHAPE)
-        {
-            laneObejcts.append(object);
-        }
-    }
     drawList[ShapeType::RECT_SHAPE]->setObjectList(rectObejcts);
     drawList[ShapeType::LINE_SHAPE]->setObjectList(lineObejcts);
     drawList[ShapeType::POLYGON_SHAPE]->setObjectList(polygonObejcts);
     drawList[ShapeType::POLYLINE_SHAPE]->setObjectList(laneObejcts);
-    this->sampleClass = sampleClass;
-    drawPixmap();
-}
-
-QList<MyObject> EditableLabel::getObjects()
-{
-    QList<MyObject> allObject;
-    allObject.clear();
-
-    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
-    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
-    {
-        QList<MyObject> tempObject;
-        tempObject.clear();
-        drawList[drawIterator.key()]->getObjectList(tempObject);
-        allObject.append(tempObject);
-    }
-    return allObject;
-}
-
-void EditableLabel::resetDraw()
-{
-    this->zoomValue = 100;
     drawPixmap();
 }
 
@@ -321,10 +265,6 @@ void EditableLabel::initData()
     this->setMouseTracking(true);
     this->setCursor(Qt::CrossCursor);
 
-    this->sampleClass = "All";
-
-    this->removeRectAction = new QAction(tr("删除标注"), this);
-
     this->shapeType = ShapeType::RECT_SHAPE;
 
     this->zoomValue = 100;
@@ -339,9 +279,4 @@ void EditableLabel::initData()
     {
         drawList[drawIterator.key()]->setVisibleSampleClass(this->sampleClass);
     }
-}
-
-void EditableLabel::initConnect()
-{
-    connect(removeRectAction, &QAction::triggered, this, &EditableLabel::slotRemoveObject);
 }

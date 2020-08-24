@@ -298,23 +298,7 @@ void DrawPolygonShape::createImageMask(QImage &maskImage)
 {
     for(int i=0; i< this->listPolygon.count(); i++)
     {
-        QString color = ManualParamterConfig::getMarkClassColor(this->listPolygon[i].getObjectClass());
-        QColor drawColor(color);
-        if(!drawColor.isValid())
-        {
-            drawColor = QColor("#000000");
-        }
-        if(this->visibleSampleClass == "All")
-        {
-            drawMaskImage(this->listPolygon[i].getPolygon(), drawColor, maskImage);
-        }
-        else
-        {
-            if(this->listPolygon[i].getObjectClass().contains(this->visibleSampleClass))
-            {
-                drawMaskImage(this->listPolygon[i].getPolygon(), drawColor, maskImage);
-            }
-        }
+        drawImageMask.drawPolygonMaskImage(this->listPolygon[i], this->visibleSampleClass, maskImage);
     }
 }
 
@@ -366,28 +350,4 @@ void DrawPolygonShape::updatePolygon(const QPoint point)
     QPolygon polygon = listPolygon[nearPolygonIndex].getPolygon();
     polygon[polygonPointIndex - 1] = point;
     listPolygon[nearPolygonIndex].setPolygon(polygon);
-}
-
-void DrawPolygonShape::drawMaskImage(const QPolygon &drawPolygon, const QColor &color, QImage &maskImage)
-{
-    if(!maskImage.isNull())
-    {
-        QPainter painter;
-        painter.setRenderHint(QPainter::Antialiasing);
-        painter.setRenderHint(QPainter::HighQualityAntialiasing);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform);
-        QPen pen(color, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-        QBrush brush(color, Qt::SolidPattern);
-        painter.begin(&maskImage);
-        painter.setPen(pen);
-        painter.setBrush(brush);
-        painter.drawPolygon(drawPolygon);
-        painter.end();
-    }
-}
-
-void DrawPolygonShape::drawMaskImage(const int width, const int height, QImage &maskImage)
-{
-    QImage result = segmentPorcess.generateMaskFromPolygon(this->listPolygon, width, height);
-    maskImage = result.copy();
 }

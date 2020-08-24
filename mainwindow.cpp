@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
 MainWindow::~MainWindow()
 {
+    markWindow[loadDataType]->saveClassConfig();
     centerWidget->deleteLater();
 }
 
@@ -43,6 +44,7 @@ void MainWindow::slotOpenImageDir()
         initImageMarkShape();
         processDataList = dirProcess.getDirFileName(this->openDataDir);
         markWindow[loadDataType]->saveMarkDataList();
+        markWindow[loadDataType]->saveClassConfig();
         loadDataType = MarkDataType::IMAGE;
         markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
@@ -65,6 +67,7 @@ void MainWindow::slotOpenVideoDir()
         initImageMarkShape();
         processDataList = dirProcess.getDirFileName(this->openDataDir);
         markWindow[loadDataType]->saveMarkDataList();
+        markWindow[loadDataType]->saveClassConfig();
         loadDataType = MarkDataType::VIDEO;
         markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
@@ -87,6 +90,7 @@ void MainWindow::slotOpenImageSegmentDir()
         initSegmentMarkShape();
         processDataList = dirProcess.getDirFileName(this->openDataDir);
         markWindow[loadDataType]->saveMarkDataList();
+        markWindow[loadDataType]->saveClassConfig();
         loadDataType = MarkDataType::SEGMENT;
         markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
@@ -116,6 +120,7 @@ void MainWindow::slotOpenPCDDir()
             dirProcess.getDirAllFileName(this->openDataDir, "*.bin", processDataList);
         }
         markWindow[loadDataType]->saveMarkDataList();
+        markWindow[loadDataType]->saveClassConfig();
         loadDataType = MarkDataType::PCD;
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
@@ -201,6 +206,16 @@ void MainWindow::slotAutoSampleMark()
     }
     autoSampleMarkWindow->show();
     autoSampleMarkWindow->initData();
+}
+
+void MainWindow::slotSegLabelConvert()
+{
+    if(segLabelConvertWindow == NULL)
+    {
+        segLabelConvertWindow = new SegmentationLabelConvertWindow();
+        connect(segLabelConvertWindow, &SegmentationLabelConvertWindow::signalCloseSegLabelConverterWindow, this, &MainWindow::slotCloseOtherWindow);
+    }
+    segLabelConvertWindow->show();
 }
 
 void MainWindow::slotVideoToPicture()
@@ -324,6 +339,12 @@ void MainWindow::slotCloseOtherWindow(QString flag)
         delete autoSampleMarkWindow;
         autoSampleMarkWindow = NULL;
     }
+    else if(flag.contains("segLabelConverter"))
+    {
+        disconnect(segLabelConvertWindow, &SegmentationLabelConvertWindow::signalCloseSegLabelConverterWindow, this, &MainWindow::slotCloseOtherWindow);
+        delete segLabelConvertWindow;
+        segLabelConvertWindow = NULL;
+    }
     else if(flag.contains("videoToPicture"))
     {
         disconnect(videoToPictureWindow, &FromVideoToPictureWindow::signalCloseVideoToPictureWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -378,6 +399,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if(autoSampleMarkWindow != NULL)
         autoSampleMarkWindow->close();
+    if(segLabelConvertWindow != NULL)
+        segLabelConvertWindow->close();
     if(videoToPictureWindow != NULL)
         videoToPictureWindow->close();
     if(videoFromPictureWindow != NULL)
@@ -405,6 +428,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::initData()
 {
     autoSampleMarkWindow = NULL;
+    segLabelConvertWindow = NULL;
     videoToPictureWindow = NULL;
     videoFromPictureWindow = NULL;
     videoCuttingWindow = NULL;
@@ -441,6 +465,8 @@ void MainWindow::initAction()
     autoMarkAction = new QAction(tr("自动化样本标注"), this);
     autoMarkAction->setIcon(QIcon(tr(":/images/images/mark.png")));
     //tool
+    segLabelConvertAction = new QAction(tr("分割图生成"), this);
+    segLabelConvertAction->setIcon(QIcon(tr(":/images/images/seg.png")));
     videoToPictureAction = new QAction(tr("视频转换为图片"), this);
     videoToPictureAction->setIcon(QIcon(tr(":/images/images/cut.png")));
     videoFromPictureAction = new QAction(tr("图片转换为视频"), this);
@@ -503,6 +529,8 @@ void MainWindow::initMenuBar()
     autoMarkMenu->addAction(autoMarkAction);
     //tool
     toolMenu = new QMenu(tr("工具"), this);
+    toolMenu->addAction(segLabelConvertAction);
+    toolMenu->addSeparator();
     toolMenu->addAction(videoToPictureAction);
     toolMenu->addAction(videoFromPictureAction);
     toolMenu->addAction(videoCuttingAction);
@@ -588,6 +616,8 @@ void MainWindow::initConnect()
     //autoMark
     connect(autoMarkAction, &QAction::triggered, this, &MainWindow::slotAutoSampleMark);
     //tool
+    connect(segLabelConvertAction, &QAction::triggered, this, &MainWindow::slotSegLabelConvert);
+
     connect(videoToPictureAction, &QAction::triggered, this, &MainWindow::slotVideoToPicture);
     connect(videoFromPictureAction, &QAction::triggered, this, &MainWindow::slotVideoFromPicture);
     connect(videoCuttingAction, &QAction::triggered, this, &MainWindow::slotVideoCutting);

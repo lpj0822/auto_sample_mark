@@ -4,6 +4,7 @@
 #include "controlwindow.h"
 #include "utilityGUI/customWindow/myscrollarea.h"
 #include "drawWidget/segmentlabel.h"
+#include "saveMarkData/segmentationmaskprocess.h"
 
 class ImageSegmentControlWindow : public ControlWindow
 {
@@ -56,8 +57,8 @@ private:
                        const QString &saveAnnotationsDir);
     void saveImageDataResult(const QString &saveAnnotationsDir, const QString &imagePath,
                              const QList<MyObject> &objects);
-    void saveImageSegmentResult(const QString &saveAnnotationsDir, const QString &imagePath,
-                                const MyObject &maskObject);
+//    void saveImageSegmentResult(const QString &saveAnnotationsDir, const QString &imagePath,
+//                                const MyObject &maskObject);
 
     void initData();
     void initImageData();
@@ -65,6 +66,7 @@ private:
 private:
     //imageData
     QString currentImagePath;
+    SegmentationMaskProcess maskProcess;
 
 };
 
