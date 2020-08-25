@@ -273,7 +273,7 @@ void EditableLabel::initData()
     drawList.insert(ShapeType::RECT_SHAPE, new DrawRectShape(MarkDataType::IMAGE));
     drawList.insert(ShapeType::LINE_SHAPE, new DrawLineShape(MarkDataType::IMAGE));
     drawList.insert(ShapeType::POLYGON_SHAPE, new DrawPolygonShape(MarkDataType::IMAGE, false));
-    drawList.insert(ShapeType::POLYLINE_SHAPE, new DrawLaneShape(MarkDataType::IMAGE, false, false));
+    drawList.insert(ShapeType::POLYLINE_SHAPE, new DrawLaneShape(MarkDataType::IMAGE, false));
     QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
     for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
     {

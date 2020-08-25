@@ -20,7 +20,7 @@ public slots:
     void slotScrollArea(int keyValue) override;
 
 protected:
-    void keyPressEvent(QKeyEvent *e) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     void showPrevious() override;

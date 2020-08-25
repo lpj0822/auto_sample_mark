@@ -108,7 +108,7 @@ int DrawPolygonShape::drawMouseRelease(QWidget *parent, const QPoint point, bool
                     MyObject object;
                     if(this->markDataType == MarkDataType::SEGMENT)
                     {
-                        object.setShapeType(ShapeType::SEGMENT_POLYGON_SHAPE);
+                        object.setShapeType(ShapeType::POLYGON_SEGMENT_SHAPE);
                     }
                     else
                     {
@@ -193,6 +193,16 @@ bool DrawPolygonShape::isInShape(const QPoint &point)
         }
     }
     return isFind;
+}
+
+void DrawPolygonShape::cancelDrawShape(bool &isDraw)
+{
+    isDraw = false;
+    if(this->currentPolygon.count() > 0)
+    {
+        this->currentPolygon.pop_back();
+        isDraw = true;
+    }
 }
 
 void DrawPolygonShape::drawPixmap(const ShapeType shapeID, QPainter &painter)

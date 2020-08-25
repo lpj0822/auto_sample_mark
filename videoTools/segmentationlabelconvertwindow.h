@@ -41,7 +41,7 @@ private:
     QComboBox *convertTypeBox;
 
     QString pathDir;
-    SegmentationLabelConvertThread *converterThread;
+    std::unique_ptr<SegmentationLabelConvertThread> converterThread;
 
     void init();
     void initUI();

@@ -350,7 +350,7 @@ int JSONProcess::writeLaneData(const QList<MyObject>& objects, QJsonObject &json
     int dataIndex = 0;
     for(int loop = 0; loop < objects.size(); loop++)
     {
-        if(objects[loop].getShapeType() == ShapeType::LANE_SHAPE)
+        if(objects[loop].getShapeType() == ShapeType::LANE_SEGMENT_SHAPE)
         {
             const QList<QPoint> pointList = objects[loop].getPointList();
             QJsonObject objectData;
@@ -396,7 +396,7 @@ int JSONProcess::readLaneData(const QJsonArray &value, QList<MyObject>& objects)
         object.setObjectClass(objectData.take("class").toVariant().toString());
         object.setLineWidth(objectData.take("lineWidth").toVariant().toInt());
         object.setPointList(pointList);
-        object.setShapeType(ShapeType::LANE_SHAPE);
+        object.setShapeType(ShapeType::LANE_SEGMENT_SHAPE);
         objects.append(object);
     }
 
@@ -409,7 +409,7 @@ int JSONProcess::writeSegmentData(const QList<MyObject>& objects, QJsonObject &j
     int dataIndex = 0;
     for(int loop = 0; loop < objects.size(); loop++)
     {
-        if(objects[loop].getShapeType() == ShapeType::SEGMENT_POLYGON_SHAPE)
+        if(objects[loop].getShapeType() == ShapeType::POLYGON_SEGMENT_SHAPE)
         {
             const QPolygon polygon = objects[loop].getPolygon();
             QJsonObject objectData;
@@ -453,7 +453,7 @@ int JSONProcess::readSegmentData(const QJsonArray &value, QList<MyObject>& objec
         }
         object.setObjectClass(objectData.take("class").toVariant().toString());
         object.setPolygon(polygon);
-        object.setShapeType(ShapeType::SEGMENT_POLYGON_SHAPE);
+        object.setShapeType(ShapeType::POLYGON_SEGMENT_SHAPE);
         objects.append(object);
     }
 

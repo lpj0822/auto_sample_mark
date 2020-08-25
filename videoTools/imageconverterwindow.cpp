@@ -94,8 +94,8 @@ void ImageConverterWindow::closeEvent(QCloseEvent *event)
     else
     {
         event->accept();
-        QWidget::closeEvent(event);
         emit signalCloseImageConverterWindow("imageConverter");
+        QWidget::closeEvent(event);
     }
 }
 

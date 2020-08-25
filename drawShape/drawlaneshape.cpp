@@ -133,7 +133,7 @@ int DrawLaneShape::drawMouseDoubleClick(QWidget *parent, const QPoint point, boo
             MyObject object;
             if(this->markDataType == MarkDataType::SEGMENT)
             {
-                object.setShapeType(ShapeType::LANE_SHAPE);
+                object.setShapeType(ShapeType::LANE_SEGMENT_SHAPE);
             }
             else
             {
@@ -216,7 +216,7 @@ void DrawLaneShape::drawPixmap(const ShapeType shapeID, QPainter &painter)
     bool isDraw = false;
     QPolygon currentPolygon = getCurrentPolygon(isDraw);
 
-    if(shapeID == ShapeType::LANE_SHAPE)
+    if(shapeID == ShapeType::LANE_SEGMENT_SHAPE)
     {
         painter.save();
         QPen tempPen(QColor(0, 0, 0, 120));

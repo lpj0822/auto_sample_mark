@@ -122,6 +122,16 @@ bool MyObject::getIsTrackingObject() const
     return this->isTrackingObject;
 }
 
+void MyObject::setMask(QPolygon mask)
+{
+    this->mask = mask;
+}
+
+QPolygon MyObject::getMask() const
+{
+    return this->mask;
+}
+
 void MyObject::setSegmentImage(const QImage &image)
 {
     maskImage = image.copy();

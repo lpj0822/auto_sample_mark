@@ -16,12 +16,10 @@ SegmentationLabelConvertWindow::SegmentationLabelConvertWindow(QWidget *parent) 
 
 SegmentationLabelConvertWindow::~SegmentationLabelConvertWindow()
 {
-    if (converterThread != nullptr)
+    if (converterThread.get() != nullptr)
     {
         converterThread->stopThread();
         converterThread->wait();
-        delete converterThread;
-        converterThread = nullptr;
     }
 }
 
@@ -85,22 +83,22 @@ void SegmentationLabelConvertWindow::closeEvent(QCloseEvent *event)
             converterThread->stopThread();
             converterThread->wait();
             event->accept();
-            QWidget::closeEvent(event);
             emit signalCloseSegLabelConverterWindow("segLabelConverter");
+            QWidget::closeEvent(event);
         }
     }
     else
     {
         event->accept();
-        QWidget::closeEvent(event);
         emit signalCloseSegLabelConverterWindow("segLabelConverter");
+        QWidget::closeEvent(event);
     }
 }
 
 void SegmentationLabelConvertWindow::init()
 {
     pathDir = ".";
-    converterThread = new SegmentationLabelConvertThread();
+    converterThread = std::unique_ptr<SegmentationLabelConvertThread>(new SegmentationLabelConvertThread());
 }
 
 void SegmentationLabelConvertWindow::initUI()
@@ -146,5 +144,5 @@ void SegmentationLabelConvertWindow::initConnect()
     connect(openButton, &QPushButton::clicked, this, &SegmentationLabelConvertWindow::slotOpen);
     connect(startButton, &QPushButton::clicked, this, &SegmentationLabelConvertWindow::slotStart);
     connect(stopButton, &QPushButton::clicked, this, &SegmentationLabelConvertWindow::slotStop);
-    connect(converterThread, &SegmentationLabelConvertThread::signalFinish, this, &SegmentationLabelConvertWindow::slotFinish);
+    connect(converterThread.get(), &SegmentationLabelConvertThread::signalFinish, this, &SegmentationLabelConvertWindow::slotFinish);
 }

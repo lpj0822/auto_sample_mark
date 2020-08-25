@@ -137,8 +137,8 @@ void MainWindow::slotManualMarkParamterConfig()
     {
         emit signalManualMarkParamterChanged();
     }
-    delete manualMarkParamterWindow;
-    manualMarkParamterWindow = NULL;
+    manualMarkParamterWindow->deleteLater();;
+    manualMarkParamterWindow = nullptr;
 }
 
 void MainWindow::slotAutoMarkParamterConfig()
@@ -151,8 +151,8 @@ void MainWindow::slotAutoMarkParamterConfig()
     {
         ;
     }
-    delete window;
-    window = NULL;
+    window->deleteLater();
+    window = nullptr;
 }
 
 void MainWindow::slotVideoMarkParamterConfig()
@@ -165,8 +165,8 @@ void MainWindow::slotVideoMarkParamterConfig()
     {
         ;
     }
-    delete window;
-    window = NULL;
+    window->deleteLater();
+    window = nullptr;
 }
 
 void MainWindow::slotSegmentMarkParamterConfig()
@@ -179,8 +179,8 @@ void MainWindow::slotSegmentMarkParamterConfig()
     {
         ;
     }
-    delete window;
-    window = NULL;
+    window->deleteLater();
+    window = nullptr;
 }
 
 void MainWindow::slotPointCloudParamterConfig()
@@ -193,13 +193,13 @@ void MainWindow::slotPointCloudParamterConfig()
     {
         ;
     }
-    delete window;
-    window = NULL;
+    window->deleteLater();
+    window = nullptr;
 }
 
 void MainWindow::slotAutoSampleMark()
 {
-    if(autoSampleMarkWindow == NULL)
+    if(autoSampleMarkWindow == nullptr)
     {
         autoSampleMarkWindow = new AutoSampleMarkWindow();
         connect(autoSampleMarkWindow, &AutoSampleMarkWindow::signalCloseAutoSampleMarkWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -210,7 +210,7 @@ void MainWindow::slotAutoSampleMark()
 
 void MainWindow::slotSegLabelConvert()
 {
-    if(segLabelConvertWindow == NULL)
+    if(segLabelConvertWindow == nullptr)
     {
         segLabelConvertWindow = new SegmentationLabelConvertWindow();
         connect(segLabelConvertWindow, &SegmentationLabelConvertWindow::signalCloseSegLabelConverterWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -220,7 +220,7 @@ void MainWindow::slotSegLabelConvert()
 
 void MainWindow::slotVideoToPicture()
 {
-    if(videoToPictureWindow == NULL)
+    if(videoToPictureWindow == nullptr)
     {
         videoToPictureWindow = new FromVideoToPictureWindow();
         connect(videoToPictureWindow, &FromVideoToPictureWindow::signalCloseVideoToPictureWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -230,7 +230,7 @@ void MainWindow::slotVideoToPicture()
 
 void MainWindow::slotVideoFromPicture()
 {
-    if(videoFromPictureWindow == NULL)
+    if(videoFromPictureWindow == nullptr)
     {
         videoFromPictureWindow = new FromPictureToVideoWindow();
         connect(videoFromPictureWindow, &FromPictureToVideoWindow::signalCloseVideoFromPictureWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -240,7 +240,7 @@ void MainWindow::slotVideoFromPicture()
 
 void MainWindow::slotVideoCropping()
 {
-    if(videoCroppingWindow == NULL)
+    if(videoCroppingWindow == nullptr)
     {
         videoCroppingWindow = new VideoCroppingWindow();
         connect(videoCroppingWindow, &VideoCroppingWindow::signalCloseVideoCroppingWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -250,7 +250,7 @@ void MainWindow::slotVideoCropping()
 
 void MainWindow::slotVideoCutting()
 {
-    if(videoCuttingWindow == NULL)
+    if(videoCuttingWindow == nullptr)
     {
         videoCuttingWindow = new VideoCuttingWindow();
         connect(videoCuttingWindow, &VideoCuttingWindow::signalCloseVideoCuttingWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -260,7 +260,7 @@ void MainWindow::slotVideoCutting()
 
 void MainWindow::slotImageConverter()
 {
-    if(imageConverterWindow == NULL)
+    if(imageConverterWindow == nullptr)
     {
         imageConverterWindow = new ImageConverterWindow();
         connect(imageConverterWindow, &ImageConverterWindow::signalCloseImageConverterWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -270,7 +270,7 @@ void MainWindow::slotImageConverter()
 
 void MainWindow::slotCamera()
 {
-    if(cameraWindow == NULL)
+    if(cameraWindow == nullptr)
     {
         cameraWindow = new QCameraWindow();
         connect(cameraWindow, &QCameraWindow::signalCloseCameraWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -280,7 +280,7 @@ void MainWindow::slotCamera()
 
 void MainWindow::slotPcdConverter()
 {
-    if(pcdConverterWindow == NULL)
+    if(pcdConverterWindow == nullptr)
     {
         pcdConverterWindow = new PCDConverterWindow();
         connect(pcdConverterWindow, &PCDConverterWindow::signalClosePCDConverterWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -290,7 +290,7 @@ void MainWindow::slotPcdConverter()
 
 void MainWindow::slotPcdFilter()
 {
-    if(pcdFilterWindow == NULL)
+    if(pcdFilterWindow == nullptr)
     {
         pcdFilterWindow = new PCDFilterWindow();
         connect(pcdFilterWindow, &PCDFilterWindow::signalClosePCDFilterWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -336,88 +336,88 @@ void MainWindow::slotCloseOtherWindow(QString flag)
     if(flag.contains("mark"))
     {
         disconnect(autoSampleMarkWindow, &AutoSampleMarkWindow::signalCloseAutoSampleMarkWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete autoSampleMarkWindow;
-        autoSampleMarkWindow = NULL;
+        autoSampleMarkWindow->deleteLater();;
+        autoSampleMarkWindow = nullptr;
     }
     else if(flag.contains("segLabelConverter"))
     {
         disconnect(segLabelConvertWindow, &SegmentationLabelConvertWindow::signalCloseSegLabelConverterWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete segLabelConvertWindow;
-        segLabelConvertWindow = NULL;
+        segLabelConvertWindow->deleteLater();
+        segLabelConvertWindow = nullptr;
     }
     else if(flag.contains("videoToPicture"))
     {
         disconnect(videoToPictureWindow, &FromVideoToPictureWindow::signalCloseVideoToPictureWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete videoToPictureWindow;
-        videoToPictureWindow = NULL;
+        videoToPictureWindow->deleteLater();
+        videoToPictureWindow = nullptr;
     }
     else if(flag.contains("videoFromPicture"))
     {
         disconnect(videoFromPictureWindow, &FromPictureToVideoWindow::signalCloseVideoFromPictureWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete videoFromPictureWindow;
-        videoFromPictureWindow = NULL;
+        videoFromPictureWindow->deleteLater();
+        videoFromPictureWindow = nullptr;
     }
     else if(flag.contains("videoCropping"))
     {
         disconnect(videoCroppingWindow, &VideoCroppingWindow::signalCloseVideoCroppingWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete videoCroppingWindow;
-        videoCroppingWindow = NULL;
+        videoCroppingWindow->deleteLater();
+        videoCroppingWindow = nullptr;
     }
     else if(flag.contains("videoCutting"))
     {
         disconnect(videoCuttingWindow, &VideoCuttingWindow::signalCloseVideoCuttingWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete videoCuttingWindow;
-        videoCuttingWindow = NULL;
+        videoCuttingWindow->deleteLater();
+        videoCuttingWindow = nullptr;
     }
     else if(flag.contains("imageConverter"))
     {
         disconnect(imageConverterWindow, &ImageConverterWindow::signalCloseImageConverterWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete imageConverterWindow;
-        imageConverterWindow = NULL;
+        imageConverterWindow->deleteLater();
+        imageConverterWindow = nullptr;
     }
     else if(flag.contains("camera"))
     {
         disconnect(cameraWindow, &QCameraWindow::signalCloseCameraWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete cameraWindow;
-        cameraWindow = NULL;
+        cameraWindow->deleteLater();
+        cameraWindow = nullptr;
     }
     else if(flag.contains("pcdConverter"))
     {
         disconnect(pcdConverterWindow, &PCDConverterWindow::signalClosePCDConverterWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete pcdConverterWindow;
-        pcdConverterWindow = NULL;
+        pcdConverterWindow->deleteLater();
+        pcdConverterWindow = nullptr;
     }
     else if(flag.contains("pcdFilter"))
     {
         disconnect(pcdFilterWindow, &PCDFilterWindow::signalClosePCDFilterWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete pcdFilterWindow;
-        pcdFilterWindow = NULL;
+        pcdFilterWindow->deleteLater();
+        pcdFilterWindow = nullptr;
     }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if(autoSampleMarkWindow != NULL)
+    if(autoSampleMarkWindow != nullptr)
         autoSampleMarkWindow->close();
-    if(segLabelConvertWindow != NULL)
+    if(segLabelConvertWindow != nullptr)
         segLabelConvertWindow->close();
-    if(videoToPictureWindow != NULL)
+    if(videoToPictureWindow != nullptr)
         videoToPictureWindow->close();
-    if(videoFromPictureWindow != NULL)
+    if(videoFromPictureWindow != nullptr)
         videoFromPictureWindow->close();
-    if(videoCroppingWindow != NULL)
+    if(videoCroppingWindow != nullptr)
         videoCroppingWindow->close();
-    if(videoCuttingWindow != NULL)
+    if(videoCuttingWindow != nullptr)
         videoCuttingWindow->close();
-    if(imageConverterWindow != NULL)
+    if(imageConverterWindow != nullptr)
         imageConverterWindow->close();
-    if(cameraWindow != NULL)
+    if(cameraWindow != nullptr)
         cameraWindow->close();
-    if(pcdConverterWindow != NULL)
+    if(pcdConverterWindow != nullptr)
         pcdConverterWindow->close();
-    if(pcdFilterWindow != NULL)
+    if(pcdFilterWindow != nullptr)
         pcdFilterWindow->close();
-    if(centerWidget != NULL)
+    if(centerWidget != nullptr)
     {
         centerWidget->currentWidget()->close();
         centerWidget->close();
@@ -427,17 +427,17 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::initData()
 {
-    autoSampleMarkWindow = NULL;
-    segLabelConvertWindow = NULL;
-    videoToPictureWindow = NULL;
-    videoFromPictureWindow = NULL;
-    videoCuttingWindow = NULL;
-    videoCroppingWindow = NULL;
-    imageConverterWindow = NULL;
-    cameraWindow = NULL;
+    autoSampleMarkWindow = nullptr;
+    segLabelConvertWindow = nullptr;
+    videoToPictureWindow = nullptr;
+    videoFromPictureWindow = nullptr;
+    videoCuttingWindow = nullptr;
+    videoCroppingWindow = nullptr;
+    imageConverterWindow = nullptr;
+    cameraWindow = nullptr;
 
-    pcdConverterWindow = NULL;
-    pcdFilterWindow = NULL;
+    pcdConverterWindow = nullptr;
+    pcdFilterWindow = nullptr;
 
     openDataDir = ".";
     loadDataType = MarkDataType::UNKNOWN;

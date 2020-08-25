@@ -45,8 +45,8 @@ QMap<int, QString> MyShape::getSegmentShape() const
 {
     QMap<int, QString> result;
     result.clear();
-    result.insert(ShapeType::SEGMENT_POLYGON_SHAPE, QObject::tr("多边形分割"));
-    result.insert(ShapeType::LANE_SHAPE, QObject::tr("折线分割"));
+    result.insert(ShapeType::POLYGON_SEGMENT_SHAPE, QObject::tr("多边形分割"));
+    result.insert(ShapeType::LANE_SEGMENT_SHAPE, QObject::tr("折线分割"));
     return result;
 }
 

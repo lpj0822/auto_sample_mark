@@ -19,11 +19,11 @@ QImage SegmentationMaskProcess::createSegmentMask(const QList<MyObject> &obejcts
     for(int loop = 0; loop < obejcts.count(); loop++)
     {
         const MyObject object = obejcts[loop];
-        if(object.getShapeType() == ShapeType::SEGMENT_POLYGON_SHAPE)
+        if(object.getShapeType() == ShapeType::POLYGON_SEGMENT_SHAPE)
         {
             generateMaskFromPolygon(object, src);
         }
-        else if(object.getShapeType() == ShapeType::POLYLINE_SHAPE)
+        else if(object.getShapeType() == ShapeType::LANE_SEGMENT_SHAPE)
         {
             generateMaskFromLane(object, src);
         }
@@ -64,10 +64,10 @@ void SegmentationMaskProcess::generateMaskFromPolygon(const MyObject &object, cv
     {
         contour.push_back(cv::Point(polygon[pointIndex].x(), polygon[pointIndex].y()));
     }
-    cv::polylines(mask, contour, true, cv::Scalar(color.red(), color.green(), color.blue()), 2, cv::LINE_AA);
+    cv::polylines(mask, contour, true, cv::Scalar(color.blue(), color.green(), color.red()), 1, cv::LINE_AA);
     std::vector<std::vector<cv::Point >> contours;
     contours.push_back(contour);
-    cv::fillPoly(mask, contours, cv::Scalar(color.red(), color.green(), color.blue()));
+    cv::fillPoly(mask, contours, cv::Scalar(color.blue(), color.green(), color.red()));
 }
 
 void SegmentationMaskProcess::generateMaskFromLane(const MyObject &object, cv::Mat &mask)
@@ -93,7 +93,7 @@ void SegmentationMaskProcess::generateMaskFromLane(const MyObject &object, cv::M
         int y = std::min(resultPoints[loop].y(), height);
         int minX = std::max(0, resultPoints[loop].x() - harf_width);
         int maxX = std::min(resultPoints[loop].x() + harf_width, width);
-        cv::line(mask, cv::Point(minX, y), cv::Point(maxX, y), cv::Scalar(color.red(), color.green(), color.blue()));
+        cv::line(mask, cv::Point(minX, y), cv::Point(maxX, y), cv::Scalar(color.blue(), color.green(), color.red()));
     }
 }
 

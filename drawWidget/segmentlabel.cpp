@@ -221,8 +221,8 @@ void SegmentLabel::paintEvent(QPaintEvent *e)
 
 void SegmentLabel::setDrawShapeObjects()
 {
-    drawList[ShapeType::SEGMENT_POLYGON_SHAPE]->setObjectList(polygonSegObejcts);
-    drawList[ShapeType::LANE_SHAPE]->setObjectList(laneSegObejcts);
+    drawList[ShapeType::POLYGON_SEGMENT_SHAPE]->setObjectList(polygonSegObejcts);
+    drawList[ShapeType::LANE_SEGMENT_SHAPE]->setObjectList(laneSegObejcts);
     drawPixmap();
 }
 
@@ -319,11 +319,11 @@ void SegmentLabel::initData()
 
     this->maskImage = NULL;
 
-    this->shapeType = ShapeType::SEGMENT_POLYGON_SHAPE;
+    this->shapeType = ShapeType::POLYGON_SEGMENT_SHAPE;
     drawList.clear();
-    drawList.insert(ShapeType::SEGMENT_POLYGON_SHAPE,
+    drawList.insert(ShapeType::POLYGON_SEGMENT_SHAPE,
                     new DrawPolygonShape(MarkDataType::SEGMENT, true));
-    drawList.insert(ShapeType::LANE_SHAPE,
+    drawList.insert(ShapeType::LANE_SEGMENT_SHAPE,
                     new DrawLaneShape(MarkDataType::SEGMENT, true));
     QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
     for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)

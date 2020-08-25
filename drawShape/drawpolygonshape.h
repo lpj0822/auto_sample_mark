@@ -20,6 +20,8 @@ public:
     void removeShape(bool &isDraw) override;
     bool isInShape(const QPoint &point) override;
 
+    void cancelDrawShape(bool &isDraw) override;
+
     void drawPixmap(const ShapeType shapeID, QPainter &painter) override;
 
     void setObjectList(QList<MyObject> list) override;

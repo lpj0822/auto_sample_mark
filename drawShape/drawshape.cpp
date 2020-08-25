@@ -12,6 +12,11 @@ int DrawShape::drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &i
     return 0;
 }
 
+void DrawShape::cancelDrawShape(bool &isDraw)
+{
+    isDraw = false;
+}
+
 int DrawShape::getObjectSize()
 {
     return 0;

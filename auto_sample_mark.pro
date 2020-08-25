@@ -75,7 +75,8 @@ SOURCES += main.cpp\
     videoTools/segmentationlabelconvertwindow.cpp \
     videoTools/segmentationlabelconvertthread.cpp \
     saveMarkData/segmentationmaskprocess.cpp \
-    drawShape/drawimagemask.cpp
+    drawShape/drawimagemask.cpp \
+    drawShape/drawinstancesegmentshape.cpp
 
 HEADERS  += controlwindow.h \
     markclasswindow.h \
@@ -132,7 +133,8 @@ HEADERS  += controlwindow.h \
     videoTools/segmentationlabelconvertwindow.h \
     videoTools/segmentationlabelconvertthread.h \
     saveMarkData/segmentationmaskprocess.h \
-    drawShape/drawimagemask.h
+    drawShape/drawimagemask.h \
+    drawShape/drawinstancesegmentshape.h
 
 RESOURCES += \
     style.qrc \

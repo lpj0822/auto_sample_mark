@@ -42,11 +42,11 @@ void ImageDrawLabel::setOjects(QList<MyObject> obejcts, QString sampleClass)
         {
             laneObejcts.append(object);
         }
-        else if(object.getShapeType() == ShapeType::SEGMENT_POLYGON_SHAPE)
+        else if(object.getShapeType() == ShapeType::POLYGON_SEGMENT_SHAPE)
         {
             polygonSegObejcts.append(object);
         }
-        else if(object.getShapeType() == ShapeType::LANE_SHAPE)
+        else if(object.getShapeType() == ShapeType::LANE_SEGMENT_SHAPE)
         {
             laneSegObejcts.append(object);
         }
@@ -73,6 +73,19 @@ QList<MyObject> ImageDrawLabel::getObjects()
         allObject.append(tempObject);
     }
     return allObject;
+}
+
+void ImageDrawLabel::undoDrawShape()
+{
+    bool isDraw = false;
+    if(drawList.count() > 0)
+    {
+        drawList[this->shapeType]->cancelDrawShape(isDraw);
+    }
+    if(isDraw)
+    {
+        drawPixmap();
+    }
 }
 
 void ImageDrawLabel::slotRemoveObject()

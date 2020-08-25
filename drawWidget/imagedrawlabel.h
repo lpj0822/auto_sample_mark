@@ -28,6 +28,8 @@ public:
     virtual void setMaskOject(const MyObject &mask);
     virtual QList<MyObject> getObjects();
 
+    virtual void undoDrawShape();
+
 public slots:
 
     void slotRemoveObject();

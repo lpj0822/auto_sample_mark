@@ -82,17 +82,24 @@ void ImageControlWindow::slotScrollArea(int keyValue)
 {
     if(processMarkDataList.size() > 0)
     {
-        if(keyValue == int(Qt::Key_A))
+        switch (keyValue)
         {
+        case Qt::Key_A:
             showPrevious();
-        }
-        else if(keyValue == int(Qt::Key_D))
-        {
+            break;
+        case Qt::Key_D:
             showNext();
-        }
-        else if(keyValue == int(Qt::Key_E))
-        {
+            break;
+        case Qt::Key_E:
             slotIsMark();
+            break;
+        }
+        if(keyValue == int(Qt::ControlModifier + Qt::Key_Z))
+        {
+            if(isMark)
+            {
+                drawLable->undoDrawShape();
+            }
         }
     }
     if(keyValue == int(Qt::Key_Escape))
@@ -107,21 +114,32 @@ void ImageControlWindow::closeEvent(QCloseEvent *event)
     ControlWindow::closeEvent(event);
 }
 
-void ImageControlWindow::keyPressEvent(QKeyEvent *e)
+void ImageControlWindow::keyPressEvent(QKeyEvent *event)
 {
     if(processMarkDataList.size() > 0)
     {
-        if(e->key() == Qt::Key_A)
+        switch (event->key())
         {
+        case Qt::Key_A:
             showPrevious();
-        }
-        else if(e->key() == Qt::Key_D)
-        {
+            break;
+        case Qt::Key_D:
             showNext();
-        }
-        else if(e->key() == Qt::Key_E)
-        {
+            break;
+        case Qt::Key_E:
             slotIsMark();
+            break;
+        }
+    }
+    if(event->modifiers() == Qt::ControlModifier)
+    {
+        if(event->key() == Qt::Key_M)
+        {
+            this->setWindowState(Qt::WindowMaximized);
+        }
+        else if(event->key() == Qt::Key_Z && isMark)
+        {
+            drawLable->undoDrawShape();
         }
     }
 }
