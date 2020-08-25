@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "imageconverterwindow.h"
 #include <QFileDialog>
 #include <QMessageBox>
@@ -24,7 +26,7 @@ ImageConverterWindow::~ImageConverterWindow()
 
 void ImageConverterWindow::slotOpen()
 {
-    pathDir = QFileDialog::getExistingDirectory(this, tr("选择文件夹"),tr("."),QFileDialog::ShowDirsOnly);
+    pathDir = QFileDialog::getExistingDirectory(this, tr("选择文件夹"), pathDir, QFileDialog::ShowDirsOnly);
     if(pathDir.trimmed().isEmpty())
     {
         qDebug() << "打开的文件路径有误:" << pathDir << endl;
@@ -92,14 +94,14 @@ void ImageConverterWindow::closeEvent(QCloseEvent *event)
     else
     {
         event->accept();
-        QWidget::closeEvent(event);
         emit signalCloseImageConverterWindow("imageConverter");
+        QWidget::closeEvent(event);
     }
 }
 
 void ImageConverterWindow::init()
 {
-    pathDir = "";
+    pathDir = ".";
     imageConverterThread = new ImageConverterThread();
 }
 

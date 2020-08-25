@@ -25,7 +25,7 @@ public slots:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
-    virtual void keyPressEvent(QKeyEvent *e) override;
+    virtual void keyPressEvent(QKeyEvent *event) override;
 
 protected:
 

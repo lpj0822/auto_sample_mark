@@ -1,82 +1,55 @@
 ﻿#ifndef SEGMENTLABEL_H
 #define SEGMENTLABEL_H
 
-#include <QLabel>
-#include <QPainter>
-#include <QMouseEvent>
-#include <QFileDialog>
-#include <QDateTime>
-#include <QToolButton>
-#include <QPoint>
-#include <QList>
-#include <QAction>
-#include <QWheelEvent>
+#include "drawWidget/imagedrawlabel.h"
+
 #include <QList>
 #include <QCursor>
+
 #include "drawShape/drawpolygonshape.h"
 #include "drawShape/drawlaneshape.h"
-#include "saveMarkData/segmentimagesave.h"
 
-class SegmentLabel : public QLabel
+class SegmentLabel : public ImageDrawLabel
 {
 public:
     SegmentLabel(QWidget *parent = 0);
     ~SegmentLabel();
 
-    void clearObjects();
-    void setNewQImage(QImage &image);
-    void setDrawShape(int shapeID);
-    void setOjects(const MyObject &mask, const QList<MyObject> &obejcts, const QString &sampleClass);
-    QList<MyObject> getObjects();
-    MyObject getSegmentMask();
-    void resetDraw();
+    void clearDraw() override;
+    void setNewQImage(QImage &image) override;
+    void setDrawShape(int shapeID) override;
+    void resetDraw() override;
+
+    void setMaskOject(const MyObject &mask) override;
 
 public slots:
 
-    void slotRemoveObject();
-
 protected:
-    void mouseMoveEvent(QMouseEvent *e);
-    void mousePressEvent(QMouseEvent *e);
-    void mouseReleaseEvent(QMouseEvent *e);
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent * event);
+    void mouseMoveEvent(QMouseEvent *e) override;
+    void mousePressEvent(QMouseEvent *e) override;
+    void mouseReleaseEvent(QMouseEvent *e) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent * event) override;
 
-    void paintEvent(QPaintEvent *e);
+    void paintEvent(QPaintEvent *e) override;
 
-    void contextMenuEvent(QContextMenuEvent * event);
+    void contextMenuEvent(QContextMenuEvent * event) override;
+
+    void setDrawShapeObjects() override;
+    void drawPixmap() override;
 
 private:
 
-    void drawPixmap();
-
     void drawSegmentMask(QPainter &painter);
-
-    void setMaskOject(const MyObject &mask);
 
     QPointF offsetToCenter();
     QPoint scalePoint(const QPoint point);
 
     void initData();
-    void initConnect();
 
 private:
-
-    QAction *removeRectAction;
-
-    QPixmap mp;
-    QPixmap tempPixmap;
-
     float scale;
-    QString sampleClass;
-
     QImage *maskImage;
-
-    ShapeType shapeType;
-    QMap<ShapeType, DrawShape*> drawList;
-
-    SegmentImageSave segmentPorcess;
-
     QCursor myDrawCursor;
 };
 

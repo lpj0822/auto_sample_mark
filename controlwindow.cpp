@@ -29,7 +29,7 @@ ControlWindow::ControlWindow(QWidget *parent)
 
 ControlWindow::~ControlWindow()
 {
-    saveClassConfig(markDataDir);
+    
 }
 
 void ControlWindow::setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType)
@@ -46,6 +46,70 @@ void ControlWindow::saveMarkDataList()
 void ControlWindow::setDrawShape(int shapeId)
 {
     qDebug() << "shape:" << shapeId;
+}
+
+void ControlWindow::readClassConfig()
+{
+    QDir tempDir(this->markDataDir);
+    if(!tempDir.exists())
+    {
+        return;
+    }
+    QString saveClassPath = this->markDataDir + "/../" + "class.json";
+    switch(markDataType)
+    {
+    case MarkDataType::IMAGE:
+    case MarkDataType::VIDEO:
+    {
+        if(ManualParamterConfig::loadDetClassConfig(saveClassPath) == 0)
+        {
+            initMarkClassBox();
+        }
+        break;
+    }
+    case MarkDataType::SEGMENT:
+    {
+        if(ManualParamterConfig::loadSegClassConfig(saveClassPath) == 0)
+        {
+            initMarkClassBox();
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+void ControlWindow::saveClassConfig()
+{
+    QDir tempDir(this->markDataDir);
+    if(!tempDir.exists())
+    {
+        return;
+    }
+    QString saveClassPath = this->markDataDir + "/../" + "class.json";
+    switch(markDataType)
+    {
+    case MarkDataType::IMAGE:
+    case MarkDataType::VIDEO:
+    {
+        if(ManualParamterConfig::saveDetClassConfig(saveClassPath) == 0)
+        {
+            ManualParamterConfig::saveConfig();
+        }
+        break;
+    }
+    case MarkDataType::SEGMENT:
+    {
+        if(ManualParamterConfig::saveSegClassConfig(saveClassPath) == 0)
+        {
+            ManualParamterConfig::saveConfig();
+        }
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void ControlWindow::resizeEvent(QResizeEvent *e)
@@ -167,7 +231,7 @@ void ControlWindow::updateLabelText(int markCount)
 
 void ControlWindow::init()
 {
-    initMarkData(".", MarkDataType::UNKNOWN);
+    initMarkData("/temp", MarkDataType::UNKNOWN);
     ManualParamterConfig::loadConfig();
 }
 
@@ -333,60 +397,6 @@ void ControlWindow::updateExpandRight()
     {
         markDataListWidget->setMaximumWidth(200);
         leftTabminmumwidth2 = markDataListWidget->width();
-    }
-}
-
-void ControlWindow::readClassConfig(const QString &markDataDir)
-{
-    QString saveClassPath = markDataDir + "/../" + "class.json";
-    switch(markDataType)
-    {
-    case MarkDataType::IMAGE:
-    case MarkDataType::VIDEO:
-    {
-        if(ManualParamterConfig::loadClassConfig(saveClassPath) == 0)
-        {
-            initMarkClassBox();
-        }
-        break;
-    }
-    case MarkDataType::SEGMENT:
-    {
-        if(ManualParamterConfig::loadSegClassConfig(saveClassPath) == 0)
-        {
-            initMarkClassBox();
-        }
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void ControlWindow::saveClassConfig(const QString &markDataDir)
-{
-    QString saveClassPath = markDataDir + "/../" + "class.json";
-    switch(markDataType)
-    {
-    case MarkDataType::IMAGE:
-    case MarkDataType::VIDEO:
-    {
-        if(ManualParamterConfig::saveClassConfig(saveClassPath) == 0)
-        {
-            ManualParamterConfig::saveConfig();
-        }
-        break;
-    }
-    case MarkDataType::SEGMENT:
-    {
-        if(ManualParamterConfig::saveSegClassConfig(saveClassPath) == 0)
-        {
-            ManualParamterConfig::saveConfig();
-        }
-        break;
-    }
-    default:
-        break;
     }
 }
 

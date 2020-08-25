@@ -2,7 +2,7 @@
 #define DRAWPOLYGONSHAPE_H
 
 #include "drawshape.h"
-#include "saveMarkData/segmentimagesave.h"
+#include "drawShape/drawimagemask.h"
 
 class DrawPolygonShape : public DrawShape
 {
@@ -19,6 +19,8 @@ public:
     int drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw) override;
     void removeShape(bool &isDraw) override;
     bool isInShape(const QPoint &point) override;
+
+    void cancelDrawShape(bool &isDraw) override;
 
     void drawPixmap(const ShapeType shapeID, QPainter &painter) override;
 
@@ -40,9 +42,6 @@ private:
     int nearPolygonPoint(const QPoint point);
     void updatePolygon(const QPoint point);
 
-    void drawMaskImage(const QPolygon &drawPolygon, const QColor &color, QImage &maskImage);
-    void drawMaskImage(const int width, const int height, QImage &maskImage);
-
 private:
 
     bool nearFirstPoint;
@@ -56,7 +55,7 @@ private:
     QList<MyObject> listPolygon;
 
     bool isSegment;
-    SegmentImageSave segmentPorcess;
+    DrawImageMask drawImageMask;
 };
 
 #endif // DRAWPOLYGONSHAPE_H

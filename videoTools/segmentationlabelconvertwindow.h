@@ -1,5 +1,5 @@
-#ifndef IMAGECONVERTERWINDOW_H
-#define IMAGECONVERTERWINDOW_H
+﻿#ifndef SEGMENTATIONLABELCONVERTWINDOW_H
+#define SEGMENTATIONLABELCONVERTWINDOW_H
 
 #include <QWidget>
 #include <QVBoxLayout>
@@ -9,18 +9,17 @@
 #include <QLineEdit>
 #include <QList>
 #include <QCloseEvent>
-#include "videoTools/imageconverterthread.h"
+#include "videoTools/segmentationlabelconvertthread.h"
 
-class ImageConverterWindow : public QWidget
+class SegmentationLabelConvertWindow : public QWidget
 {
     Q_OBJECT
-
 public:
-    ImageConverterWindow(QWidget *parent = 0);
-    ~ImageConverterWindow();
+    SegmentationLabelConvertWindow(QWidget *parent = nullptr);
+    ~SegmentationLabelConvertWindow();
 
 signals:
-    void signalCloseImageConverterWindow(QString flag);
+    void signalCloseSegLabelConverterWindow(QString flag);
 
 public slots:
     void slotOpen();
@@ -38,17 +37,15 @@ private:
     QPushButton *startButton;
     QPushButton *stopButton;
     QLineEdit *pathText;
-    QLabel *imagePostLabel;
-    QComboBox *imagePostBox;
-    QLabel *imageFormatLabel;
-    QComboBox *imageFormatBox;
+    QLabel *convertTypeLabel;
+    QComboBox *convertTypeBox;
 
     QString pathDir;
-    ImageConverterThread *imageConverterThread;
+    std::unique_ptr<SegmentationLabelConvertThread> converterThread;
 
     void init();
     void initUI();
     void initConnect();
 };
 
-#endif // IMAGECONVERTERWINDOW_H
+#endif // SEGMENTATIONLABELCONVERTWINDOW_H

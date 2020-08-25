@@ -48,6 +48,9 @@ public:
     void setIsTrackingObject(bool flag);
     bool getIsTrackingObject() const;
 
+    void setMask(QPolygon mask);
+    QPolygon getMask() const;
+
     void setSegmentImage(const QImage &image);
     QImage getSegmentImage() const;
 
@@ -61,6 +64,7 @@ private:
     QList<QPoint> line;
     QList<QPoint> pointList;
     QPolygon polygon;
+    QPolygon mask;
     QImage maskImage;
     QString obejctClass;
     ShapeType shapeType;

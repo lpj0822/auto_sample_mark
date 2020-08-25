@@ -14,9 +14,6 @@ public:
     void setLineWidth(const int width);
     static int getLineWidth();
 
-    static int loadClassConfig(const QString &classPath);
-    static int saveClassConfig(const QString &saveClassPath);
-
     static int loadConfig();
     static int saveConfig();
 

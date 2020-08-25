@@ -8,10 +8,9 @@
 #include "sampleMarkParam/manualparamterconfig.h"
 
 SegmentLabel::SegmentLabel(QWidget *parent):
-    QLabel(parent)
+    ImageDrawLabel(parent)
 {
     initData();
-    initConnect();
 }
 
 SegmentLabel::~SegmentLabel()
@@ -32,12 +31,57 @@ SegmentLabel::~SegmentLabel()
     }
 }
 
-void SegmentLabel::slotRemoveObject()
+void SegmentLabel::clearDraw()
 {
-    bool isDraw = false;
-    drawList[this->shapeType]->removeShape(isDraw);
-    if(isDraw)
+    if(maskImage != NULL)
     {
+        delete maskImage;
+        maskImage = NULL;
+    }
+    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
+    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
+    {
+        drawList[drawIterator.key()]->initDraw();
+    }
+    drawPixmap();
+}
+
+void SegmentLabel::setNewQImage(QImage &image)
+{
+    mp = QPixmap::fromImage(image);
+    this->scale = 1.0f;
+    drawPixmap();
+}
+
+void SegmentLabel::setDrawShape(int shapeID)
+{
+    if(shapeID >= 0 && shapeID < ShapeType::MAX_IMAGE_SHAPE_TYPE)
+    {
+        this->shapeType = static_cast<ShapeType>(shapeID);
+        drawPixmap();
+    }
+    else
+    {
+        QMessageBox::information(this, tr("标注形状"), tr("选择的标注形状有误！"));
+    }
+}
+
+void SegmentLabel::resetDraw()
+{
+    this->scale = 1.0f;
+    drawPixmap();
+}
+
+void SegmentLabel::setMaskOject(const MyObject &mask)
+{
+    if(maskImage != NULL)
+    {
+        delete maskImage;
+        maskImage = NULL;
+    }
+    if(!mask.getSegmentImage().isNull())
+    {
+        maskImage = new QImage(mask.getSegmentImage());
         drawPixmap();
     }
 }
@@ -175,92 +219,10 @@ void SegmentLabel::paintEvent(QPaintEvent *e)
     QLabel::paintEvent(e);
 }
 
-void SegmentLabel::clearObjects()
+void SegmentLabel::setDrawShapeObjects()
 {
-    if(maskImage != NULL)
-    {
-        delete maskImage;
-        maskImage = NULL;
-    }
-    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
-    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
-    {
-        drawList[drawIterator.key()]->initDraw();
-    }
-    drawPixmap();
-}
-
-void SegmentLabel::setNewQImage(QImage &image)
-{
-    mp = QPixmap::fromImage(image);
-    this->scale = 1.0f;
-    drawPixmap();
-}
-
-void SegmentLabel::setDrawShape(int shapeID)
-{
-    if(shapeID >= 0 && shapeID < ShapeType::MAX_IMAGE_SHAPE_TYPE)
-    {
-        this->shapeType = static_cast<ShapeType>(shapeID);
-        drawPixmap();
-    }
-    else
-    {
-        QMessageBox::information(this, tr("标注形状"), tr("选择的标注形状有误！"));
-    }
-}
-
-void SegmentLabel::setOjects(const MyObject &mask, const QList<MyObject> &obejcts, const QString &sampleClass)
-{
-    QList<MyObject> polygonObejcts;
-    QList<MyObject> laneObejcts;
-    polygonObejcts.clear();
-    laneObejcts.clear();
-    for(int loop = 0; loop < obejcts.count(); loop++)
-    {
-        const MyObject object = obejcts[loop];
-        if(object.getShapeType() == ShapeType::SEGMENT_POLYGON_SHAPE)
-        {
-            polygonObejcts.append(object);
-        }
-        else if(object.getShapeType() == ShapeType::LANE_SHAPE)
-        {
-            laneObejcts.append(object);
-        }
-    }
-    drawList[ShapeType::SEGMENT_POLYGON_SHAPE]->setObjectList(polygonObejcts);
-    drawList[ShapeType::LANE_SHAPE]->setObjectList(laneObejcts);
-    setMaskOject(mask);
-    this->sampleClass = sampleClass;
-    drawPixmap();
-}
-
-QList<MyObject> SegmentLabel::getObjects()
-{
-    QList<MyObject> allObject;
-    allObject.clear();
-    QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
-    for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
-    {
-        QList<MyObject> tempObject;
-        tempObject.clear();
-        drawList[drawIterator.key()]->getObjectList(tempObject);
-        allObject.append(tempObject);
-    }
-    return allObject;
-}
-
-MyObject SegmentLabel::getSegmentMask()
-{
-    MyObject result;
-    if(maskImage != NULL)
-        result.setSegmentImage(*maskImage);
-    return result;
-}
-
-void SegmentLabel::resetDraw()
-{
-    this->scale = 1.0f;
+    drawList[ShapeType::POLYGON_SEGMENT_SHAPE]->setObjectList(polygonSegObejcts);
+    drawList[ShapeType::LANE_SEGMENT_SHAPE]->setObjectList(laneSegObejcts);
     drawPixmap();
 }
 
@@ -313,22 +275,11 @@ void SegmentLabel::drawSegmentMask(QPainter &painter)
         if(maskImage != NULL)
         {
             painter.save();
-            painter.setOpacity(0.35);
+            painter.setOpacity(0.3);
             painter.drawImage(QPoint(0, 0), *maskImage);
             painter.restore();
         }
     }
-}
-
-void SegmentLabel::setMaskOject(const MyObject &mask)
-{
-    if(maskImage != NULL)
-    {
-        delete maskImage;
-        maskImage = NULL;
-    }
-    if(!mask.getSegmentImage().isNull())
-        maskImage = new QImage(mask.getSegmentImage());
 }
 
 QPointF SegmentLabel::offsetToCenter()
@@ -361,31 +312,22 @@ QPoint SegmentLabel::scalePoint(const QPoint point)
 void SegmentLabel::initData()
 {
     myDrawCursor = QCursor(QPixmap(tr(":/images/images/cross.png")));
-
     this->setMouseTracking(true);
     this->setCursor(myDrawCursor);
 
     this->scale = 1.0f;
-    this->sampleClass = "All";
 
     this->maskImage = NULL;
 
-    this->removeRectAction = new QAction(tr("删除标注"), this);
-
-    this->shapeType = ShapeType::SEGMENT_POLYGON_SHAPE;
+    this->shapeType = ShapeType::POLYGON_SEGMENT_SHAPE;
     drawList.clear();
-    drawList.insert(ShapeType::SEGMENT_POLYGON_SHAPE,
+    drawList.insert(ShapeType::POLYGON_SEGMENT_SHAPE,
                     new DrawPolygonShape(MarkDataType::SEGMENT, true));
-    drawList.insert(ShapeType::LANE_SHAPE,
-                    new DrawLaneShape(MarkDataType::SEGMENT, true, true));
+    drawList.insert(ShapeType::LANE_SEGMENT_SHAPE,
+                    new DrawLaneShape(MarkDataType::SEGMENT, true));
     QMap<ShapeType, DrawShape*>::const_iterator drawIterator;
     for(drawIterator = drawList.constBegin(); drawIterator != drawList.constEnd(); ++drawIterator)
     {
         drawList[drawIterator.key()]->setVisibleSampleClass(this->sampleClass);
     }
-}
-
-void SegmentLabel::initConnect()
-{
-    connect(removeRectAction, &QAction::triggered, this, &SegmentLabel::slotRemoveObject);
 }

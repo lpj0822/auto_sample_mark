@@ -29,6 +29,8 @@ public:
 
     virtual int drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &isDraw);
 
+    virtual void cancelDrawShape(bool &isDraw);
+
     virtual void createImageMask(QImage &maskImage);
 
     void setVisibleSampleClass(const QString &sampleClass);

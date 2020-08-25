@@ -12,6 +12,7 @@
 #include <QAction>
 #include <QComboBox>
 #include <QStackedWidget>
+#include "videoTools/segmentationlabelconvertwindow.h"
 #include "videoTools/fromvideotopicturewindow.h"
 #include "videoTools/frompicturetovideowindow.h"
 #include "videoTools/videocuttingwindow.h"
@@ -54,6 +55,8 @@ public slots:
     //autoMark
     void slotAutoSampleMark();
     //tool
+    void slotSegLabelConvert();
+
     void slotVideoToPicture();
     void slotVideoFromPicture();
     void slotVideoCropping();
@@ -94,6 +97,7 @@ private:
     //autoMark
     QAction *autoMarkAction;
     //tool
+    QAction *segLabelConvertAction;
     QAction *videoToPictureAction;
     QAction *videoFromPictureAction;
     QAction *videoCuttingAction;
@@ -129,6 +133,7 @@ private:
 private:
     AutoSampleMarkWindow *autoSampleMarkWindow;
 
+    SegmentationLabelConvertWindow *segLabelConvertWindow;
     FromVideoToPictureWindow *videoToPictureWindow;
     FromPictureToVideoWindow *videoFromPictureWindow;
     VideoCuttingWindow *videoCuttingWindow;

@@ -1,4 +1,4 @@
-T#-------------------------------------------------
+#-------------------------------------------------
 #
 # Project created by QtCreator 2017-05-08T12:15:54
 #
@@ -11,7 +11,7 @@ CONFIG   += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = SampleMark
+TARGET = EasyAiSampleMark
 TEMPLATE = app
 
 include(helpers/helpers.pri)
@@ -59,7 +59,6 @@ SOURCES += main.cpp\
     drawShape/drawshape.cpp \
     imagesegmentcontrolwindow.cpp \
     drawWidget/segmentlabel.cpp \
-    saveMarkData/segmentimagesave.cpp \
     dataType/myobject.cpp \
     dataType/myrect3d.cpp \
     paramWindow/manualparamterconfigwindow.cpp \
@@ -71,7 +70,13 @@ SOURCES += main.cpp\
     sampleMarkParam/pointcloudparamterconfig.cpp \
     paramWindow/pointcloudmarkparamterwindow.cpp \
     pcTools/pcdfilterthread.cpp \
-    pcTools/pcdfilterwindow.cpp
+    pcTools/pcdfilterwindow.cpp \
+    drawWidget/imagedrawlabel.cpp \
+    videoTools/segmentationlabelconvertwindow.cpp \
+    videoTools/segmentationlabelconvertthread.cpp \
+    saveMarkData/segmentationmaskprocess.cpp \
+    drawShape/drawimagemask.cpp \
+    drawShape/drawinstancesegmentshape.cpp
 
 HEADERS  += controlwindow.h \
     markclasswindow.h \
@@ -111,7 +116,6 @@ HEADERS  += controlwindow.h \
     drawShape/drawshape.h \
     imagesegmentcontrolwindow.h \
     drawWidget/segmentlabel.h \
-    saveMarkData/segmentimagesave.h \
     dataType/myobject.h \
     dataType/myrect3d.h \
     paramWindow/manualparamterconfigwindow.h \
@@ -124,7 +128,13 @@ HEADERS  += controlwindow.h \
     paramWindow/pointcloudmarkparamterwindow.h \
     dataType/mark_data_type.h \
     pcTools/pcdfilterterthread.h \
-    pcTools/pcdfilterwindow.h
+    pcTools/pcdfilterwindow.h \
+    drawWidget/imagedrawlabel.h \
+    videoTools/segmentationlabelconvertwindow.h \
+    videoTools/segmentationlabelconvertthread.h \
+    saveMarkData/segmentationmaskprocess.h \
+    drawShape/drawimagemask.h \
+    drawShape/drawinstancesegmentshape.h
 
 RESOURCES += \
     style.qrc \
@@ -133,7 +143,7 @@ RESOURCES += \
     document.qrc \
     qm.qrc
 
-RC_ICONS = appico.ico
+RC_ICONS = logo.ico
 
 TRANSLATIONS = zh.ts en.ts ja.ts
 

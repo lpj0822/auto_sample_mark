@@ -31,8 +31,8 @@ public:
     static int loadConfig();
     static int saveConfig();
 
-    static int loadClassConfig(const QString &classPath);
-    static int saveClassConfig(const QString &classPath);
+    static int loadDetClassConfig(const QString &classPath);
+    static int saveDetClassConfig(const QString &classPath);
 
     static int loadSegClassConfig(const QString &classPath);
     static int saveSegClassConfig(const QString &classPath);
