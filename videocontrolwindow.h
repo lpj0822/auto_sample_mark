@@ -20,7 +20,7 @@ public slots:
     void slotScrollArea(int keyValue) override;
 
 protected:
-    void keyPressEvent(QKeyEvent *e) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     void showPrevious() override;
@@ -34,7 +34,7 @@ private:
     void loadMarkData(const QString dataPath) override;
     void saveMarkDataResult() override;
     void loadMarkImage() override;
-    void saveMarkImageResult() override;
+    void saveMarkImageResult();
 
     //videoData
     void loadVideoData(const QString videoPath, const QString saveAnnotationsDir);

@@ -1,12 +1,16 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "selectmarkclasswindow.h"
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QMessageBox>
 
 #include "sampleMarkParam/manualparamterconfig.h"
+#include "sampleMarkParam/segmentparamterconfig.h"
 
-SelectMarkClassWindow::SelectMarkClassWindow(QDialog *parent) : QDialog(parent)
+SelectMarkClassWindow::SelectMarkClassWindow(const MarkDataType dataType, QDialog *parent) :
+    QDialog(parent), markDataType(dataType)
 {
     initData();
     initUI();
@@ -67,11 +71,22 @@ void SelectMarkClassWindow::slotOk()
 void SelectMarkClassWindow::initData()
 {
     classList.clear();
-    QMap<QString, QString> markClassData = ManualParamterConfig::getMarkClass();
-    for(QMap<QString, QString>::const_iterator classIterator = markClassData.constBegin();
-        classIterator != markClassData.constEnd(); ++classIterator)
+    switch(markDataType)
     {
-        classList.append(classIterator.key());
+    case MarkDataType::IMAGE:
+    case MarkDataType::VIDEO:
+    case MarkDataType::SEGMENT:
+    {
+        QMap<QString, QString> markClassData = ManualParamterConfig::getMarkClass();
+        for(QMap<QString, QString>::const_iterator classIterator = markClassData.constBegin();
+            classIterator != markClassData.constEnd(); ++classIterator)
+        {
+            classList.append(classIterator.key());
+        }
+        break;
+    }
+    default:
+        break;
     }
 }
 

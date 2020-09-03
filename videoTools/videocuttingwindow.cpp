@@ -14,7 +14,7 @@
 #include <QMenu>
 
 #include "helpers/dirprocess.h"
-#include "videoparameterwindow.h"
+#include "paramWindow/videoparameterwindow.h"
 
 VideoCuttingWindow::VideoCuttingWindow(QWidget *parent) : QWidget(parent)
 {

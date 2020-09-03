@@ -21,20 +21,10 @@
 #include "helpers/recordhistorydata.h"
 #include "saveMarkData/xmlprocess.h"
 #include "saveMarkData/jsonprocessvideo.h"
-#include "saveMarkData/segmentimagesave.h"
 #include "utilityGUI/customWindow/wexpand.h"
 #include "utilityGUI/customWindow/customanimation.h"
 #include "utilityGUI/customWindow/mystackedwidget.h"
-
-typedef enum MarkDataType{
-    UNKNOWN = 0,
-    IMAGE = 1,
-    VIDEO = 2,
-    SEGMENT = 3,
-    PCD = 4,
-    MAX_CONUT
-}MarkDataType;
-
+#include "dataType/mark_data_type.h"
 
 class ControlWindow : public QWidget
 {
@@ -48,15 +38,23 @@ public:
     virtual void saveMarkDataList();
     virtual void setDrawShape(int shapeId);
 
+    virtual void readClassConfig();
+    virtual void saveClassConfig();
+
 public slots:
     void slotManualMarkParamterChanged();
     void slotShowFull();
+    void slotIsMark();
+    void slotReset();
 
 protected:
     void resizeEvent(QResizeEvent *e);
     void contextMenuEvent (QContextMenuEvent * event);
 
 protected:
+
+    virtual void resetDraw();
+    virtual void isMarkData();
 
     void updateIsMarkButton(bool isValue);
     void updateListBox();
@@ -73,7 +71,6 @@ protected:
     void updateExpandLeft();
     void updateExpandRight();
 
-    void readClassConfig(const QString &markDataDir);
     void readMarkHistory();
     void writeMarkHistory();
 
@@ -86,6 +83,7 @@ protected:
     QComboBox *classBox;
     QPushButton *showFullButton;
     QPushButton *isMarkButton;
+    QPushButton *resetButton;
     QLabel *markProcessLabel;
 
     MyStackedWidget *drawMarkDataWidget;
@@ -114,9 +112,9 @@ protected:
     QImage currentImage;
     int currentIndex;
 
-    JSONProcessVideo jsonProcess;
+    JSONProcessVideo jsonProcessVideo;
+    JSONProcess jsonProcess;
     XMLProcess xmlProcess;
-    SegmentImageSave segmentImageProcess;
 
     RecordHistoryData historyProcess;
 };

@@ -7,7 +7,7 @@ class DrawRectShape : public DrawShape
 {
     Q_OBJECT
 public:
-    DrawRectShape(QObject *parent = 0);
+    DrawRectShape(MarkDataType dataType, QObject *parent = 0);
     ~DrawRectShape();
 
     void initDraw();
@@ -15,11 +15,11 @@ public:
     //rect
     int drawMousePress(const QPoint point, bool &isDraw);
     int drawMouseMove(const QPoint point, bool &isDraw);
-    int drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw);
+    int drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw);
     void removeShape(bool &isDraw);
     bool isInShape(const QPoint &point);
 
-    void drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter);
+    void drawPixmap(const ShapeType shapeID, QPainter &painter);
 
     void setObjectList(QList<MyObject> list);
     void getObjectList(QList<MyObject> &list);

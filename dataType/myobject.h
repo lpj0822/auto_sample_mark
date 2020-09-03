@@ -6,6 +6,7 @@
 #include <QList>
 #include <QPolygon>
 #include <QImage>
+#include "myrect3d.h"
 #include "drawShape/myshape.h"
 
 class MyObject
@@ -20,6 +21,9 @@ public:
     void setBox(QRect box);
     QRect getBox() const;
 
+    void setBox3D(MyRect3D box);
+    MyRect3D getBox3D() const;
+
     void setLine(QPoint startPoint, QPoint stopPoint);
     QList<QPoint> getLine() const;
 
@@ -32,6 +36,9 @@ public:
     void setObjectClass(QString objectClass);
     QString getObjectClass() const;
 
+    void setLineWidth(const int width);
+    int getLineWidth() const;
+
     void setIsDifficult(bool flag);
     bool getIsDifficult() const;
 
@@ -41,6 +48,9 @@ public:
     void setIsTrackingObject(bool flag);
     bool getIsTrackingObject() const;
 
+    void setMask(QPolygon mask);
+    QPolygon getMask() const;
+
     void setSegmentImage(const QImage &image);
     QImage getSegmentImage() const;
 
@@ -48,10 +58,13 @@ private:
     int objectFlag;
     bool isDifficult;
     bool isTrackingObject;
+    int lineWidth;
+    MyRect3D box3D;
     QRect box;
     QList<QPoint> line;
     QList<QPoint> pointList;
     QPolygon polygon;
+    QPolygon mask;
     QImage maskImage;
     QString obejctClass;
     ShapeType shapeType;

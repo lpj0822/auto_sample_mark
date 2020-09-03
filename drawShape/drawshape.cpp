@@ -1,8 +1,20 @@
 #include "drawshape.h"
 
-DrawShape::DrawShape(QObject *parent) : QObject(parent)
+DrawShape::DrawShape(MarkDataType dataType, QObject *parent) :
+    QObject(parent), markDataType(dataType)
 {
 
+}
+
+int DrawShape::drawMouseDoubleClick(QWidget *parent, const QPoint point, bool &isDraw)
+{
+    isDraw = false;
+    return 0;
+}
+
+void DrawShape::cancelDrawShape(bool &isDraw)
+{
+    isDraw = false;
 }
 
 int DrawShape::getObjectSize()
@@ -10,12 +22,12 @@ int DrawShape::getObjectSize()
     return 0;
 }
 
-void DrawShape::setSegmentImage(const MyObject &object)
+void DrawShape::createImageMask(QImage &maskImage)
 {
 
 }
 
-MyObject DrawShape::getSegmentImage()
+void DrawShape::setVisibleSampleClass(const QString &sampleClass)
 {
-    return MyObject();
+    this->visibleSampleClass = sampleClass;
 }

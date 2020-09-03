@@ -10,7 +10,7 @@
 #include "helpers/videoprocess.h"
 #include "saveMarkData/xmlprocess.h"
 #include "deepLearning/ssdector.h"
-#include "myobject.h"
+#include "dataType/myobject.h"
 
 class AutoSampleMarkThread : public QThread
 {

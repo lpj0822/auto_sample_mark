@@ -33,6 +33,7 @@ private:
     QAction *editAction;
     QAction *deleteAction;
     QAction *refreshAction;
+    bool isAddEnd;
 
 private:
     void createActions();

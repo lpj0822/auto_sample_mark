@@ -1,51 +1,56 @@
 ﻿#ifndef SEGMENTLABEL_H
 #define SEGMENTLABEL_H
 
-#include <QLabel>
-#include <QPainter>
-#include <QMouseEvent>
-#include <QFileDialog>
-#include <QDateTime>
-#include <QToolButton>
-#include <QPoint>
-#include <QList>
-#include <QAction>
-#include <QWheelEvent>
-#include <QList>
-#include "drawShape/drawshape.h"
+#include "drawWidget/imagedrawlabel.h"
 
-class SegmentLabel : public QLabel
+#include <QList>
+#include <QCursor>
+
+#include "drawShape/drawpolygonshape.h"
+#include "drawShape/drawlaneshape.h"
+
+class SegmentLabel : public ImageDrawLabel
 {
 public:
     SegmentLabel(QWidget *parent = 0);
     ~SegmentLabel();
 
-    void clearObjects();
-    void setNewQImage(QImage &image);
-    void setOjects(const MyObject &object, const QString &sampleClass);
-    QList<MyObject> getSegment();
+    void clearDraw() override;
+    void setNewQImage(QImage &image) override;
+    void setDrawShape(int shapeID) override;
+    void resetDraw() override;
+
+    void setMaskOject(const MyObject &mask) override;
 
 public slots:
 
 protected:
-    void wheelEvent(QWheelEvent * event);
-    void paintEvent(QPaintEvent *e);
+    void mouseMoveEvent(QMouseEvent *e) override;
+    void mousePressEvent(QMouseEvent *e) override;
+    void mouseReleaseEvent(QMouseEvent *e) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent * event) override;
+
+    void paintEvent(QPaintEvent *e) override;
+
+    void contextMenuEvent(QContextMenuEvent * event) override;
+
+    void setDrawShapeObjects() override;
+    void drawPixmap() override;
 
 private:
 
-    void drawPixmap();
+    void drawSegmentMask(QPainter &painter);
+
+    QPointF offsetToCenter();
+    QPoint scalePoint(const QPoint point);
 
     void initData();
-    void initConnect();
 
 private:
-
-    QPixmap mp;
-    QPixmap tempPixmap;
-
     float scale;
     QImage *maskImage;
-    QString sampleClass;
+    QCursor myDrawCursor;
 };
 
 #endif // SEGMENTLABEL_H

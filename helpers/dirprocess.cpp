@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "dirprocess.h"
 #include <QDir>
 #include <QImage>
@@ -31,7 +33,8 @@ QList<QString> DirProcess::getDirFileName(const QString& pathDir)
         for(int loop = 0 ; loop < fileList.size(); loop++)
         {
             //qDebug()<<fileList.at(loop).absoluteFilePath();
-            if((!fileList.at(loop).isHidden()) && (!fileList.at(loop).fileName().startsWith(".")))
+            if((!fileList.at(loop).isHidden()) && (!fileList.at(loop).fileName().startsWith("."))
+                    && !fileList.at(loop).isDir())
             {
                 allFileName.append(fileList.at(loop).absoluteFilePath().trimmed());
             }

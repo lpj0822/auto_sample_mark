@@ -1,10 +1,12 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "drawrectshape.h"
 #include <QMessageBox>
 #include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
-DrawRectShape::DrawRectShape(QObject *parent) : DrawShape(parent)
+DrawRectShape::DrawRectShape(MarkDataType dataType, QObject *parent) : DrawShape(dataType, parent)
 {
     initDraw();
 }
@@ -85,7 +87,7 @@ int DrawRectShape::drawMouseMove(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawRectShape::drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
+int DrawRectShape::drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw)
 {
     if(drawMousePressed)
     {
@@ -99,9 +101,9 @@ int DrawRectShape::drawMouseRelease(QWidget *parent, const QPoint point, const Q
         if(currentRect.width() >= ManualParamterConfig::getMinWidth()
                 && currentRect.height() >= ManualParamterConfig::getMinHeight())
         {
-            SelectMarkClassWindow *window = new SelectMarkClassWindow();
+            SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
             window->setModal(true);
-            window->setObjectRect(sampleClass);
+            window->setObjectRect(this->visibleSampleClass);
             int res = window->exec();
             if (res == QDialog::Accepted)
             {
@@ -170,7 +172,7 @@ bool DrawRectShape::isInShape(const QPoint &point)
     return isFind;
 }
 
-void DrawRectShape::drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter)
+void DrawRectShape::drawPixmap(const ShapeType shapeID, QPainter &painter)
 {
     QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
     QFont font("Decorative", 15);
@@ -179,7 +181,7 @@ void DrawRectShape::drawPixmap(const QString &sampleClass, const ShapeType shape
 
     bool isDraw = false;
     QRect currentRect;
-    QList<QPoint> points = getRectListPoints(sampleClass);
+    QList<QPoint> points = getRectListPoints(this->visibleSampleClass);
     getCurrentRect(currentRect, isDraw);
 
     for(int i = 0; i < this->listRect.size(); i++)
@@ -197,14 +199,14 @@ void DrawRectShape::drawPixmap(const QString &sampleClass, const ShapeType shape
             pen.setColor(drawColor);
             painter.setPen(pen);
         }
-        if(sampleClass == "All")
+        if(this->visibleSampleClass == "All")
         {
             painter.drawRect(this->listRect[i].getBox());
             painter.drawText(this->listRect[i].getBox().topLeft(), this->listRect[i].getObjectClass());
         }
         else
         {
-            if(this->listRect[i].getObjectClass().contains(sampleClass))
+            if(this->listRect[i].getObjectClass().contains(this->visibleSampleClass))
             {
                 painter.drawRect(this->listRect[i].getBox());
                 painter.drawText(this->listRect[i].getBox().topLeft(), this->listRect[i].getObjectClass());

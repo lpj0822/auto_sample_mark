@@ -12,12 +12,15 @@
 #include <QAction>
 #include <QComboBox>
 #include <QStackedWidget>
+#include "videoTools/segmentationlabelconvertwindow.h"
 #include "videoTools/fromvideotopicturewindow.h"
 #include "videoTools/frompicturetovideowindow.h"
 #include "videoTools/videocuttingwindow.h"
 #include "videoTools/videocroppingwindow.h"
 #include "videoTools/imageconverterwindow.h"
 #include "videoTools/qcamerawindow.h"
+#include "pcTools/pcdconverterwindow.h"
+#include "pcTools/pcdfilterwindow.h"
 #include "autoSampleMark/autosamplemarkwindow.h"
 #include "drawShape/myshape.h"
 #include "controlwindow.h"
@@ -44,17 +47,26 @@ public slots:
     void slotOpenPCDDir();
     //setting
     void slotManualMarkParamterConfig();
+    void slotSegmentMarkParamterConfig();
     void slotAutoMarkParamterConfig();
     void slotVideoMarkParamterConfig();
+
+    void slotPointCloudParamterConfig();
     //autoMark
     void slotAutoSampleMark();
     //tool
+    void slotSegLabelConvert();
+
     void slotVideoToPicture();
     void slotVideoFromPicture();
     void slotVideoCropping();
     void slotVideoCutting();
     void slotImageConverter();
     void slotCamera();
+
+    void slotPcdConverter();
+    void slotPcdFilter();
+
     //about
     void slotAbout();
     void slotUserManual();
@@ -78,17 +90,22 @@ private:
     QAction *exitAction;
     //setting
     QAction *manualParamterAction;
+    QAction *segmentParamterAction;
     QAction *autoParamterAction;
     QAction *videoMarkParamterAction;
+    QAction *pointcloudParamterAction;
     //autoMark
     QAction *autoMarkAction;
     //tool
+    QAction *segLabelConvertAction;
     QAction *videoToPictureAction;
     QAction *videoFromPictureAction;
     QAction *videoCuttingAction;
     QAction *videoCroppingAction;
     QAction *imageConverterAction;
     QAction *cameraAction;
+    QAction *pcdConverterAction;
+    QAction *pcdFilterAction;
     //about
     QAction *aboutAction;
     QAction *userManualAction;
@@ -116,6 +133,7 @@ private:
 private:
     AutoSampleMarkWindow *autoSampleMarkWindow;
 
+    SegmentationLabelConvertWindow *segLabelConvertWindow;
     FromVideoToPictureWindow *videoToPictureWindow;
     FromPictureToVideoWindow *videoFromPictureWindow;
     VideoCuttingWindow *videoCuttingWindow;
@@ -123,8 +141,11 @@ private:
     ImageConverterWindow *imageConverterWindow;
     QCameraWindow *cameraWindow;
 
+    PCDConverterWindow *pcdConverterWindow;
+    PCDFilterWindow *pcdFilterWindow;
+
     MarkDataType loadDataType;
-    MyShape myShape;
+    MyShape imgShape;
 
     QString openDataDir;
 
@@ -135,6 +156,10 @@ private:
     void initToolBar();
     void initUI();
     void initConnect();
+
+    void initImageMarkShape();
+    void initSegmentMarkShape();
+    void initPointCloudMarkShape();
 
 };
 

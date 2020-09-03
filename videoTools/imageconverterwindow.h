@@ -9,7 +9,7 @@
 #include <QLineEdit>
 #include <QList>
 #include <QCloseEvent>
-#include "imageconverterthread.h"
+#include "videoTools/imageconverterthread.h"
 
 class ImageConverterWindow : public QWidget
 {

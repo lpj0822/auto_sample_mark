@@ -1,7 +1,9 @@
 ﻿#pragma execution_character_set("utf-8")
 #include "pclcontrolwindow.h"
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QDebug>
+#include"sampleMarkParam/pointcloudparamterconfig.h"
 
 PCLControlWindow::PCLControlWindow(QWidget *parent)
     : ControlWindow(parent)
@@ -26,6 +28,7 @@ void PCLControlWindow::setMarkDataList(const QString markDataDir, const QList<QS
     if(markDataList.size() > 0)
     {
         this->processMarkDataList = markDataList;
+        readMarkHistory();
         updateListBox();
         isMarkButton->setEnabled(true);
     }
@@ -64,17 +67,17 @@ void PCLControlWindow::slotScrollArea(int keyValue)
 {
     if(processMarkDataList.size() > 0)
     {
-        if(keyValue == int(Qt::Key_A))
+        switch (keyValue)
         {
+        case Qt::Key_A:
             showPrevious();
-        }
-        else if(keyValue == int(Qt::Key_D))
-        {
+            break;
+        case Qt::Key_D:
             showNext();
-        }
-        else if(keyValue == int(Qt::Key_E))
-        {
+            break;
+        case Qt::Key_E:
             slotIsMark();
+            break;
         }
     }
     if(keyValue == int(Qt::Key_Escape))
@@ -92,17 +95,17 @@ void PCLControlWindow::keyPressEvent(QKeyEvent *e)
 {
     if(processMarkDataList.size() > 0)
     {
-        if(e->key() == Qt::Key_A)
+        switch (e->key())
         {
+        case Qt::Key_A:
             showPrevious();
-        }
-        else if(e->key() == Qt::Key_D)
-        {
+            break;
+        case Qt::Key_D:
             showNext();
-        }
-        else if(e->key() == Qt::Key_E)
-        {
+            break;
+        case Qt::Key_E:
             slotIsMark();
+            break;
         }
     }
 }
@@ -112,7 +115,7 @@ void PCLControlWindow::showPrevious()
     if(currentIndex > 0)
     {
         currentIndex--;
-        loadPointCloud();
+        loadMarkPointCloud();
     }
 }
 
@@ -121,23 +124,41 @@ void PCLControlWindow::showNext()
     if(currentIndex < processMarkDataList.size() - 1)
     {
         currentIndex++;
-        loadPointCloud();
+        loadMarkPointCloud();
     }
 }
 
-void PCLControlWindow::loadPointCloud()
+void PCLControlWindow::loadMarkPointCloud()
 {
-    currentPCDPath =  processMarkDataList[currentIndex];
-    loadPointCloudData(currentPCDPath);
+    if(this->markDataType == MarkDataType::PCD && processMarkDataList.size() > 0)
+    {
+        currentPCDPath =  processMarkDataList[currentIndex];
+        loadPointCloudData(currentPCDPath);
+    }
     updateListBox();
 }
 
 void PCLControlWindow::loadPointCloudData(const QString pcdFilePath)
 {
-    currentCloud->clear();
-    pcl::io::loadPCDFile(pcdFilePath.toStdString(), *currentCloud);
     drawPointCloud->clearPoints();
-    drawPointCloud->setNewPointCloud(currentCloud);
+    if(drawPointCloud->setNewPointCloud(pcdFilePath) != -1)
+    {
+        currentPCDPath = pcdFilePath;
+        QFileInfo pcdFileInfo(currentPCDPath);
+        QString saveAnnotationsDir = this->markDataDir + "/../" + "Annotations";
+        QString readJsonPath= saveAnnotationsDir + "/" + pcdFileInfo.completeBaseName() + ".json";
+        qDebug() << readJsonPath << endl;
+        QFileInfo jsonFileInfo(readJsonPath);
+        QList<MyObject> objects;
+        if(jsonFileInfo.exists() && jsonProcess.readJSON(readJsonPath, objects) == 0)
+        {
+            drawPointCloud->setOjects(objects, classBox->currentText());
+        }
+    }
+    else
+    {
+        QMessageBox::information(this, tr("加载pcd"), tr("加载pcd失败！"));
+    }
     updateListBox();
 }
 
@@ -152,7 +173,7 @@ void PCLControlWindow::initData()
 {
     initMarkData(".", MarkDataType::PCD);
     currentPCDPath = "";
-    currentCloud.reset(new pcl::PointCloud<pcl::PointXYZI>);
+    PointCloudParamterConfig::loadConfig();
 }
 
 void PCLControlWindow::initConnect()

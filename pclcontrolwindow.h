@@ -28,7 +28,7 @@ private:
     void showPrevious();
     void showNext();
 
-    void loadPointCloud();
+    void loadMarkPointCloud();
     void loadPointCloudData(const QString pcdFilePath);
 
     void initDrawWidget();
@@ -41,8 +41,6 @@ private:
 private:
 
     QString currentPCDPath;
-    pcl::PointCloud<pcl::PointXYZI>::Ptr currentCloud;
-
 };
 
 #endif // PCLCONTROLWINDOW_H

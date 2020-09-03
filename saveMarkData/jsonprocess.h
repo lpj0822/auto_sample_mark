@@ -7,7 +7,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
-#include "myobject.h"
+#include "dataType/myobject.h"
 
 class JSONProcess : public QObject
 {
@@ -35,6 +35,18 @@ protected:
 
     int writePolygonData(const QList<MyObject>& objects, QJsonObject &jsonData);
     int readPolygonData(const QJsonArray &value, QList<MyObject>& objects);
+
+    int writePolylineData(const QList<MyObject>& objects, QJsonObject &jsonData);
+    int readPolylineData(const QJsonArray &value, QList<MyObject>& objects);
+
+    int writeLaneData(const QList<MyObject>& objects, QJsonObject &jsonData);
+    int readLaneData(const QJsonArray &value, QList<MyObject>& objects);
+
+    int writeSegmentData(const QList<MyObject>& objects, QJsonObject &jsonData);
+    int readSegmentData(const QJsonArray &value, QList<MyObject>& objects);
+
+
+    int readRect3Ddata(const QJsonArray &value, QList<MyObject>& objects);
 
 };
 

@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "drawlineshape.h"
 #include <QMessageBox>
 #include <iostream>
@@ -6,7 +8,7 @@
 #include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
-DrawLineShape::DrawLineShape(QObject *parent) : DrawShape(parent)
+DrawLineShape::DrawLineShape(MarkDataType dataType, QObject *parent) : DrawShape(dataType, parent)
 {
     initDraw();
 }
@@ -84,7 +86,7 @@ int DrawLineShape::drawMouseMove(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawLineShape::drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
+int DrawLineShape::drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw)
 {
     if(drawMousePressed)
     {
@@ -92,9 +94,9 @@ int DrawLineShape::drawMouseRelease(QWidget *parent, const QPoint point, const Q
 
         if(diffPoint.manhattanLength() >= ManualParamterConfig::getMinWidth())
         {
-            SelectMarkClassWindow *window = new SelectMarkClassWindow();
+            SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
             window->setModal(true);
-            window->setObjectRect(sampleClass);
+            window->setObjectRect(this->visibleSampleClass);
             int res = window->exec();
             if (res == QDialog::Accepted)
             {
@@ -173,7 +175,7 @@ bool DrawLineShape::isInShape(const QPoint &point)
     return isFind;
 }
 
-void DrawLineShape::drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter)
+void DrawLineShape::drawPixmap(const ShapeType shapeID, QPainter &painter)
 {
     QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
     QFont font("Decorative", 15);
@@ -200,7 +202,7 @@ void DrawLineShape::drawPixmap(const QString &sampleClass, const ShapeType shape
             pen.setColor(drawColor);
             painter.setPen(pen);
         }
-        if(sampleClass == "All")
+        if(this->visibleSampleClass == "All")
         {
             painter.drawLine(line[0], line[1]);
             painter.drawText(line[0], this->listLine[i].getObjectClass());
@@ -215,7 +217,7 @@ void DrawLineShape::drawPixmap(const QString &sampleClass, const ShapeType shape
         }
         else
         {
-            if(this->listLine[i].getObjectClass().contains(sampleClass))
+            if(this->listLine[i].getObjectClass().contains(this->visibleSampleClass))
             {
                 painter.drawLine(line[0], line[1]);
                 painter.drawText(line[0], this->listLine[i].getObjectClass());

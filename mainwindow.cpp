@@ -1,13 +1,18 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "mainwindow.h"
 #include <QApplication>
 #include <QDesktopServices>
 #include <QMessageBox>
 #include <QDebug>
 #include "helpers/dirprocess.h"
-#include "manualparamterconfigwindow.h"
+#include "paramWindow/manualparamterconfigwindow.h"
+#include "paramWindow/videomarkparamterwindow.h"
+#include "paramWindow/segmentparamterconfigwindow.h"
 #include "autoSampleMark/autoparamterconfigwindow.h"
-#include "videomarkparamterwindow.h"
+#include "paramWindow/pointcloudmarkparamterwindow.h"
+#include "sampleMarkParam/pointcloudparamterconfig.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -20,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
 MainWindow::~MainWindow()
 {
+    markWindow[loadDataType]->saveClassConfig();
     centerWidget->deleteLater();
 }
 
@@ -35,9 +41,12 @@ void MainWindow::slotOpenImageDir()
     }
     else
     {
-        dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
+        initImageMarkShape();
+        processDataList = dirProcess.getDirFileName(this->openDataDir);
         markWindow[loadDataType]->saveMarkDataList();
+        markWindow[loadDataType]->saveClassConfig();
         loadDataType = MarkDataType::IMAGE;
+        markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
     }
@@ -55,9 +64,12 @@ void MainWindow::slotOpenVideoDir()
     }
     else
     {
-        dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
+        initImageMarkShape();
+        processDataList = dirProcess.getDirFileName(this->openDataDir);
         markWindow[loadDataType]->saveMarkDataList();
+        markWindow[loadDataType]->saveClassConfig();
         loadDataType = MarkDataType::VIDEO;
+        markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
     }
@@ -75,9 +87,12 @@ void MainWindow::slotOpenImageSegmentDir()
     }
     else
     {
-        dirProcess.getDirAllFileName(this->openDataDir, "*.*", processDataList);
+        initSegmentMarkShape();
+        processDataList = dirProcess.getDirFileName(this->openDataDir);
         markWindow[loadDataType]->saveMarkDataList();
+        markWindow[loadDataType]->saveClassConfig();
         loadDataType = MarkDataType::SEGMENT;
+        markWindow[loadDataType]->setDrawShape(this->shapeBox->currentData().toInt());
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
     }
@@ -95,8 +110,17 @@ void MainWindow::slotOpenPCDDir()
     }
     else
     {
-        dirProcess.getDirAllFileName(this->openDataDir, "*.pcd", processDataList);
+        initPointCloudMarkShape();
+        if(PointCloudParamterConfig::getFileType() == PointCloudFileType::PCD_FILE)
+        {
+            dirProcess.getDirAllFileName(this->openDataDir, "*.pcd", processDataList);
+        }
+        else if(PointCloudParamterConfig::getFileType() == PointCloudFileType::BIN_FILE)
+        {
+            dirProcess.getDirAllFileName(this->openDataDir, "*.bin", processDataList);
+        }
         markWindow[loadDataType]->saveMarkDataList();
+        markWindow[loadDataType]->saveClassConfig();
         loadDataType = MarkDataType::PCD;
         markWindow[loadDataType]->setMarkDataList(this->openDataDir, processDataList, loadDataType);
         centerWidget->setCurrentIndex(loadDataType);
@@ -113,8 +137,8 @@ void MainWindow::slotManualMarkParamterConfig()
     {
         emit signalManualMarkParamterChanged();
     }
-    delete manualMarkParamterWindow;
-    manualMarkParamterWindow = NULL;
+    manualMarkParamterWindow->deleteLater();;
+    manualMarkParamterWindow = nullptr;
 }
 
 void MainWindow::slotAutoMarkParamterConfig()
@@ -127,9 +151,10 @@ void MainWindow::slotAutoMarkParamterConfig()
     {
         ;
     }
-    delete window;
-    window = NULL;
+    window->deleteLater();
+    window = nullptr;
 }
+
 void MainWindow::slotVideoMarkParamterConfig()
 {
     int result = 0;
@@ -140,14 +165,41 @@ void MainWindow::slotVideoMarkParamterConfig()
     {
         ;
     }
-    delete window;
-    window = NULL;
+    window->deleteLater();
+    window = nullptr;
+}
 
+void MainWindow::slotSegmentMarkParamterConfig()
+{
+    int result = 0;
+    SegmentParamterConfigWindow *window = new SegmentParamterConfigWindow();
+    window->setModal(true);
+    result = window->exec();
+    if(result == QDialog::Accepted)
+    {
+        ;
+    }
+    window->deleteLater();
+    window = nullptr;
+}
+
+void MainWindow::slotPointCloudParamterConfig()
+{
+    int result = 0;
+    PointCloudMarkParamterWindow *window = new PointCloudMarkParamterWindow();
+    window->setModal(true);
+    result = window->exec();
+    if(result == QDialog::Accepted)
+    {
+        ;
+    }
+    window->deleteLater();
+    window = nullptr;
 }
 
 void MainWindow::slotAutoSampleMark()
 {
-    if(autoSampleMarkWindow == NULL)
+    if(autoSampleMarkWindow == nullptr)
     {
         autoSampleMarkWindow = new AutoSampleMarkWindow();
         connect(autoSampleMarkWindow, &AutoSampleMarkWindow::signalCloseAutoSampleMarkWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -156,9 +208,19 @@ void MainWindow::slotAutoSampleMark()
     autoSampleMarkWindow->initData();
 }
 
+void MainWindow::slotSegLabelConvert()
+{
+    if(segLabelConvertWindow == nullptr)
+    {
+        segLabelConvertWindow = new SegmentationLabelConvertWindow();
+        connect(segLabelConvertWindow, &SegmentationLabelConvertWindow::signalCloseSegLabelConverterWindow, this, &MainWindow::slotCloseOtherWindow);
+    }
+    segLabelConvertWindow->show();
+}
+
 void MainWindow::slotVideoToPicture()
 {
-    if(videoToPictureWindow == NULL)
+    if(videoToPictureWindow == nullptr)
     {
         videoToPictureWindow = new FromVideoToPictureWindow();
         connect(videoToPictureWindow, &FromVideoToPictureWindow::signalCloseVideoToPictureWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -168,7 +230,7 @@ void MainWindow::slotVideoToPicture()
 
 void MainWindow::slotVideoFromPicture()
 {
-    if(videoFromPictureWindow == NULL)
+    if(videoFromPictureWindow == nullptr)
     {
         videoFromPictureWindow = new FromPictureToVideoWindow();
         connect(videoFromPictureWindow, &FromPictureToVideoWindow::signalCloseVideoFromPictureWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -178,7 +240,7 @@ void MainWindow::slotVideoFromPicture()
 
 void MainWindow::slotVideoCropping()
 {
-    if(videoCroppingWindow == NULL)
+    if(videoCroppingWindow == nullptr)
     {
         videoCroppingWindow = new VideoCroppingWindow();
         connect(videoCroppingWindow, &VideoCroppingWindow::signalCloseVideoCroppingWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -188,7 +250,7 @@ void MainWindow::slotVideoCropping()
 
 void MainWindow::slotVideoCutting()
 {
-    if(videoCuttingWindow == NULL)
+    if(videoCuttingWindow == nullptr)
     {
         videoCuttingWindow = new VideoCuttingWindow();
         connect(videoCuttingWindow, &VideoCuttingWindow::signalCloseVideoCuttingWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -198,7 +260,7 @@ void MainWindow::slotVideoCutting()
 
 void MainWindow::slotImageConverter()
 {
-    if(imageConverterWindow == NULL)
+    if(imageConverterWindow == nullptr)
     {
         imageConverterWindow = new ImageConverterWindow();
         connect(imageConverterWindow, &ImageConverterWindow::signalCloseImageConverterWindow, this, &MainWindow::slotCloseOtherWindow);
@@ -208,12 +270,32 @@ void MainWindow::slotImageConverter()
 
 void MainWindow::slotCamera()
 {
-    if(cameraWindow == NULL)
+    if(cameraWindow == nullptr)
     {
         cameraWindow = new QCameraWindow();
         connect(cameraWindow, &QCameraWindow::signalCloseCameraWindow, this, &MainWindow::slotCloseOtherWindow);
     }
     cameraWindow->show();
+}
+
+void MainWindow::slotPcdConverter()
+{
+    if(pcdConverterWindow == nullptr)
+    {
+        pcdConverterWindow = new PCDConverterWindow();
+        connect(pcdConverterWindow, &PCDConverterWindow::signalClosePCDConverterWindow, this, &MainWindow::slotCloseOtherWindow);
+    }
+    pcdConverterWindow->show();
+}
+
+void MainWindow::slotPcdFilter()
+{
+    if(pcdFilterWindow == nullptr)
+    {
+        pcdFilterWindow = new PCDFilterWindow();
+        connect(pcdFilterWindow, &PCDFilterWindow::signalClosePCDFilterWindow, this, &MainWindow::slotCloseOtherWindow);
+    }
+    pcdFilterWindow->show();
 }
 
 void MainWindow::slotAbout()
@@ -238,6 +320,7 @@ void MainWindow::slotSelectMarkShape(const QString &text)
         markWindow[MarkDataType::VIDEO]->setDrawShape(index);
         break;
     case MarkDataType::SEGMENT:
+        markWindow[MarkDataType::SEGMENT]->setDrawShape(index);
         break;
     case MarkDataType::PCD:
         break;
@@ -253,64 +336,88 @@ void MainWindow::slotCloseOtherWindow(QString flag)
     if(flag.contains("mark"))
     {
         disconnect(autoSampleMarkWindow, &AutoSampleMarkWindow::signalCloseAutoSampleMarkWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete autoSampleMarkWindow;
-        autoSampleMarkWindow = NULL;
+        autoSampleMarkWindow->deleteLater();;
+        autoSampleMarkWindow = nullptr;
+    }
+    else if(flag.contains("segLabelConverter"))
+    {
+        disconnect(segLabelConvertWindow, &SegmentationLabelConvertWindow::signalCloseSegLabelConverterWindow, this, &MainWindow::slotCloseOtherWindow);
+        segLabelConvertWindow->deleteLater();
+        segLabelConvertWindow = nullptr;
     }
     else if(flag.contains("videoToPicture"))
     {
         disconnect(videoToPictureWindow, &FromVideoToPictureWindow::signalCloseVideoToPictureWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete videoToPictureWindow;
-        videoToPictureWindow = NULL;
+        videoToPictureWindow->deleteLater();
+        videoToPictureWindow = nullptr;
     }
     else if(flag.contains("videoFromPicture"))
     {
         disconnect(videoFromPictureWindow, &FromPictureToVideoWindow::signalCloseVideoFromPictureWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete videoFromPictureWindow;
-        videoFromPictureWindow = NULL;
+        videoFromPictureWindow->deleteLater();
+        videoFromPictureWindow = nullptr;
     }
     else if(flag.contains("videoCropping"))
     {
         disconnect(videoCroppingWindow, &VideoCroppingWindow::signalCloseVideoCroppingWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete videoCroppingWindow;
-        videoCroppingWindow = NULL;
+        videoCroppingWindow->deleteLater();
+        videoCroppingWindow = nullptr;
     }
     else if(flag.contains("videoCutting"))
     {
         disconnect(videoCuttingWindow, &VideoCuttingWindow::signalCloseVideoCuttingWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete videoCuttingWindow;
-        videoCuttingWindow = NULL;
+        videoCuttingWindow->deleteLater();
+        videoCuttingWindow = nullptr;
     }
     else if(flag.contains("imageConverter"))
     {
         disconnect(imageConverterWindow, &ImageConverterWindow::signalCloseImageConverterWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete imageConverterWindow;
-        imageConverterWindow =NULL;
+        imageConverterWindow->deleteLater();
+        imageConverterWindow = nullptr;
     }
     else if(flag.contains("camera"))
     {
         disconnect(cameraWindow, &QCameraWindow::signalCloseCameraWindow, this, &MainWindow::slotCloseOtherWindow);
-        delete cameraWindow;
-        cameraWindow = NULL;
+        cameraWindow->deleteLater();
+        cameraWindow = nullptr;
+    }
+    else if(flag.contains("pcdConverter"))
+    {
+        disconnect(pcdConverterWindow, &PCDConverterWindow::signalClosePCDConverterWindow, this, &MainWindow::slotCloseOtherWindow);
+        pcdConverterWindow->deleteLater();
+        pcdConverterWindow = nullptr;
+    }
+    else if(flag.contains("pcdFilter"))
+    {
+        disconnect(pcdFilterWindow, &PCDFilterWindow::signalClosePCDFilterWindow, this, &MainWindow::slotCloseOtherWindow);
+        pcdFilterWindow->deleteLater();
+        pcdFilterWindow = nullptr;
     }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if(autoSampleMarkWindow != NULL)
+    if(autoSampleMarkWindow != nullptr)
         autoSampleMarkWindow->close();
-    if(videoToPictureWindow != NULL)
+    if(segLabelConvertWindow != nullptr)
+        segLabelConvertWindow->close();
+    if(videoToPictureWindow != nullptr)
         videoToPictureWindow->close();
-    if(videoFromPictureWindow != NULL)
+    if(videoFromPictureWindow != nullptr)
         videoFromPictureWindow->close();
-    if(videoCroppingWindow != NULL)
+    if(videoCroppingWindow != nullptr)
         videoCroppingWindow->close();
-    if(videoCuttingWindow != NULL)
+    if(videoCuttingWindow != nullptr)
         videoCuttingWindow->close();
-    if(imageConverterWindow != NULL)
+    if(imageConverterWindow != nullptr)
         imageConverterWindow->close();
-    if(cameraWindow != NULL)
+    if(cameraWindow != nullptr)
         cameraWindow->close();
-    if(centerWidget != NULL)
+    if(pcdConverterWindow != nullptr)
+        pcdConverterWindow->close();
+    if(pcdFilterWindow != nullptr)
+        pcdFilterWindow->close();
+    if(centerWidget != nullptr)
     {
         centerWidget->currentWidget()->close();
         centerWidget->close();
@@ -320,13 +427,18 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::initData()
 {
-    autoSampleMarkWindow = NULL;
-    videoToPictureWindow = NULL;
-    videoFromPictureWindow = NULL;
-    videoCuttingWindow = NULL;
-    videoCroppingWindow = NULL;
-    imageConverterWindow = NULL;
-    cameraWindow = NULL;
+    autoSampleMarkWindow = nullptr;
+    segLabelConvertWindow = nullptr;
+    videoToPictureWindow = nullptr;
+    videoFromPictureWindow = nullptr;
+    videoCuttingWindow = nullptr;
+    videoCroppingWindow = nullptr;
+    imageConverterWindow = nullptr;
+    cameraWindow = nullptr;
+
+    pcdConverterWindow = nullptr;
+    pcdFilterWindow = nullptr;
+
     openDataDir = ".";
     loadDataType = MarkDataType::UNKNOWN;
 }
@@ -345,12 +457,16 @@ void MainWindow::initAction()
     exitAction = new QAction(tr("退出系统"), this);
     //setting
     manualParamterAction = new QAction(tr("手动标注参数设置"), this);
+    segmentParamterAction = new QAction(tr("分割标注参数设置"), this);
     autoParamterAction = new QAction(tr("自动标注参数设置"), this);
     videoMarkParamterAction = new QAction(tr("视频标注参数设置"), this);
+    pointcloudParamterAction = new QAction(tr("点云标注参数设置"));
     //autoMark
     autoMarkAction = new QAction(tr("自动化样本标注"), this);
     autoMarkAction->setIcon(QIcon(tr(":/images/images/mark.png")));
     //tool
+    segLabelConvertAction = new QAction(tr("分割图生成"), this);
+    segLabelConvertAction->setIcon(QIcon(tr(":/images/images/seg.png")));
     videoToPictureAction = new QAction(tr("视频转换为图片"), this);
     videoToPictureAction->setIcon(QIcon(tr(":/images/images/cut.png")));
     videoFromPictureAction = new QAction(tr("图片转换为视频"), this);
@@ -363,20 +479,23 @@ void MainWindow::initAction()
     imageConverterAction->setIcon(QIcon(tr(":/images/images/play.png")));
     cameraAction = new QAction(tr("视频采集"), this);
     cameraAction->setIcon(QIcon(tr(":/images/images/record.png")));
+
+    pcdConverterAction = new QAction(tr("PCD格式转换"), this);
+    pcdConverterAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
+
+    pcdFilterAction = new QAction(tr("PCD文件过滤"), this);
+    pcdFilterAction->setIcon(QIcon(tr(":/images/images/pcl.png")));
+
     //about
     aboutAction = new QAction(tr("关于"), this);
     userManualAction = new QAction(tr("系统说明"), this);
 
     //shapeTool
-    QMap<int, QString> shapeDatas = myShape.getAllShape();
+
     shapeWidget = new QWidget(this);
     shapeLabel = new QLabel(tr("选择标注形状"));
     shapeBox = new QComboBox();
-    for(QMap<int, QString>::const_iterator iter = shapeDatas.constBegin();
-        iter != shapeDatas.constEnd(); ++iter)
-    {
-        shapeBox->addItem(iter.value(), iter.key());
-    }
+    shapeBox->clear();
     QHBoxLayout *shapLayout = new QHBoxLayout();
     shapLayout->setSpacing(10);
     shapLayout->addWidget(shapeLabel);
@@ -399,19 +518,28 @@ void MainWindow::initMenuBar()
     //setting
     settingMenu = new QMenu(tr("设置"), this);
     settingMenu->addAction(manualParamterAction);
-    settingMenu->addAction(autoParamterAction);
+    settingMenu->addAction(segmentParamterAction);
     settingMenu->addAction(videoMarkParamterAction);
+    settingMenu->addSeparator();
+    settingMenu->addAction(autoParamterAction);
+    settingMenu->addSeparator();
+    settingMenu->addAction(pointcloudParamterAction);
     //autoMark
     autoMarkMenu = new QMenu(tr("自动化标注"), this);
     autoMarkMenu->addAction(autoMarkAction);
     //tool
     toolMenu = new QMenu(tr("工具"), this);
+    toolMenu->addAction(segLabelConvertAction);
+    toolMenu->addSeparator();
     toolMenu->addAction(videoToPictureAction);
     toolMenu->addAction(videoFromPictureAction);
     toolMenu->addAction(videoCuttingAction);
     toolMenu->addAction(videoCroppingAction);
     toolMenu->addAction(imageConverterAction);
     toolMenu->addAction(cameraAction);
+    toolMenu->addSeparator();
+    toolMenu->addAction(pcdConverterAction);
+    toolMenu->addAction(pcdFilterAction);
     //about
     aboutMenu = new QMenu(tr("关于"), this);
     aboutMenu->addAction(aboutAction);
@@ -461,7 +589,6 @@ void MainWindow::initUI()
 
    for(int loop = 0; loop < markWindow.size(); loop++)
    {
-       markWindow[loop]->setDrawShape(this->shapeBox->currentData().toInt());
        centerWidget->addWidget(markWindow[loop]);
    }
    centerWidget->setCurrentIndex(loadDataType);
@@ -482,17 +609,25 @@ void MainWindow::initConnect()
     connect(exitAction, &QAction::triggered, this, &MainWindow::close);
     //setting
     connect(manualParamterAction, &QAction::triggered, this, &MainWindow::slotManualMarkParamterConfig);
+    connect(segmentParamterAction, &QAction::triggered, this, &MainWindow::slotSegmentMarkParamterConfig);
     connect(autoParamterAction, &QAction::triggered, this, &MainWindow::slotAutoMarkParamterConfig);
     connect(videoMarkParamterAction, &QAction::triggered, this, &MainWindow::slotVideoMarkParamterConfig);
+    connect(pointcloudParamterAction, &QAction::triggered, this, &MainWindow::slotPointCloudParamterConfig);
     //autoMark
     connect(autoMarkAction, &QAction::triggered, this, &MainWindow::slotAutoSampleMark);
     //tool
+    connect(segLabelConvertAction, &QAction::triggered, this, &MainWindow::slotSegLabelConvert);
+
     connect(videoToPictureAction, &QAction::triggered, this, &MainWindow::slotVideoToPicture);
     connect(videoFromPictureAction, &QAction::triggered, this, &MainWindow::slotVideoFromPicture);
     connect(videoCuttingAction, &QAction::triggered, this, &MainWindow::slotVideoCutting);
     connect(videoCroppingAction, &QAction::triggered, this, &MainWindow::slotVideoCropping);
     connect(imageConverterAction, &QAction::triggered, this, &MainWindow::slotImageConverter);
     connect(cameraAction, &QAction::triggered, this, &MainWindow::slotCamera);
+
+    connect(pcdConverterAction, &QAction::triggered, this, &MainWindow::slotPcdConverter);
+    connect(pcdFilterAction, &QAction::triggered, this, &MainWindow::slotPcdFilter);
+
     //about
     connect(aboutAction, &QAction::triggered, this, &MainWindow::slotAbout);
     connect(userManualAction, &QAction::triggered, this, &MainWindow::slotUserManual);
@@ -503,4 +638,31 @@ void MainWindow::initConnect()
     {
         connect(this, &MainWindow::signalManualMarkParamterChanged, markWindow[loop], &ControlWindow::slotManualMarkParamterChanged);
     }
+}
+
+void MainWindow::initImageMarkShape()
+{
+    QMap<int, QString> shapeDatas = imgShape.getImageShape();
+    shapeBox->clear();
+    for(QMap<int, QString>::const_iterator iter = shapeDatas.constBegin();
+        iter != shapeDatas.constEnd(); ++iter)
+    {
+        shapeBox->addItem(iter.value(), iter.key());
+    }
+}
+
+void MainWindow::initSegmentMarkShape()
+{
+    QMap<int, QString> shapeDatas = imgShape.getSegmentShape();
+    shapeBox->clear();
+    for(QMap<int, QString>::const_iterator iter = shapeDatas.constBegin();
+        iter != shapeDatas.constEnd(); ++iter)
+    {
+        shapeBox->addItem(iter.value(), iter.key());
+    }
+}
+
+void MainWindow::initPointCloudMarkShape()
+{
+    shapeBox->clear();
 }

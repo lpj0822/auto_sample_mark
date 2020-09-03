@@ -28,9 +28,14 @@ public:
     static QMap<QString, QString> getMarkClass();
     static QString getMarkClassColor(QString className);
 
-    static int loadClassConfig(const QString &classPath);
     static int loadConfig();
     static int saveConfig();
+
+    static int loadDetClassConfig(const QString &classPath);
+    static int saveDetClassConfig(const QString &classPath);
+
+    static int loadSegClassConfig(const QString &classPath);
+    static int saveSegClassConfig(const QString &classPath);
 
 private:
 

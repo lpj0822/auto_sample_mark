@@ -13,7 +13,7 @@
 #include <QIcon>
 #include <QMenu>
 
-#include "videoparameterwindow.h"
+#include "paramWindow/videoparameterwindow.h"
 
 FromVideoToPictureWindow::FromVideoToPictureWindow(QWidget *parent) : QWidget(parent)
 {

@@ -1,10 +1,13 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "drawpolygonshape.h"
 #include <QMessageBox>
 #include "sampleMarkParam/manualparamterconfig.h"
 #include "selectmarkclasswindow.h"
 
-DrawPolygonShape::DrawPolygonShape(QObject *parent) : DrawShape(parent)
+DrawPolygonShape::DrawPolygonShape(MarkDataType dataType, bool isSegment, QObject *parent) :
+    DrawShape(dataType, parent), isSegment(isSegment)
 {
     initDraw();
 }
@@ -86,7 +89,7 @@ int DrawPolygonShape::drawMouseMove(const QPoint point, bool &isDraw)
     return mouseChange;
 }
 
-int DrawPolygonShape::drawMouseRelease(QWidget *parent, const QPoint point, const QString sampleClass, bool &isDraw)
+int DrawPolygonShape::drawMouseRelease(QWidget *parent, const QPoint point, bool &isDraw)
 {
     if(finishDrawPolygon)
     {
@@ -96,14 +99,21 @@ int DrawPolygonShape::drawMouseRelease(QWidget *parent, const QPoint point, cons
             int minArea = ManualParamterConfig::getMinWidth() * ManualParamterConfig::getMinHeight();
             if(area >= minArea)
             {
-                SelectMarkClassWindow *window = new SelectMarkClassWindow();
+                SelectMarkClassWindow *window = new SelectMarkClassWindow(this->markDataType);
                 window->setModal(true);
-                window->setObjectRect(sampleClass);
+                window->setObjectRect(this->visibleSampleClass);
                 int res = window->exec();
                 if (res == QDialog::Accepted)
                 {
                     MyObject object;
-                    object.setShapeType(ShapeType::POLYGON_SHAPE);
+                    if(this->markDataType == MarkDataType::SEGMENT)
+                    {
+                        object.setShapeType(ShapeType::POLYGON_SEGMENT_SHAPE);
+                    }
+                    else
+                    {
+                        object.setShapeType(ShapeType::POLYGON_SHAPE);
+                    }
                     object.setPolygon(currentPolygon);
                     object.setObjectClass(window->getObjectClass());
                     object.setIsDifficult(window->getIsDifficult());
@@ -185,9 +195,24 @@ bool DrawPolygonShape::isInShape(const QPoint &point)
     return isFind;
 }
 
-void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType shapeID, QPainter &painter)
+void DrawPolygonShape::cancelDrawShape(bool &isDraw)
 {
-    QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
+    isDraw = false;
+    if(this->currentPolygon.count() > 0)
+    {
+        this->currentPolygon.pop_back();
+        isDraw = true;
+    }
+}
+
+void DrawPolygonShape::drawPixmap(const ShapeType shapeID, QPainter &painter)
+{
+    int drawLineWidth = 2;
+    if(isSegment)
+    {
+        drawLineWidth = 1;
+    }
+    QPen pen(QColor("#3CFF55"), drawLineWidth ,Qt::DashLine);
     QFont font("Decorative", 15);
     painter.setPen(pen);
     painter.setFont(font);
@@ -211,7 +236,7 @@ void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType sh
             pen.setColor(drawColor);
             painter.setPen(pen);
         }
-        if(sampleClass == "All")
+        if(this->visibleSampleClass == "All")
         {
             QPolygon drawpoints = this->listPolygon[i].getPolygon();
             drawpoints.append(drawpoints.at(0));
@@ -228,7 +253,7 @@ void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType sh
         }
         else
         {
-            if(this->listPolygon[i].getObjectClass().contains(sampleClass))
+            if(this->listPolygon[i].getObjectClass().contains(this->visibleSampleClass))
             {
                 QPolygon drawpoints = this->listPolygon[i].getPolygon();
                 drawpoints.append(drawpoints.at(0));
@@ -254,8 +279,9 @@ void DrawPolygonShape::drawPixmap(const QString &sampleClass, const ShapeType sh
             {
                 painter.drawEllipse(var, 2, 2);
             }
-
-            QPen pen(QColor("#3CFF55"), 2 ,Qt::DashLine);
+            painter.setBrush(QColor("#000000"));
+            painter.drawEllipse(firstPoint, 4, 4);
+            QPen pen(QColor("#3CFF55"), drawLineWidth ,Qt::DashLine);
             painter.setPen(pen);
             painter.drawPolyline(QPolygonF(currentPolygon));
         }
@@ -271,6 +297,19 @@ void DrawPolygonShape::setObjectList(QList<MyObject> list)
 void DrawPolygonShape::getObjectList(QList<MyObject> &list)
 {
     list = this->listPolygon;
+}
+
+int DrawPolygonShape::getObjectSize()
+{
+    return this->listPolygon.count();
+}
+
+void DrawPolygonShape::createImageMask(QImage &maskImage)
+{
+    for(int i=0; i< this->listPolygon.count(); i++)
+    {
+        drawImageMask.drawPolygonMaskImage(this->listPolygon[i], this->visibleSampleClass, maskImage);
+    }
 }
 
 QPolygon DrawPolygonShape::getCurrentPolygon(bool &isDraw)

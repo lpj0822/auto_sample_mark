@@ -1,4 +1,4 @@
-T#-------------------------------------------------
+#-------------------------------------------------
 #
 # Project created by QtCreator 2017-05-08T12:15:54
 #
@@ -11,7 +11,7 @@ CONFIG   += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = SampleMark
+TARGET = EasyAiSampleMark
 TEMPLATE = app
 
 include(helpers/helpers.pri)
@@ -23,8 +23,6 @@ include(multipletracking/multipletracking.pri)
 
 SOURCES += main.cpp\
         controlwindow.cpp \
-    videoparameterwindow.cpp \
-    manualparamterconfigwindow.cpp \
     markclasswindow.cpp \
     mainwindow.cpp \
     selectmarkclasswindow.cpp \
@@ -38,8 +36,6 @@ SOURCES += main.cpp\
     videoTools/frompicturetovideowindow.cpp \
     autoSampleMark/modellabelwindow.cpp \
     autoSampleMark/autoparamterconfigwindow.cpp \
-    videomarkparamterwindow.cpp \
-    myobject.cpp \
     drawShape/myshape.cpp \
     drawShape/drawrectshape.cpp \
     drawShape/drawlineshape.cpp \
@@ -56,17 +52,33 @@ SOURCES += main.cpp\
     pclcontrolwindow.cpp \
     sampleMarkParam/manualparamterconfig.cpp \
     sampleMarkParam/videomarkparamterconfig.cpp \
+    sampleMarkParam/segmentparamterconfig.cpp \
     videoTools/imageconverterthread.cpp \
     videoTools/imageconverterwindow.cpp \
     drawShape/drawlaneshape.cpp \
     drawShape/drawshape.cpp \
     imagesegmentcontrolwindow.cpp \
     drawWidget/segmentlabel.cpp \
-    saveMarkData/segmentimagesave.cpp
+    dataType/myobject.cpp \
+    dataType/myrect3d.cpp \
+    paramWindow/manualparamterconfigwindow.cpp \
+    paramWindow/segmentparamterconfigwindow.cpp \
+    paramWindow/videoparameterwindow.cpp \
+    paramWindow/videomarkparamterwindow.cpp \
+    pcTools/pcdconverterthread.cpp \
+    pcTools/pcdconverterwindow.cpp \
+    sampleMarkParam/pointcloudparamterconfig.cpp \
+    paramWindow/pointcloudmarkparamterwindow.cpp \
+    pcTools/pcdfilterthread.cpp \
+    pcTools/pcdfilterwindow.cpp \
+    drawWidget/imagedrawlabel.cpp \
+    videoTools/segmentationlabelconvertwindow.cpp \
+    videoTools/segmentationlabelconvertthread.cpp \
+    saveMarkData/segmentationmaskprocess.cpp \
+    drawShape/drawimagemask.cpp \
+    drawShape/drawinstancesegmentshape.cpp
 
 HEADERS  += controlwindow.h \
-    videoparameterwindow.h \
-    manualparamterconfigwindow.h \
     markclasswindow.h \
     mainwindow.h \
     selectmarkclasswindow.h \
@@ -80,8 +92,6 @@ HEADERS  += controlwindow.h \
     videoTools/frompicturetovideowindow.h \
     autoSampleMark/modellabelwindow.h \
     autoSampleMark/autoparamterconfigwindow.h \
-    videomarkparamterwindow.h \
-    myobject.h \
     drawShape/myshape.h \
     drawShape/drawrectshape.h \
     drawShape/drawlineshape.h \
@@ -99,21 +109,43 @@ HEADERS  += controlwindow.h \
     sampleMarkParam/drawmarkcolor.h \
     sampleMarkParam/manualparamterconfig.h \
     sampleMarkParam/videomarkparamterconfig.h \
+    sampleMarkParam/segmentparamterconfig.h \
     videoTools/imageconverterthread.h \
     videoTools/imageconverterwindow.h \
     drawShape/drawlaneshape.h \
     drawShape/drawshape.h \
     imagesegmentcontrolwindow.h \
     drawWidget/segmentlabel.h \
-    saveMarkData/segmentimagesave.h
+    dataType/myobject.h \
+    dataType/myrect3d.h \
+    paramWindow/manualparamterconfigwindow.h \
+    paramWindow/segmentparamterconfigwindow.h \
+    paramWindow/videoparameterwindow.h \
+    paramWindow/videomarkparamterwindow.h \
+    pcTools/pcdconverterthread.h \
+    pcTools/pcdconverterwindow.h \
+    sampleMarkParam/pointcloudparamterconfig.h \
+    paramWindow/pointcloudmarkparamterwindow.h \
+    dataType/mark_data_type.h \
+    pcTools/pcdfilterterthread.h \
+    pcTools/pcdfilterwindow.h \
+    drawWidget/imagedrawlabel.h \
+    videoTools/segmentationlabelconvertwindow.h \
+    videoTools/segmentationlabelconvertthread.h \
+    saveMarkData/segmentationmaskprocess.h \
+    drawShape/drawimagemask.h \
+    drawShape/drawinstancesegmentshape.h
 
 RESOURCES += \
     style.qrc \
     images.qrc \
     QtAwesome.qrc \
-    document.qrc
+    document.qrc \
+    qm.qrc
 
-RC_ICONS = appico.ico
+RC_ICONS = logo.ico
+
+TRANSLATIONS = zh.ts en.ts ja.ts
 
 win32{
 

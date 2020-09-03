@@ -4,6 +4,7 @@
 #include "controlwindow.h"
 #include "utilityGUI/customWindow/myscrollarea.h"
 #include "drawWidget/segmentlabel.h"
+#include "saveMarkData/segmentationmaskprocess.h"
 
 class ImageSegmentControlWindow : public ControlWindow
 {
@@ -25,16 +26,21 @@ public slots:
 
 protected:
     void closeEvent(QCloseEvent *event) override;
-    void keyPressEvent(QKeyEvent *e) override;
+    void keyPressEvent(QKeyEvent *event) override;
 
 protected:
 
-    void showPrevious();
-    void showNext();
+    void isMarkData() override;
+    void resetDraw() override;
 
+    virtual void showPrevious();
+    virtual void showNext();
+
+    void updateDrawLabel(bool isValue);
     void updateImage();
 
     void loadMarkData(const QString dataPath);
+    void saveMarkDataResult();
     void loadMarkImage();
 
     void initDrawWidget();
@@ -47,7 +53,12 @@ protected:
 
 private:
     //imageData
-    void loadImageData(const QString imagePath, const QString saveAnnotationsDir);
+    void loadImageData(const QString &imagePath, const QString &saveSegmentLabelDir,
+                       const QString &saveAnnotationsDir);
+    void saveImageDataResult(const QString &saveAnnotationsDir, const QString &imagePath,
+                             const QList<MyObject> &objects);
+//    void saveImageSegmentResult(const QString &saveAnnotationsDir, const QString &imagePath,
+//                                const MyObject &maskObject);
 
     void initData();
     void initImageData();
@@ -55,6 +66,7 @@ private:
 private:
     //imageData
     QString currentImagePath;
+    SegmentationMaskProcess maskProcess;
 
 };
 

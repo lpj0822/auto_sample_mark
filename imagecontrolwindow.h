@@ -19,16 +19,18 @@ public:
 
 public slots:
 
-    void slotIsMark();
     void slotImageItem(QListWidgetItem *item);
     void slotChangeClass(QString classText);
     virtual void slotScrollArea(int keyValue);
 
 protected:
     void closeEvent(QCloseEvent *event) override;
-    virtual void keyPressEvent(QKeyEvent *e) override;
+    virtual void keyPressEvent(QKeyEvent *event) override;
 
 protected:
+
+    void isMarkData() override;
+    void resetDraw() override;
 
     virtual void showPrevious();
     virtual void showNext();
@@ -39,7 +41,6 @@ protected:
     virtual void loadMarkData(const QString dataPath);
     virtual void saveMarkDataResult();
     virtual void loadMarkImage();
-    virtual void saveMarkImageResult();
 
     void initDrawWidget();
     void initConnect();
@@ -52,9 +53,8 @@ protected:
 private:
     //imageData
     void loadImageData(const QString imagePath, const QString saveAnnotationsDir);
-    void saveImageDataResult(const QString &saveAnnotationsDir, const QString &imagePath, const QList<MyObject> &objects);
-    void saveImageSegmentResult(const QString &saveAnnotationsDir, const QString &imagePath, const QList<MyObject> &objects);
-
+    void saveImageDataResult(const QString &saveAnnotationsDir, const QString &imagePath,
+                             const QList<MyObject> &objects);
     void initData();
     void initImageData();
 

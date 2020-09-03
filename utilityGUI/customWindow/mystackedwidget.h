@@ -18,7 +18,7 @@ signals:
     void signalsKey(int keyValue);
 
 protected:
-    void keyPressEvent(QKeyEvent *e);
+    void keyPressEvent(QKeyEvent *event);
 };
 
 #endif // MYSTACKEDWIDGET_H

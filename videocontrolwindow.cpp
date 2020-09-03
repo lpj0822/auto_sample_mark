@@ -1,4 +1,6 @@
-﻿#pragma execution_character_set("utf-8")
+﻿#ifdef WIN32
+#pragma execution_character_set("utf-8")
+#endif
 #include "videocontrolwindow.h"
 #include <QMessageBox>
 #include <QDebug>
@@ -22,7 +24,6 @@ VideoControlWindow::~VideoControlWindow()
 
 void VideoControlWindow::setMarkDataList(const QString markDataDir, const QList<QString> markDataList, const MarkDataType dataType)
 {
-    readClassConfig(markDataDir);
     initMarkData(markDataDir, dataType);
     initVideoData();
     updateIsMarkButton(this->isMark);
@@ -30,6 +31,7 @@ void VideoControlWindow::setMarkDataList(const QString markDataDir, const QList<
 
     if(markDataList.size() > 0)
     {
+        readClassConfig();
         this->processMarkDataList = markDataList;
         initImageList();
         updateListBox();
@@ -48,25 +50,30 @@ void VideoControlWindow::slotScrollArea(int keyValue)
 {
     if(processMarkDataList.size() > 0)
     {
-        if(keyValue == int(Qt::Key_A))
+        switch (keyValue)
         {
+        case Qt::Key_A:
             showPrevious();
-        }
-        else if(keyValue == int(Qt::Key_D))
-        {
+            break;
+        case Qt::Key_D:
             showNext();
-        }
-        if(keyValue == int(Qt::Key_J))
-        {
-            previousVideo();
-        }
-        else if(keyValue == int(Qt::Key_L))
-        {
-            nextVideo();
-        }
-        else if(keyValue == int(Qt::Key_E))
-        {
+            break;
+        case Qt::Key_E:
             slotIsMark();
+            break;
+        case Qt::Key_J:
+            previousVideo();
+            break;
+        case Qt::Key_L:
+            nextVideo();
+            break;
+        }
+        if(keyValue == int(Qt::ControlModifier + Qt::Key_Z))
+        {
+            if(isMark)
+            {
+                drawLable->undoDrawShape();
+            }
         }
     }
     if(keyValue == int(Qt::Key_Escape))
@@ -75,29 +82,38 @@ void VideoControlWindow::slotScrollArea(int keyValue)
     }
 }
 
-void VideoControlWindow::keyPressEvent(QKeyEvent *e)
+void VideoControlWindow::keyPressEvent(QKeyEvent *event)
 {
     if(processMarkDataList.size() > 0)
     {
-        if(e->key() == Qt::Key_A)
+        switch (event->key())
         {
+        case Qt::Key_A:
             showPrevious();
-        }
-        else if(e->key() == Qt::Key_D)
-        {
+            break;
+        case Qt::Key_D:
             showNext();
-        }
-        if(e->key() == Qt::Key_J)
-        {
-            previousVideo();
-        }
-        else if(e->key() == Qt::Key_L)
-        {
-            nextVideo();
-        }
-        else if(e->key() == Qt::Key_E)
-        {
+            break;
+        case Qt::Key_E:
             slotIsMark();
+            break;
+        case Qt::Key_J:
+            previousVideo();
+            break;
+        case Qt::Key_L:
+            nextVideo();
+            break;
+        }
+    }
+    if(event->modifiers() == Qt::ControlModifier)
+    {
+        if(event->key() == Qt::Key_M)
+        {
+            this->setWindowState(Qt::WindowMaximized);
+        }
+        else if(event->key() == Qt::Key_Z && isMark)
+        {
+            drawLable->undoDrawShape();
         }
     }
 }
@@ -235,7 +251,7 @@ void VideoControlWindow::loadVideoData(const QString videoPath, const QString sa
         QFileInfo videoFileInfo(currentVideoPath);
         QString readJsonPath= saveAnnotationsDir + "/" + videoFileInfo.completeBaseName() + ".json";
         QFileInfo jsonFileInfo(readJsonPath);
-        if(jsonFileInfo.exists() && jsonProcess.readJSON(readJsonPath, videoResult, skipFrameNumber) == 0)
+        if(jsonFileInfo.exists() && jsonProcessVideo.readJSON(readJsonPath, videoResult, skipFrameNumber) == 0)
         {
             ;
         }
@@ -260,7 +276,7 @@ void VideoControlWindow::saveVideoDataResult(const QString &saveAnnotationsDir, 
     videoProcess.closeVideo();
     if(videoResult.size() > 0)
     {
-        if(jsonProcess.createJSON(saveJsonPath, currentVideoPath, videoResult, skipFrameNumber) == 0)
+        if(jsonProcessVideo.createJSON(saveJsonPath, currentVideoPath, videoResult, skipFrameNumber) == 0)
         {
             if(currentIndex >= 0)
             {
